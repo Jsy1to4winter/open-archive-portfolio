@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { GalleryNotesLayout } from './galleryNotesLayout';
+import { screenText } from './content';
 
 export default function GalleryNotes({ layout }: { layout: GalleryNotesLayout }) {
   if (layout.level === 'hidden') return null;
@@ -21,13 +22,13 @@ export default function GalleryNotes({ layout }: { layout: GalleryNotesLayout })
     } as CSSProperties}>
       <div className="archive-gallery-note archive-gallery-note-left" style={rectStyle(layout.left)}>
         <span className="archive-gallery-note-label">{layout.level === 'minimal' ? '05' : 'ARCHIVE / 05'}</span>
-        <h2>{layout.level === 'minimal' ? 'Work.' : <>Selected<br /><em>work.</em></>}</h2>
+        <h2>{layout.level === 'minimal' ? <span data-edit-path="screenText.gallery.minimalTitle">{screenText.gallery.minimalTitle}</span> : <><span data-edit-path="screenText.gallery.titleLine1">{screenText.gallery.titleLine1}</span><br /><em data-edit-path="screenText.gallery.titleLine2">{screenText.gallery.titleLine2}</em></>}</h2>
         {layout.level === 'full' && <div className="archive-gallery-note-copy">
-          <p>An open collection of images, observations, and ideas in progress. Each piece begins with something small: a shape, a feeling, or a passing thought.</p>
-          <p>Gathered here to be seen a little closer — and to make room for whatever comes next.</p>
+          <p data-edit-path="screenText.gallery.bodyLine1">{screenText.gallery.bodyLine1}</p>
+          <p data-edit-path="screenText.gallery.bodyLine2">{screenText.gallery.bodyLine2}</p>
         </div>}
-        {layout.level === 'compact' && <p className="archive-gallery-note-copy">Images and ideas,<br />always in progress.</p>}
-        {layout.level === 'full' && <span className="archive-gallery-note-foot">LOOK A LITTLE CLOSER ↗</span>}
+        {layout.level === 'compact' && <p className="archive-gallery-note-copy"><span data-edit-path="screenText.gallery.compactLine1">{screenText.gallery.compactLine1}</span><br /><span data-edit-path="screenText.gallery.compactLine2">{screenText.gallery.compactLine2}</span></p>}
+        {layout.level === 'full' && <span data-edit-path="screenText.gallery.footer" className="archive-gallery-note-foot">{screenText.gallery.footer}</span>}
       </div>
     </div>
   );

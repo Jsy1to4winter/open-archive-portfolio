@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
-import { introMedia, templateProfile } from './content';
+import { introMedia, templateProfile, screenText } from './content';
 import { createScreenVideoRenderer, type ScreenVideoRenderer } from './screenVideoRenderer';
 
 type ComputerIntroProps = {
@@ -247,15 +247,15 @@ export default function ComputerIntro({ onEnter, width: computerWidth, scale, lo
             )}
             {/* One video texture; pointer changes only the lightweight shader uniforms. */}
             <canvas ref={canvasRef} className="archive-screen-renderer" width={900} height={600} aria-hidden="true" />
-            <span className="archive-screen-eyebrow">{templateProfile.brand} / SELECTED WORK</span>
+            <span className="archive-screen-eyebrow">{templateProfile.brand} / <span>{screenText.intro.selectedWork}</span></span>
             <span className="archive-screen-title">
-              <span className="archive-screen-title-line">An open</span>
+              <span data-edit-path="screenText.intro.titleLine1" className="archive-screen-title-line">{screenText.intro.titleLine1}</span>
               <span className="archive-screen-title-line">
-                <span className="archive-screen-archive">archive</span><span className="archive-screen-dot" aria-hidden="true">_</span>
+                <span data-edit-path="screenText.intro.titleLine2" className="archive-screen-archive">{screenText.intro.titleLine2}</span><span className="archive-screen-dot" aria-hidden="true">_</span>
               </span>
             </span>
             <span className="archive-screen-entry">
-              <span className="archive-screen-scroll-hint">KEEP SCROLLING</span>
+              <span className="archive-screen-scroll-hint">{screenText.intro.scrollHint}</span>
               <span className="archive-screen-arrow" aria-hidden="true">
                 <svg viewBox="0 0 72 42" width="72" height="42" focusable="false">
                   <path d="M5 21h53M42 7l16 14-16 14" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />

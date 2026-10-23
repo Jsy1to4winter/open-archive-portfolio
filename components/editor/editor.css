@@ -20,6 +20,16 @@
 .portfolio-owner-editing .archive-screen-eyebrow {
   pointer-events: auto;
 }
+.portfolio-owner-editing .archive-gallery-note-left {
+  pointer-events: auto;
+}
+.editor-screen-group-title {
+  margin: 16px 0;
+  padding-top: 12px;
+  border-top: 1px solid #ddd;
+  font-size: 14px;
+  font-weight: 600;
+}
 .portfolio-edit-trigger {
   position: fixed;
   top: 16px;

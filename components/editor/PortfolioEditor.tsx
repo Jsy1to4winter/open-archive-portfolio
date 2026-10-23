@@ -16,6 +16,7 @@ import {
   applyContent,
   currentContent,
   validateContent,
+  normalizeContent,
   type SiteContent,
 } from "../archive/content";
 import {
@@ -29,6 +30,29 @@ import {
 import "./editor.css";
 
 const labels: Record<string, string> = {
+  screenText: "页面文字",
+  about: "01 关于我卡片",
+  fragments: "02 灵感卡片",
+  craft: "03 创作卡片",
+  perspective: "04 观点卡片",
+  gallery: "05 作品卡片",
+  collaboration: "06 联系卡片",
+  intro: "电脑开场",
+  profile: "简历纸条",
+  titleLine1: "标题第一行",
+  titleLine2: "标题第二行",
+  description: "说明文字",
+  bodyLine1: "正文第一段",
+  bodyLine2: "正文第二段",
+  subtitle: "副标题",
+  minimalTitle: "缩小状态标题",
+  compactLine1: "简版说明第一行",
+  compactLine2: "简版说明第二行",
+  footer: "底部文字",
+  status: "右上角文字",
+  selectedWork: "屏幕上方文字",
+  scrollHint: "滚动提示",
+  openButton: "进入按钮文字",
   templateProfile: "个人资料",
   contactEmail: "联系邮箱",
   contactPhone: "联系电话",
@@ -73,6 +97,7 @@ const labels: Record<string, string> = {
   tools: "技能与工具",
 };
 const tabs = [
+  "screenText",
   "templateProfile",
   "reasons",
   "portfolioWorks",
@@ -155,10 +180,17 @@ export default function PortfolioEditor() {
     collect(draft, []);
     function match(target: EventTarget | null): Path | null {
       if (
-        !(target instanceof HTMLElement) ||
+        !(target instanceof Element) ||
         target.closest(".portfolio-editor,.portfolio-edit-trigger")
       )
         return null;
+      const annotated = target
+        .closest("[data-edit-path]")
+        ?.getAttribute("data-edit-path");
+      if (annotated) {
+        const path = annotated.split(".");
+        if (typeof get(draft, path) === "string") return path;
+      }
       if (target instanceof HTMLImageElement) {
         const index = draft.portfolioWorks.findIndex((work) =>
           [work.image, work.thumbnail].some(
@@ -169,7 +201,7 @@ export default function PortfolioEditor() {
         );
         if (index >= 0) return ["portfolioWorks", index, "image"];
       }
-      let element: HTMLElement | null = target;
+      let element: Element | null = target;
       for (let i = 0; element && i < 3; i++, element = element.parentElement) {
         const text = element.textContent?.trim().replace(/\s+/g, " ");
         const found = fields.find((field) => field.text === text);
@@ -177,10 +209,10 @@ export default function PortfolioEditor() {
       }
       return null;
     }
-    let highlighted: HTMLElement | null = null;
+    let highlighted: Element | null = null;
     const hover = (e: MouseEvent) => {
       highlighted?.classList.remove("portfolio-inline-target");
-      highlighted = match(e.target) ? (e.target as HTMLElement) : null;
+      highlighted = match(e.target) ? (e.target as Element) : null;
       highlighted?.classList.add("portfolio-inline-target");
     };
     const select = (e: MouseEvent) => {
@@ -233,8 +265,7 @@ export default function PortfolioEditor() {
     try {
       const value = tokenInput.trim();
       const session = await login(value);
-      const content = session.content ?? currentContent();
-      validateContent(content);
+      const content = normalizeContent(session.content ?? currentContent());
       token.current = value;
       setTokenInput("");
       setAuth(session);
@@ -326,7 +357,7 @@ export default function PortfolioEditor() {
     try {
       if (file.size > 80 * 1024 * 1024) throw new Error("备份文件过大。");
       const value = JSON.parse(await file.text());
-      validateContent(value.content);
+      value.content = normalizeContent(value.content);
       if (
         !Array.isArray(value.uploads) ||
         !value.uploads.every(
@@ -530,6 +561,9 @@ export default function PortfolioEditor() {
     if (value !== null && typeof value === "object")
       return (
         <div key={path.join(".")} className="editor-fields">
+          {path[0] === "screenText" && path.length === 2 && (
+            <h3 className="editor-screen-group-title">{name}</h3>
+          )}
           {Object.entries(value).map(([child, entry]) =>
             field(entry, [...path, child]),
           )}
@@ -537,9 +571,15 @@ export default function PortfolioEditor() {
       );
     const media = ["image", "thumbnail", "poster", "src"].includes(key);
     const multiline =
-      ["body", "biography", "introduction", "practice", "caption"].includes(
-        key,
-      ) || typeof path[path.length - 1] === "number";
+      [
+        "body",
+        "biography",
+        "introduction",
+        "practice",
+        "caption",
+        "bodyLine1",
+        "bodyLine2",
+      ].includes(key) || typeof path[path.length - 1] === "number";
     return (
       <div className="editor-field" key={path.join(".")}>
         <label htmlFor={`field-${path.join("-")}`}>{name}</label>

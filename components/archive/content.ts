@@ -1,7 +1,9 @@
 import * as defaults from "./default-content";
+import { defaultScreenText } from "./screen-text";
 export type { Reason, PortfolioWork } from "./default-content";
 
 export const defaultContent = {
+  screenText: defaultScreenText,
   templateProfile: defaults.templateProfile,
   contactEmail: defaults.contactEmail,
   contactPhone: defaults.contactPhone,
@@ -12,6 +14,20 @@ export const defaultContent = {
   templateResume: defaults.templateResume,
 };
 export type SiteContent = typeof defaultContent;
+export function normalizeContent(value: unknown): SiteContent {
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw new Error("内容格式不完整。");
+  const source = value as Record<string, unknown>;
+  const result = {
+    ...source,
+    screenText:
+      source.screenText === undefined
+        ? structuredClone(defaultScreenText)
+        : source.screenText,
+  };
+  validateContent(result);
+  return result;
+}
 function shape(value: unknown, example: unknown): boolean {
   if (example === null) return value === null || typeof value === "string";
   if (Array.isArray(example))
@@ -84,14 +100,13 @@ try {
     response.ok &&
     response.headers.get("content-type")?.includes("application/json")
   ) {
-    const value: unknown = await response.json();
-    validateContent(value);
-    loaded = value;
+    loaded = normalizeContent(await response.json());
   }
 } catch (error) {
   console.warn("Using bundled portfolio content.", error);
 }
 export let templateProfile = loaded.templateProfile;
+export let screenText = loaded.screenText;
 export let contactEmail = loaded.contactEmail;
 export let contactPhone = loaded.contactPhone;
 export let otherPortfolioUrl = loaded.templateProfile.website;
@@ -102,6 +117,7 @@ export let workCategories = loaded.workCategories;
 export let templateResume = loaded.templateResume;
 export function currentContent(): SiteContent {
   return structuredClone({
+    screenText,
     templateProfile,
     contactEmail,
     contactPhone,
@@ -115,6 +131,7 @@ export function currentContent(): SiteContent {
 export function applyContent(data: SiteContent) {
   validateContent(data);
   ({
+    screenText,
     templateProfile,
     contactEmail,
     contactPhone,

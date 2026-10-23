@@ -178,6 +178,85 @@ test("page text can be selected directly after owner preview", async ({
   await page.locator(".archive-intro-brand-name").click();
   await expect(page.getByLabel("品牌名称", { exact: true })).toBeFocused();
 });
+test("screen copy migrates old content and publishes without replacing profile", async ({
+  page,
+}) => {
+  const writes = await mockGithub(page);
+  await enter(page);
+  await page.getByRole("tab", { name: "页面文字", exact: true }).click();
+  await expect(page.locator("#field-screenText-about-titleLine1")).toHaveValue(
+    "A little",
+  );
+  await page.locator("#field-screenText-about-titleLine1").fill("关于我的");
+  await page.locator("#field-screenText-fragments-title").fill("灵感");
+  await page.locator("#field-screenText-craft-titleLine1").fill("创作过程");
+  await page.locator("#field-screenText-perspective-tag").fill("保持好奇");
+  await page
+    .locator("#field-screenText-collaboration-titleLine1")
+    .fill("一起合作");
+  await page.locator("#field-screenText-gallery-titleLine1").fill("精选");
+  await page.locator("#field-screenText-intro-titleLine1").fill("我的创作");
+  await page.getByRole("button", { name: "预览", exact: true }).click();
+  await expect(page.locator(".archive-screen-title-line").first()).toHaveText(
+    "我的创作",
+  );
+  await expect(page.locator(".archive-desk-about-title")).toContainText(
+    "关于我的",
+  );
+  await expect(page.locator(".archive-desk-stat")).toHaveText("灵感");
+  await expect(page.locator(".archive-desk-user-tag")).toHaveText("保持好奇");
+  await page.getByRole("button", { name: "编辑作品集", exact: true }).click();
+  await page.getByRole("button", { name: "保存发布", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("已保存到 GitHub");
+  const saved = JSON.parse(
+    Buffer.from(writes[0].body.content as string, "base64").toString("utf8"),
+  );
+  expect(saved.templateProfile).toEqual(original.templateProfile);
+  expect(saved.portfolioWorks).toEqual(original.portfolioWorks);
+  expect(saved.screenText.gallery.titleLine1).toBe("精选");
+  await page.route("**/content.json", (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify(saved),
+    }),
+  );
+  await page.reload();
+  await expect(page.locator(".archive-screen-title-line").first()).toHaveText(
+    "我的创作",
+  );
+});
+test("clicking card title opens the exact screen text field instead of details", async ({
+  page,
+}) => {
+  await mockGithub(page);
+  await enter(page);
+  await page.getByRole("tab", { name: "页面文字", exact: true }).click();
+  await page.locator("#field-screenText-about-titleLine1").fill("同样的标题");
+  await page.locator("#field-screenText-craft-titleLine1").fill("同样的标题");
+  await page.getByRole("button", { name: "预览", exact: true }).click();
+  await page.locator(".archive-scroll-track").evaluate(async (el) => {
+    // Use the same timeline mapping as the visible chapter navigation.
+    const module = await import("/components/archive/timeline.ts");
+    const progress = module.progressForModule("about", 8);
+    el.scrollTop = progress * (el.scrollHeight - el.clientHeight);
+  });
+  await page.locator(".archive-desk-about-title > span").first().click();
+  await expect(
+    page.locator("#field-screenText-about-titleLine1"),
+  ).toBeFocused();
+  await expect(page.locator(".archive-archive-dialog[open]")).toHaveCount(0);
+  await page.getByRole("button", { name: "预览", exact: true }).click();
+  await page.locator(".archive-scroll-track").evaluate(async (el) => {
+    const module = await import("/components/archive/timeline.ts");
+    el.scrollTop =
+      module.progressForModule("craft", 8) *
+      (el.scrollHeight - el.clientHeight);
+  });
+  await page.locator('[data-edit-path="screenText.craft.titleLine1"]').click();
+  await expect(
+    page.locator("#field-screenText-craft-titleLine1"),
+  ).toBeFocused();
+});
 test("editor remains accessible from an open portfolio detail", async ({
   page,
 }) => {
