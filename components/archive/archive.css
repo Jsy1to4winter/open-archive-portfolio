@@ -170,7 +170,7 @@ body.archive-page-open { background: #f3f3f3; color: #171717; overflow: hidden; 
 .archive-detail-reason > span { padding-top: 2px; font: 700 18px/1.5 'Archive Space', sans-serif; color: #171717; }
 .archive-detail-reason h3 { font-size: 17px; font-weight: 650; line-height: 1.6; }
 .archive-detail-reason p { font-size: 14px; line-height: 1.95; color: #444444; margin-top: 12px; }
-.archive-detail-reason .archive-poem { font-family: Georgia, 'Times New Roman', serif; font-size: 22px; line-height: 1.65; white-space: pre-line; color: var(--ink); }
+.archive-detail-reason .archive-poem, .archive-detail-reason .archive-about-copy { font-family: Georgia, 'Times New Roman', serif; font-size: 22px; line-height: 1.65; white-space: pre-line; color: var(--ink); }
 .archive-poem-credit { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font: 400 10px/1.6 'Archive Mono', monospace; color: #555 !important; text-decoration: underline !important; text-underline-offset: 4px; }
 .archive-detail-contact { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; border-bottom: 2px solid var(--ink); font-size: 15px; margin-top: 12px; overflow-wrap: anywhere; gap: 15px; }
 .archive-detail-works { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }

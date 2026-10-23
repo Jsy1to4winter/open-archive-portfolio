@@ -20,81 +20,51 @@
   "reasons": [
     {
       "id": "01",
-      "title": "A Clear Midnight",
-      "shortTitle": "Quiet things",
-      "body": "This is thy hour O Soul, thy free flight into the wordless,",
-      "note": "Leave room for a pause.",
-      "tag": "Fragments",
-      "author": "Walt Whitman",
-      "source": "https://poets.org/poem/clear-midnight"
+      "title": "账号定位与前期调研",
+      "shortTitle": "账号定位与前期调研",
+      "body": "结合自身经验、内容优势及市场需求，明确账号定位、目标用户与内容方向；观察同赛道账号的内容布局、用户反馈及数据表现，寻找现有内容中的空缺，确定账号的差异化切入点",
+      "note": "",
+      "tag": "账号定位"
     },
     {
       "id": "02",
-      "title": "Look a little closer",
-      "shortTitle": "Look closely",
-      "body": "To see a World in a Grain of Sand\nAnd a Heaven in a Wild Flower",
-      "note": "Attention is a beginning.",
-      "tag": "Observation",
-      "author": "William Blake",
-      "source": "https://poets.org/poem/auguries-innocence"
+      "title": "竞品分析与内容拆解",
+      "shortTitle": "竞品分析与内容拆解",
+      "body": "筛选同领域优质账号，围绕账号定位、选题方向、标题表达、内容结构及互动情况进行分析，拆解高流量内容的共性，了解目标用户的兴趣偏好与内容需求，为后续内容策划提供参考",
+      "note": "",
+      "tag": "竞品分析"
     },
     {
       "id": "03",
-      "title": "Ideas become experiences",
-      "shortTitle": "From idea to experience",
-      "body": "Use this space to describe the questions behind a project. What did you explore, what did you learn, and what changed along the way?",
-      "note": "Keep the question open.",
-      "tag": "Exploration"
+      "title": "用户洞察与选题规划",
+      "shortTitle": "用户洞察与选题规划",
+      "body": "结合用户评论、互动反馈、平台热点及同类账号表现，挖掘用户感兴趣的话题与潜在需求；挖掘40+高流量选题，建立选题储备，并根据内容方向、用户需求及热点时效性安排发布计划",
+      "note": "",
+      "tag": "用户洞察"
     },
     {
       "id": "04",
-      "title": "A small kind of hope",
-      "shortTitle": "Make, notice, repeat",
-      "body": "Hope is the thing with feathers\nThat perches in the soul,",
-      "note": "One mark at a time.",
-      "tag": "Practice",
-      "author": "Emily Dickinson",
-      "source": "https://poets.org/poem/hope-thing-feathers-254"
+      "title": "内容策划与生产",
+      "shortTitle": "内容策划与生产",
+      "body": "围绕选定主题完成素材搜集、内容构思、脚本撰写及视频剪辑，持续优化内容切入点、开头吸引力与表达方式。结合热点事件和用户讨论策划内容",
+      "note": "",
+      "tag": "内容生产"
     },
     {
       "id": "05",
-      "title": "Another way to see a shape",
-      "shortTitle": "A different angle",
-      "body": "A familiar form can hold an unfamiliar possibility. Add an example of how you move between techniques, formats, or ways of seeing.",
-      "note": "Turn the page.",
-      "tag": "Form"
+      "title": "数据复盘",
+      "shortTitle": "数据复盘",
+      "body": "持续跟踪内容发布后的播放量、完播率、点赞、评论及涨粉等数据，分析不同选题与内容形式的表现差异。通过高表现内容拆解与低表现内容复盘，判断内容优势及优化方向，并将分析结果应用于后续选题与制作",
+      "note": "",
+      "tag": "数据复盘"
     },
     {
       "id": "06",
-      "title": "Let us make something together",
-      "shortTitle": "Say hello",
-      "body": "Replace this with your availability, the kinds of projects you welcome, and how you prefer to collaborate. The contact details here are placeholders.",
-      "note": "Begin with a conversation.",
-      "tag": "Collaboration"
-    },
-    {
-      "id": "07",
-      "title": "Collecting the in-between",
-      "shortTitle": "Notes from the everyday",
-      "body": "References can arrive from anywhere: a book, a conversation, an unfinished thought. Share the things that shape your point of view.",
-      "note": "Keep a small notebook.",
-      "tag": "References"
-    },
-    {
-      "id": "08",
-      "title": "A story beyond a single image",
-      "shortTitle": "Beyond the frame",
-      "body": "A project can continue through a series, an object, or a new context. Describe the directions you would like your work to take.",
-      "note": "There is another page.",
-      "tag": "Possibilities"
-    },
-    {
-      "id": "09",
-      "title": "A point of view, still growing",
-      "shortTitle": "A way of seeing",
-      "body": "Use this space for your personal approach to making. A clear, thoughtful sentence is enough. Leave room for your practice to change.",
-      "note": "Stay curious.",
-      "tag": "Perspective"
+      "title": "策略迭代与用户运营",
+      "shortTitle": "策略迭代与用户运营",
+      "body": "根据数据表现及用户反馈，持续调整内容方向、选题策略与表达方式，建立「用户洞察—选题策划—内容生产—发布测试—数据复盘—策略迭代」的内容运营闭环",
+      "note": "",
+      "tag": "用户运营"
     }
   ],
   "portfolioWorks": [

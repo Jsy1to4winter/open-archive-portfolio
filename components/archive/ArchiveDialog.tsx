@@ -57,7 +57,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
         <button ref={closeButton} type="button" className="archive-detail-close" onClick={requestClose} aria-label="Close details"><X size={20} /></button>
         {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || module?.label}</h2>}
         {module && selectedReasons.map(reason => <article key={reason.id} className="archive-detail-reason">
-          <span>{reason.id}</span><div><h3>{reason.title}</h3><p className={reason.author ? 'archive-poem' : undefined}>{reason.body}</p>{reason.author && <a className="archive-poem-credit" href={reason.source} target="_blank" rel="noopener noreferrer">— {reason.author} <ArrowUpRight size={12} aria-hidden="true" /></a>}</div>
+          <span>{reason.id}</span><div><h3>{reason.title}</h3><p className={module.id === 'about' ? 'archive-about-copy' : reason.author ? 'archive-poem' : undefined}>{reason.body}</p>{reason.author && <a className="archive-poem-credit" href={reason.source} target="_blank" rel="noopener noreferrer">— {reason.author} <ArrowUpRight size={12} aria-hidden="true" /></a>}</div>
         </article>)}
         {module?.id === 'fragments' && <div className="archive-detail-fragment-images" aria-label="Selected visual fragments">
           {portfolioWorks.filter(item => item.category === 'fragments').map(item => <button
