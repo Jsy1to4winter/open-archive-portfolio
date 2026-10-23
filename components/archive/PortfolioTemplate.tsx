@@ -41,7 +41,8 @@ export default function PortfolioTemplate() {
   const layout = getResponsiveLayout(viewport);
   const frame = sampleTimeline(t, layout.compact, galleryCount);
   const gallery = getGalleryLayout(viewport, portfolioWorks);
-  const galleryFrame = sampleGalleryLayoutProgress(frame.galleryProgress, gallery);
+  const displayedGalleryProgress = frame.galleryExpansion <= 1e-6 ? 0 : frame.galleryProgress;
+  const galleryFrame = sampleGalleryLayoutProgress(displayedGalleryProgress, gallery);
   const sceneT = frame.sceneProgress;
   const opening = sampleOpeningLayers(sceneT, Boolean(reducedMotion));
   const current = modules.find(item => item.id === frame.activeModule);
@@ -250,7 +251,7 @@ export default function PortfolioTemplate() {
                 transform: `translate(-50%, -50%) rotate(${portal.rotation}deg) scale(${portal.scale})`,
                 pointerEvents: galleryInteractive ? 'auto' : 'none',
               }}>
-                <ScrollGallery layout={gallery} composition={galleryComposition} progress={frame.galleryProgress} reducedMotion={!!reducedMotion} onView={openWork} onSeek={seekImage} />
+                <ScrollGallery layout={gallery} composition={galleryComposition} progress={displayedGalleryProgress} reducedMotion={!!reducedMotion} onView={openWork} onSeek={seekImage} />
               </div>
             </div>
             <div className="archive-archive-chrome" style={{ opacity: opening.deskOpacity, visibility: opening.archiveVisible ? 'visible' : 'hidden', '--chrome-surface': `rgb(${chromeGray}, ${chromeGray}, ${chromeGray})` } as CSSProperties} aria-hidden={!opening.archiveInteractive} inert={!opening.archiveInteractive}>
