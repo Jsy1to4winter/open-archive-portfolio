@@ -2,6 +2,8 @@
 
 **一份可以慢慢展开的作品集。**
 
+此副本已添加右上角网页编辑入口。登录、上传图片和发布的操作见 [网页编辑说明](EDITOR.md)。
+
 黑白、纸张、留白。从一台电脑开始，穿过便利贴展板，再把一张作品卡片放大成完整画廊。一个适合视觉设计、插画与创意实践的开源作品集模板，由 [KAKI](https://github.com/kakizzzzz) 制作。
 
 **[打开演示 ↗](https://kakizzzzz.github.io/open-archive-portfolio/) · [MIT License](LICENSE)**

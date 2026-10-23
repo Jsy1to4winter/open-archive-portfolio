@@ -1,0 +1,45 @@
+# 使用网页编辑器
+
+网页右上角的小铅笔是编辑入口。原有示例内容不会被自动替换。
+
+## 第一次登录
+
+1. 点击网页右上角的小铅笔，再点击“创建 GitHub 编辑凭证”。
+2. 在 GitHub 中，将 Resource owner 选择为 `Jsy1to4winter`。
+3. Repository access 选择 **Only select repositories**，仅勾选 `open-archive-portfolio`。
+4. Repository permissions 中，将 **Contents** 设为 **Read and write**，其余保留默认值。
+5. 选择有效期并生成凭证，将它粘贴到网页的“编辑凭证”输入框中登录。
+
+凭证相当于此仓库的编辑钥匙，不要发给任何人，也不要提交到仓库。网页仅将它保存在当前页面内存中，直接用于 HTTPS GitHub API 请求；刷新或退出后清除。它不会进入 localStorage、草稿备份或发布文件。可在 GitHub 的 Settings → Developer settings → Personal access tokens → Fine-grained tokens 撤销凭证。
+
+## 修改内容
+
+- 侧面板可编辑个人资料、纸条文字、作品、履历、联系方式和开场媒体。
+- 点击“预览”查看当前修改。登录期间，点击页面中已有的资料文字或作品图片，也可跳回相应编辑字段。
+- 上传作品主图时会自动读取真实尺寸，并同步缩略图。图片支持 JPG、PNG、WebP、GIF、AVIF，单张不超过 8 MB；视频支持 MP4、WebM，单个不超过 20 MB。
+- 作品与文字条目支持新增、删除、排序。请保留原有纸条编号，页面模块用这些编号关联文字。
+- 点击“保存发布”，修改和上传媒体会在同一次 Git 提交中保存到仓库。部署工作流完成后，其他访客即可看到更新。GitHub Pages 可能需要几分钟刷新。
+- “取消修改”恢复最近保存的内容；“预览”不会公开发布。关闭面板保留当前页面草稿，刷新会丢失未发布草稿。“备份”可下载文字和待上传文件的 JSON 备份，不含凭证；重新登录后，点击“恢复”可以重新加载备份。
+
+普通访客可以打开登录框，但无法保存。GitHub 在服务器端检查仓库写入权限；网页内的账号检查还限制了编辑入口仅接受 `Jsy1to4winter`。不要给其他人授予仓库写入权限，也不要分享编辑凭证。
+
+## 网站发布
+
+在仓库的 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**。在 **Actions** 中启用工作流（如果 Fork 后尚未启用），运行 **Deploy portfolio to GitHub Pages** 或推送更新到 `main`。
+
+保存内容位于 `public/content.json`，媒体位于 `public/assets/uploads/`。本地默认内容仍保留在 `components/archive/default-content.ts`。保存成功只代表 GitHub 提交成功；若部署失败，请在仓库 Actions 查看失败的任务，原线上版本会保留。分支保护规则也可能阻止直接保存，应保留规则并单独调整编辑发布流程。
+
+如果多人或其他工具同时改动仓库，编辑器会拒绝覆盖。先下载草稿备份，再重新登录加载最新仓库内容并整理修改。不要强制覆盖分支。
+
+## 开发验证
+
+```sh
+npm ci
+npm run build
+npx playwright install chromium
+npm run test:editor
+```
+
+已安装系统 Chromium 时，可使用 `CHROMIUM_PATH=/usr/bin/chromium npm run test:editor`。
+
+自动化测试使用模拟 GitHub API，覆盖所有者登录、访客拒绝、写入拒绝、中文保存、图片上传、并发保护和手机布局。它们不证明真实账号凭证或线上 Pages 部署已配置成功；这些需实际保存和查看 Actions 验证。

@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react';
-import { ArrowUpRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ArrowUpRight, ChevronLeft, ChevronRight, X, Pencil } from 'lucide-react';
 import { contactEmail, contactPhone, otherPortfolioUrl, portfolioWorks, reasons } from './content';
 import { portfolioModules } from './modules';
 import type { ModuleId } from './timeline';
@@ -53,6 +53,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
       aria-label={isResume ? 'Profile' : undefined}
     >
       {detail && <div className="archive-detail-paper">
+        <button className="portfolio-edit-trigger" type="button" aria-label="编辑作品集" title="编辑作品集" onClick={() => window.dispatchEvent(new Event('portfolio-open-editor'))}><Pencil size={14}/></button>
         <button ref={closeButton} type="button" className="archive-detail-close" onClick={requestClose} aria-label="Close details"><X size={20} /></button>
         {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || module?.label}</h2>}
         {module && selectedReasons.map(reason => <article key={reason.id} className="archive-detail-reason">

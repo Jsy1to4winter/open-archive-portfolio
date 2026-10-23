@@ -1,0 +1,331 @@
+.portfolio-inline-target {
+  outline: 1px dashed #267653 !important;
+  outline-offset: 4px;
+  cursor: text !important;
+}
+.archive-intro-header,
+.archive-archive-chrome > header {
+  padding-right: max(var(--page-gutter, 20px), 64px);
+}
+.archive-archive-dialog .portfolio-edit-trigger {
+  right: 62px;
+  top: 18px;
+}
+.archive-image-dialog .archive-detail-paper h2 {
+  padding-right: 90px;
+}
+.portfolio-owner-editing .archive-intro-brand-name,
+.portfolio-owner-editing .archive-intro-brand-discipline,
+.portfolio-owner-editing .archive-intro-role,
+.portfolio-owner-editing .archive-screen-eyebrow {
+  pointer-events: auto;
+}
+.portfolio-edit-trigger {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 200;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: #555;
+  background: #ffffffd9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 1px 4px #0000000d;
+}
+.portfolio-edit-trigger:hover {
+  color: #111;
+  border-color: #888;
+}
+.editor-dirty {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 5px;
+  height: 5px;
+  background: #24724b;
+  border-radius: 50%;
+}
+.portfolio-editor {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  height: 100dvh;
+  max-height: 100dvh;
+  width: 440px;
+  max-width: 100vw;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid #d7d7d7;
+  border-radius: 0;
+  background: #fff;
+  color: #242424;
+  font:
+    14px/1.5 Inter,
+    Arial,
+    sans-serif;
+  box-sizing: border-box;
+  letter-spacing: 0;
+  overflow: auto;
+  z-index: 300;
+}
+.portfolio-editor[open] {
+  display: flex;
+  flex-direction: column;
+}
+.portfolio-editor::backdrop {
+  background: #00000038;
+}
+.portfolio-editor * {
+  box-sizing: border-box;
+  letter-spacing: 0;
+}
+.portfolio-editor header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e5e5;
+  flex-shrink: 0;
+}
+.portfolio-editor h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 3px 0 0;
+}
+.editor-eyebrow {
+  font-size: 10px;
+  color: #777;
+}
+.portfolio-editor button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 5px 9px;
+  background: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+}
+.portfolio-editor header button,
+.editor-entry-heading button,
+.editor-list-heading button {
+  width: 32px;
+  padding: 0;
+}
+.portfolio-editor button:hover {
+  background: #f2f4f3;
+}
+.portfolio-editor button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.portfolio-editor :focus-visible,
+.portfolio-edit-trigger:focus-visible {
+  outline: 2px solid #267653;
+  outline-offset: 3px;
+}
+.portfolio-editor input,
+.portfolio-editor textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+  padding: 9px 10px;
+  font: inherit;
+}
+.portfolio-editor textarea {
+  resize: vertical;
+}
+.portfolio-editor .editor-primary {
+  background: #246b4b;
+  color: #fff;
+  border-color: #246b4b;
+}
+.portfolio-editor .editor-primary:hover {
+  background: #19583b;
+}
+.editor-login {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.editor-login p {
+  margin: 0;
+}
+.editor-login a {
+  color: #246b4b;
+  text-underline-offset: 3px;
+}
+.editor-login details {
+  border-top: 1px solid #ddd;
+  padding-top: 16px;
+}
+.editor-login li {
+  margin-bottom: 9px;
+  overflow-wrap: anywhere;
+}
+.editor-muted {
+  color: #777;
+  font-size: 12px;
+}
+.editor-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e5e5e5;
+  flex-shrink: 0;
+}
+.editor-tabs button {
+  white-space: nowrap;
+  border-color: transparent;
+}
+.editor-tabs button[aria-selected="true"] {
+  color: #246b4b;
+  border-color: #bed3c8;
+  background: #eef5f1;
+}
+.editor-body {
+  padding: 20px 24px;
+  margin: 0;
+  min-width: 0;
+  border: 0;
+  flex: 1;
+  overflow: auto;
+}
+.editor-field {
+  margin-bottom: 17px;
+}
+.editor-field > label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #555;
+}
+.editor-list-heading,
+.editor-entry-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.editor-list-heading h3 {
+  font-size: 15px;
+  margin: 0;
+}
+.editor-entry {
+  padding: 18px 0;
+  border-bottom: 1px solid #ddd;
+}
+.editor-entry-heading {
+  margin-bottom: 15px;
+  font-size: 12px;
+  color: #666;
+}
+.editor-entry-heading > div {
+  display: flex;
+  gap: 4px;
+}
+.editor-media {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.editor-media img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border: 1px solid #ddd;
+  background: #f4f4f4;
+}
+.editor-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.editor-upload input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.portfolio-editor footer {
+  padding: 14px 24px;
+  border-top: 1px solid #ddd;
+  background: #fafafa;
+  flex-shrink: 0;
+}
+.editor-status {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 10px;
+  overflow-wrap: anywhere;
+}
+.editor-commands {
+  display: flex;
+  gap: 8px;
+}
+.editor-commands button {
+  flex: 1;
+}
+.editor-secondary {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.editor-secondary button {
+  font-size: 12px;
+  background: transparent;
+  border-color: transparent;
+}
+.editor-error {
+  color: #a42e2e;
+  padding: 0 24px 24px;
+  margin: 0;
+}
+.editor-confirm {
+  padding: 10px 0;
+  border-top: 1px solid #ddd;
+}
+.editor-confirm p {
+  margin: 0 0 8px;
+}
+.editor-confirm button {
+  margin-right: 8px;
+}
+@media (max-width: 480px) {
+  .portfolio-edit-trigger {
+    top: 12px;
+    right: 12px;
+  }
+  .portfolio-editor {
+    width: 100%;
+  }
+  .portfolio-editor header {
+    padding: 16px 20px;
+  }
+  .editor-body {
+    padding: 16px 20px;
+  }
+  .portfolio-editor footer {
+    padding: 12px 20px;
+  }
+}
