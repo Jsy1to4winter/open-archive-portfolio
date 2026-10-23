@@ -185,7 +185,7 @@ test("screen copy migrates old content and publishes without replacing profile",
   await enter(page);
   await page.getByRole("tab", { name: "页面文字", exact: true }).click();
   await expect(page.locator("#field-screenText-about-titleLine1")).toHaveValue(
-    "A little",
+    original.screenText?.about.titleLine1 ?? "A little",
   );
   await page.locator("#field-screenText-about-titleLine1").fill("关于我的");
   await page.locator("#field-screenText-fragments-title").fill("灵感");
@@ -237,7 +237,11 @@ test("clicking card title opens the exact screen text field instead of details",
   await page.locator(".archive-scroll-track").evaluate(async (el) => {
     // Use the same timeline mapping as the visible chapter navigation.
     const module = await import("/components/archive/timeline.ts");
-    const progress = module.progressForModule("about", 8);
+    const content = await import("/components/archive/content.ts");
+    const progress = module.progressForModule(
+      "about",
+      content.portfolioWorks.length,
+    );
     el.scrollTop = progress * (el.scrollHeight - el.clientHeight);
   });
   await page.locator(".archive-desk-about-title > span").first().click();
@@ -249,7 +253,10 @@ test("clicking card title opens the exact screen text field instead of details",
   await page.locator(".archive-scroll-track").evaluate(async (el) => {
     const module = await import("/components/archive/timeline.ts");
     el.scrollTop =
-      module.progressForModule("craft", 8) *
+      module.progressForModule(
+        "craft",
+        (await import("/components/archive/content.ts")).portfolioWorks.length,
+      ) *
       (el.scrollHeight - el.clientHeight);
   });
   await page.locator('[data-edit-path="screenText.craft.titleLine1"]').click();
