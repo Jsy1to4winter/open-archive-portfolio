@@ -14,13 +14,14 @@ The computer-screen video is an original work by KAKI (kakizzzzz), released with
 | React DOM | [MIT — Meta Platforms](licenses/react-dom.txt) |
 | Scheduler | [MIT — Meta Platforms](licenses/scheduler.txt) |
 | Framer Motion | [MIT — Framer B.V.](licenses/framer-motion.txt) |
+| GSAP / ScrollTrigger | [GSAP Standard License — Copyright 2008–2025, GreenSock](https://gsap.com/standard-license) |
 | Motion DOM | [MIT — Motion B.V.](licenses/motion-dom.txt) |
 | Motion Utils | [MIT — Motion B.V.](licenses/motion-utils.txt) |
 | Lucide React / Feather | [ISC and MIT — complete original notices](licenses/lucide-react.txt) |
 | tslib | [0BSD — Microsoft](licenses/tslib.txt) |
 | Vite's module-preload runtime | [MIT and bundled third-party notices](licenses/vite.txt) |
 
-The full, unmodified license files above are included in the source repository and deployed static site. Dependency versions are pinned in package-lock.json. Development dependencies also carry their own licenses in their installed packages.
+The local license files linked above are included unmodified in the source repository and deployed static site. GSAP's standard license is linked separately; its original source license headers are retained. Dependency versions are pinned in package-lock.json. Development dependencies also carry their own licenses in their installed packages.
 
 ## Fonts
 

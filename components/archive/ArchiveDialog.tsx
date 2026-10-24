@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import { ArrowUpRight, ChevronLeft, ChevronRight, X, Pencil } from 'lucide-react';
-import { contactEmail, contactPhone, otherPortfolioUrl, portfolioWorks, reasons } from './content';
+import { contactEmail, contactPhone, otherPortfolioUrl, portfolioWorks, reasons, screenText } from './content';
+import AccountShowcase from './AccountShowcase';
 import { portfolioModules } from './modules';
 import type { ModuleId } from './timeline';
 import ResumeDetails from './ResumeDetails';
@@ -45,7 +46,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
   return (
     <dialog
       ref={dialog}
-      className={`archive-archive-dialog${isResume ? ' archive-resume-dialog' : ''}${work ? ' archive-image-dialog' : ''}`}
+      className={`archive-archive-dialog${isResume ? ' archive-resume-dialog' : ''}${work ? ' archive-image-dialog' : ''}${module?.id === 'fragments' ? ' archive-account-dialog' : ''}`}
       onClose={event => { if (!event.currentTarget.open) onClose(); }}
       onCancel={event => { event.preventDefault(); requestClose(); }}
       onClick={event => { if (event.target === event.currentTarget) requestClose(); }}
@@ -55,21 +56,11 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
       {detail && <div className="archive-detail-paper">
         <button className="portfolio-edit-trigger" type="button" aria-label="编辑作品集" title="编辑作品集" onClick={() => window.dispatchEvent(new Event('portfolio-open-editor'))}><Pencil size={14}/></button>
         <button ref={closeButton} type="button" className="archive-detail-close" onClick={requestClose} aria-label="Close details"><X size={20} /></button>
-        {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || module?.label}</h2>}
-        {module && selectedReasons.map(reason => <article key={reason.id} className="archive-detail-reason">
+        {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || (module?.id === 'fragments' ? screenText.fragments.title : module?.label)}</h2>}
+        {module?.id === 'fragments' && <AccountShowcase/>}
+        {module && module.id !== 'fragments' && selectedReasons.map(reason => <article key={reason.id} className="archive-detail-reason">
           <span>{reason.id}</span><div><h3>{reason.title}</h3><p className={module.id === 'about' ? 'archive-about-copy' : reason.author ? 'archive-poem' : undefined}>{reason.body}</p>{reason.author && <a className="archive-poem-credit" href={reason.source} target="_blank" rel="noopener noreferrer">— {reason.author} <ArrowUpRight size={12} aria-hidden="true" /></a>}</div>
         </article>)}
-        {module?.id === 'fragments' && <div className="archive-detail-fragment-images" aria-label="Selected visual fragments">
-          {portfolioWorks.filter(item => item.category === 'fragments').map(item => <button
-            key={item.id}
-            className="archive-detail-fragment-image"
-            type="button"
-            onClick={() => onView(item.id)}
-            aria-label={`View ${item.title}`}
-          >
-            <img src={item.image} alt={item.alt} width={item.width} height={item.height} loading="lazy" decoding="async" />
-          </button>)}
-        </div>}
         {module?.id === 'works' && <div className="archive-detail-works">
           {portfolioWorks.map(item => <article key={item.id}>
             <button className="archive-detail-work-button" type="button" onClick={() => onView(item.id)} aria-label={`View ${item.title}`}>

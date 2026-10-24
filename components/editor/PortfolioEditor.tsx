@@ -28,8 +28,11 @@ import {
   type Upload,
 } from "./github";
 import "./editor.css";
+import { videoPoster } from "./video-poster";
 
 const labels: Record<string, string> = {
+  accountMedia: "账号和视频",
+  videos: "视频作品",
   screenText: "页面文字",
   about: "01 关于我卡片",
   fragments: "02 灵感卡片",
@@ -97,6 +100,7 @@ const labels: Record<string, string> = {
   tools: "技能与工具",
 };
 const tabs = [
+  "accountMedia",
   "screenText",
   "templateProfile",
   "reasons",
@@ -181,7 +185,9 @@ export default function PortfolioEditor() {
     function match(target: EventTarget | null): Path | null {
       if (
         !(target instanceof Element) ||
-        target.closest(".portfolio-editor,.portfolio-edit-trigger")
+        target.closest(
+          ".portfolio-editor,.portfolio-edit-trigger,.account-video-poster,.account-video-controls,.account-video-player",
+        )
       )
         return null;
       const annotated = target
@@ -282,6 +288,12 @@ export default function PortfolioEditor() {
   }
   function visibleContent(content: SiteContent) {
     const data = clone(content);
+    data.accountMedia.image =
+      urls.current.get(data.accountMedia.image) ?? data.accountMedia.image;
+    for (const item of data.accountMedia.videos) {
+      item.src = urls.current.get(item.src) ?? item.src;
+      item.poster = urls.current.get(item.poster) ?? item.poster;
+    }
     for (const work of data.portfolioWorks) {
       work.image = urls.current.get(work.image) ?? work.image;
       work.thumbnail = urls.current.get(work.thumbnail) ?? work.thumbnail;
@@ -402,7 +414,7 @@ export default function PortfolioEditor() {
     setBusy(true);
     setMessage("");
     try {
-      const video = path[0] === "introMedia" && path[1] === "src";
+      const video = path.at(-1) === "src";
       const allowed = video
         ? ["video/mp4", "video/webm"]
         : ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
@@ -439,12 +451,40 @@ export default function PortfolioEditor() {
         dimensions = { width: image.naturalWidth, height: image.naturalHeight };
       }
       const bytes = new Uint8Array(await file.arrayBuffer());
+      let generatedPoster: { address: string; upload: Upload } | null = null;
+      if (video && path[0] === "accountMedia") {
+        const poster = await videoPoster(objectUrl);
+        if (poster) {
+          const relativePoster = `assets/uploads/${crypto.randomUUID()}.jpg`;
+          const posterAddress = `${import.meta.env.BASE_URL}${relativePoster}`;
+          urls.current.set(posterAddress, URL.createObjectURL(poster));
+          generatedPoster = {
+            address: posterAddress,
+            upload: {
+              path: `public/${relativePoster}`,
+              base64: encodeBase64(new Uint8Array(await poster.arrayBuffer())),
+            },
+          };
+        }
+      }
       setUploads((previous) => [
         ...previous,
         { path: `public/${relative}`, base64: encodeBase64(bytes) },
+        ...(generatedPoster ? [generatedPoster.upload] : []),
       ]);
       setDraft((previous) => {
         let next = replace(previous, path, address);
+        if (video && path[0] === "accountMedia") {
+          const titlePath = [...path.slice(0, -1), "title"];
+          if (!get(next, titlePath))
+            next = replace(next, titlePath, file.name.replace(/\.[^.]+$/, ""));
+          if (generatedPoster)
+            next = replace(
+              next,
+              [...path.slice(0, -1), "poster"],
+              generatedPoster.address,
+            );
+        }
         if (path[0] === "portfolioWorks" && path[2] === "image" && dimensions) {
           next = replace(next, [...path.slice(0, -1), "thumbnail"], address);
           next = replace(
@@ -470,7 +510,10 @@ export default function PortfolioEditor() {
 
   function field(value: unknown, path: Path): React.ReactNode {
     const key = String(path[path.length - 1]);
-    const name = labels[key] ?? key;
+    const name =
+      path[0] === "accountMedia" && key === "image"
+        ? "账号截图"
+        : (labels[key] ?? key);
     if (key === "id") return null;
     if (Array.isArray(value))
       return (
@@ -482,7 +525,10 @@ export default function PortfolioEditor() {
               title={`添加${name}`}
               aria-label={`添加${name}`}
               onClick={() => {
-                const sample = value[0] ?? "";
+                const sample =
+                  path[0] === "accountMedia" && key === "videos"
+                    ? { id: "", title: "", src: "", poster: "" }
+                    : (value[0] ?? "");
                 const item =
                   typeof sample === "object"
                     ? {
@@ -541,7 +587,10 @@ export default function PortfolioEditor() {
                     type="button"
                     title="删除"
                     aria-label="删除"
-                    disabled={value.length <= 1}
+                    disabled={
+                      value.length <= 1 &&
+                      !(path[0] === "accountMedia" && key === "videos")
+                    }
                     onClick={() =>
                       update(
                         path,

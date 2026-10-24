@@ -1,0 +1,245 @@
+.account-showcase {
+  width: 100%;
+  min-width: 0;
+}
+.account-profile {
+  margin: 0 auto 38px;
+  max-width: 320px;
+  text-align: center;
+}
+.account-profile > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+}
+.account-profile > figcaption {
+  margin-top: 12px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.account-video-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 90px 18px 0;
+  border-top: 1px solid #ddd;
+}
+.account-video-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.account-video-header > span {
+  font:
+    11px/1.5 "Archive Mono",
+    monospace;
+  color: #777;
+}
+.account-video-window {
+  overflow: hidden;
+  padding: 20px 0 0;
+  touch-action: pan-y;
+}
+.account-video-arc {
+  position: relative;
+  height: 330px;
+  width: 100%;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.account-video-arc:active {
+  cursor: grabbing;
+}
+.account-video-poster {
+  position: absolute;
+  top: 12px;
+  left: calc(50% - 95px);
+  width: 190px;
+  height: 260px;
+  aspect-ratio: 19/26;
+  transform-origin: center 135%;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: #e6e6e6;
+  box-shadow: 0 8px 16px #0002;
+  cursor: pointer;
+  overflow: hidden;
+}
+.account-video-poster > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.account-video-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #ffffffaa;
+  background: #111b;
+  border-radius: 50%;
+  color: #fff;
+}
+.account-video-title {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 26px 12px 12px;
+  background: linear-gradient(transparent, #000b);
+  color: white;
+  font-size: 12px;
+  text-align: left;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.account-video-no-poster {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #666;
+  background: #ededed;
+}
+.account-video-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 2px 0 12px;
+}
+.account-video-controls button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d4d4d4;
+  border-radius: 50%;
+  color: #333;
+  background: transparent;
+  cursor: pointer;
+}
+.account-video-controls button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.account-video-poster:focus-visible,
+.account-video-controls button:focus-visible {
+  outline: 2px solid #267653;
+  outline-offset: 3px;
+}
+.account-video-player {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 4px;
+  padding: 46px 16px 16px;
+  background: #151515;
+  color: #fff;
+  width: min(820px, 94vw);
+  max-width: 94vw;
+  max-height: 94dvh;
+  overflow: auto;
+}
+.account-video-player::backdrop {
+  background: #000c;
+}
+.account-video-player > video {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-height: 72dvh;
+  object-fit: contain;
+  background: #000;
+}
+.account-video-player > p {
+  font:
+    13px/1.5 Inter,
+    Arial,
+    sans-serif;
+  margin: 12px 0 0;
+  overflow-wrap: anywhere;
+}
+.account-player-close {
+  position: absolute;
+  right: 10px;
+  top: 7px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  background: #ffffff1a;
+  cursor: pointer;
+}
+.archive-account-dialog .archive-detail-paper h2 {
+  font-size: 28px;
+  padding-right: 70px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .account-profile {
+    max-width: 260px;
+    margin-bottom: 26px;
+  }
+  .account-profile > img {
+    max-height: 340px;
+  }
+  .account-video-poster {
+    width: 148px;
+    height: 210px;
+    left: calc(50% - 74px);
+  }
+  .account-video-arc {
+    height: 280px;
+  }
+  .archive-account-dialog .archive-detail-paper {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .archive-account-dialog .archive-detail-paper h2 {
+    font-size: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .account-video-poster {
+    transition: none;
+  }
+}
+.account-videos {
+  position: sticky;
+  top: 12px;
+  background: #fff;
+  isolation: isolate;
+}
+.account-video-runway {
+  position: relative;
+  min-width: 0;
+}
+.archive-archive-dialog.archive-account-dialog .portfolio-edit-trigger {
+  position: sticky;
+  top: 12px;
+  left: auto;
+  right: auto;
+  margin: -40px 46px 8px auto;
+  z-index: 40;
+}
+.archive-account-dialog .archive-detail-close {
+  position: sticky;
+  top: 12px;
+  left: auto;
+  right: auto;
+  margin: -40px 0 2px auto;
+  z-index: 40;
+}
