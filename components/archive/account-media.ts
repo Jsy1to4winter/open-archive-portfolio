@@ -4,6 +4,7 @@ export type AccountVideo = {
   src: string;
   poster: string;
 };
+export const MAX_ACCOUNT_VIDEOS = 10;
 export type AccountMedia = {
   image: string;
   alt: string;

@@ -1,6 +1,6 @@
 import * as defaults from "./default-content";
 import { defaultScreenText } from "./screen-text";
-import { defaultAccountMedia } from "./account-media";
+import { defaultAccountMedia, MAX_ACCOUNT_VIDEOS } from "./account-media";
 export type { Reason, PortfolioWork } from "./default-content";
 
 export const defaultContent = {
@@ -61,6 +61,8 @@ export function validateContent(value: unknown): asserts value is SiteContent {
   if (!shape(value, defaultContent))
     throw new Error("内容格式不完整，请检查所有栏目。");
   const data = value as SiteContent;
+  if (data.accountMedia.videos.length > MAX_ACCOUNT_VIDEOS)
+    throw new Error(`视频作品最多可以放 ${MAX_ACCOUNT_VIDEOS} 个。`);
   if (
     !data.accountMedia.videos.every(
       (video) =>

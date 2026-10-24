@@ -9,6 +9,12 @@ import "./account-showcase.css";
 
 gsap.registerPlugin(ScrollTrigger);
 export { ScrollTrigger };
+function clipTitle(item: AccountVideo, index: number) {
+  const title = item.title.trim();
+  return title && !/^[a-f0-9]{24,}$/i.test(title)
+    ? title
+    : `视频作品 ${String(index + 1).padStart(2, "0")}`;
+}
 
 export default function AccountShowcase() {
   const videos = accountMedia.videos;
@@ -17,6 +23,15 @@ export default function AccountShowcase() {
   const [hovered, setHovered] = useState(false);
   const [selected, setSelected] = useState<AccountVideo | null>(null);
   const [error, setError] = useState("");
+  const selectedTitle = selected
+    ? clipTitle(
+        selected,
+        Math.max(
+          0,
+          videos.findIndex((item) => item.id === selected.id),
+        ),
+      )
+    : "视频播放";
   const reduced = useReducedMotion();
   const runway = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -149,7 +164,8 @@ export default function AccountShowcase() {
         ?.getBoundingClientRect();
       if (
         !document.hidden &&
-        !trigger.current?.isActive &&
+        (!trigger.current ||
+          trigger.current.scroll() < trigger.current.start) &&
         bounds &&
         container &&
         bounds.bottom > container.top &&
@@ -280,7 +296,8 @@ export default function AccountShowcase() {
                     }}
                     className="account-video-poster"
                     type="button"
-                    aria-label={"播放 " + (item.title || "视频 " + (index + 1))}
+                    aria-label={"播放 " + clipTitle(item, index)}
+                    title={clipTitle(item, index)}
                     aria-current={index === active ? "true" : undefined}
                     tabIndex={index === active ? 0 : -1}
                     onClick={(event) => open(item, event)}
@@ -288,7 +305,7 @@ export default function AccountShowcase() {
                     {item.poster ? (
                       <img
                         src={item.poster}
-                        alt={item.title || "视频 " + (index + 1)}
+                        alt={clipTitle(item, index)}
                         draggable={false}
                       />
                     ) : (
@@ -299,9 +316,9 @@ export default function AccountShowcase() {
                     <span className="account-video-play">
                       <Play size={20} fill="currentColor" />
                     </span>
-                    {item.title && (
-                      <span className="account-video-title">{item.title}</span>
-                    )}
+                    <span className="account-video-title">
+                      {clipTitle(item, index)}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -341,7 +358,7 @@ export default function AccountShowcase() {
       <dialog
         ref={player}
         className="account-video-player"
-        aria-label={selected?.title || "视频播放"}
+        aria-label={selectedTitle}
         onCancel={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -378,10 +395,14 @@ export default function AccountShowcase() {
               playsInline
               preload="metadata"
               onError={() =>
-                setError("视频暂时无法播放，请检查文件或视频地址。")
+                setError(
+                  video.current?.error?.code === 4
+                    ? "浏览器不支持此视频编码，请上传 H.264 编码的 MP4。"
+                    : "视频加载失败，请检查网络或视频地址。",
+                )
               }
             />
-            {selected.title && <p>{selected.title}</p>}
+            <p>{selectedTitle}</p>
             {error && <p role="alert">{error}</p>}
           </>
         )}

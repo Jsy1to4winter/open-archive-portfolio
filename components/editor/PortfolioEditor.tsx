@@ -29,6 +29,7 @@ import {
 } from "./github";
 import "./editor.css";
 import { videoPoster } from "./video-poster";
+import { MAX_ACCOUNT_VIDEOS } from "../archive/account-media";
 
 const labels: Record<string, string> = {
   accountMedia: "账号和视频",
@@ -156,12 +157,14 @@ export default function PortfolioEditor() {
     if (open) dialog.current?.showModal();
     else dialog.current?.close();
     if (open && focusPath.current) {
-      const input = document.getElementById(
-        `field-${focusPath.current.join("-")}`,
-      );
-      input?.scrollIntoView({ block: "center" });
-      input?.focus();
-      focusPath.current = null;
+      const path = focusPath.current;
+      const frame = requestAnimationFrame(() => {
+        const input = document.getElementById(`field-${path.join("-")}`);
+        input?.scrollIntoView({ block: "center" });
+        input?.focus({ preventScroll: true });
+        focusPath.current = null;
+      });
+      return () => cancelAnimationFrame(frame);
     }
   }, [open]);
   useEffect(() => {
@@ -413,6 +416,7 @@ export default function PortfolioEditor() {
   async function upload(file: File, path: Path) {
     setBusy(true);
     setMessage("");
+    let temporaryAddress: string | undefined;
     try {
       const video = path.at(-1) === "src";
       const allowed = video
@@ -443,6 +447,7 @@ export default function PortfolioEditor() {
       const address = `${import.meta.env.BASE_URL}${relative}`;
       const objectUrl = URL.createObjectURL(file);
       urls.current.set(address, objectUrl);
+      temporaryAddress = address;
       let dimensions: { width: number; height: number } | null = null;
       if (!video) {
         const image = new Image();
@@ -453,7 +458,10 @@ export default function PortfolioEditor() {
       const bytes = new Uint8Array(await file.arrayBuffer());
       let generatedPoster: { address: string; upload: Upload } | null = null;
       if (video && path[0] === "accountMedia") {
-        const poster = await videoPoster(objectUrl);
+        const poster = await videoPoster(
+          objectUrl,
+          file.type === "video/mp4" ? (bytes.buffer as ArrayBuffer) : undefined,
+        );
         if (poster) {
           const relativePoster = `assets/uploads/${crypto.randomUUID()}.jpg`;
           const posterAddress = `${import.meta.env.BASE_URL}${relativePoster}`;
@@ -502,6 +510,11 @@ export default function PortfolioEditor() {
       });
       setDirty(true);
     } catch (error) {
+      if (temporaryAddress) {
+        const url = urls.current.get(temporaryAddress);
+        if (url) URL.revokeObjectURL(url);
+        urls.current.delete(temporaryAddress);
+      }
       setMessage((error as Error).message);
     } finally {
       setBusy(false);
@@ -519,12 +532,30 @@ export default function PortfolioEditor() {
       return (
         <div className="editor-list" key={path.join(".")}>
           <div className="editor-list-heading">
-            <h3>{name}</h3>
+            <h3>
+              {name}
+              {path[0] === "accountMedia" && key === "videos" && (
+                <small className="editor-video-count">
+                  {value.length} / {MAX_ACCOUNT_VIDEOS}
+                </small>
+              )}
+            </h3>
             <button
               type="button"
               title={`添加${name}`}
               aria-label={`添加${name}`}
+              disabled={
+                path[0] === "accountMedia" &&
+                key === "videos" &&
+                value.length >= MAX_ACCOUNT_VIDEOS
+              }
               onClick={() => {
+                if (
+                  path[0] === "accountMedia" &&
+                  key === "videos" &&
+                  value.length >= MAX_ACCOUNT_VIDEOS
+                )
+                  return;
                 const sample =
                   path[0] === "accountMedia" && key === "videos"
                     ? { id: "", title: "", src: "", poster: "" }

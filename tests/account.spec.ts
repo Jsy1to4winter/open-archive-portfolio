@@ -162,7 +162,12 @@ test("owner can add, upload, publish and remove all account videos", async ({
     if (url.includes("/git/trees/"))
       return reply({ tree: [{ path: "public/content.json", sha: "data" }] });
     return reply({
-      content: Buffer.from(JSON.stringify(original)).toString("base64"),
+      content: Buffer.from(
+        JSON.stringify({
+          ...original,
+          accountMedia: { ...original.accountMedia, videos: [] },
+        }),
+      ).toString("base64"),
     });
   });
   await page.goto("/");

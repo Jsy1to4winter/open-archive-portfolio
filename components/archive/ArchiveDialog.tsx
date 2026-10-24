@@ -56,10 +56,10 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
       {detail && <div className="archive-detail-paper">
         <button className="portfolio-edit-trigger" type="button" aria-label="编辑作品集" title="编辑作品集" onClick={() => window.dispatchEvent(new Event('portfolio-open-editor'))}><Pencil size={14}/></button>
         <button ref={closeButton} type="button" className="archive-detail-close" onClick={requestClose} aria-label="Close details"><X size={20} /></button>
-        {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || (module?.id === 'fragments' ? screenText.fragments.title : module?.label)}</h2>}
+        {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || (module?.id === 'fragments' ? screenText.fragments.title : module?.id === 'perspective' ? screenText.perspective.titleLine1 : module?.label)}</h2>}
         {module?.id === 'fragments' && <AccountShowcase/>}
         {module && module.id !== 'fragments' && selectedReasons.map(reason => <article key={reason.id} className="archive-detail-reason">
-          <span>{reason.id}</span><div><h3>{reason.title}</h3><p className={module.id === 'about' ? 'archive-about-copy' : reason.author ? 'archive-poem' : undefined}>{reason.body}</p>{reason.author && <a className="archive-poem-credit" href={reason.source} target="_blank" rel="noopener noreferrer">— {reason.author} <ArrowUpRight size={12} aria-hidden="true" /></a>}</div>
+          <span>{reason.id}</span><div><h3>{reason.title}</h3><p className={module.id === 'about' || module.id === 'perspective' ? 'archive-about-copy' : reason.author ? 'archive-poem' : undefined}>{reason.body}</p>{reason.author && <a className="archive-poem-credit" href={reason.source} target="_blank" rel="noopener noreferrer">— {reason.author} <ArrowUpRight size={12} aria-hidden="true" /></a>}</div>
         </article>)}
         {module?.id === 'works' && <div className="archive-detail-works">
           {portfolioWorks.map(item => <article key={item.id}>

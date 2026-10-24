@@ -15,6 +15,7 @@ The computer-screen video is an original work by KAKI (kakizzzzz), released with
 | Scheduler | [MIT — Meta Platforms](licenses/scheduler.txt) |
 | Framer Motion | [MIT — Framer B.V.](licenses/framer-motion.txt) |
 | GSAP / ScrollTrigger | [GSAP Standard License — Copyright 2008–2025, GreenSock](https://gsap.com/standard-license) |
+| MP4Box.js | [BSD-3-Clause — GPAC contributors](licenses/mp4box.txt) |
 | Motion DOM | [MIT — Motion B.V.](licenses/motion-dom.txt) |
 | Motion Utils | [MIT — Motion B.V.](licenses/motion-utils.txt) |
 | Lucide React / Feather | [ISC and MIT — complete original notices](licenses/lucide-react.txt) |
