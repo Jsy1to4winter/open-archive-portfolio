@@ -216,5 +216,24 @@
     "profile": {
       "label": "Profile"
     }
+  },
+  "accountMedia": {
+    "image": "/open-archive-portfolio/assets/uploads/1affb7ae-ed23-470e-a473-4d962e112102.jpg",
+    "alt": "白兜兜学姐的小红书账号主页截图",
+    "caption": "白兜兜学姐",
+    "videos": [
+      {
+        "id": "item-6ecf7606",
+        "title": "32725aa1c9a3a5e2034144d06826f3fb",
+        "src": "/open-archive-portfolio/assets/uploads/0c55efa3-231c-45b7-9820-f2c7266a3ea9.mp4",
+        "poster": ""
+      },
+      {
+        "id": "item-a0ffdfec",
+        "title": "32725aa1c9a3a5e2034144d06826f3fb",
+        "src": "/open-archive-portfolio/assets/uploads/d194aca2-8ead-414b-b9cc-5f960bbf4c44.mp4",
+        "poster": ""
+      }
+    ]
   }
 }
