@@ -21,6 +21,8 @@
     "test:editor": "playwright test"
   },
   "dependencies": {
+    "@ffmpeg/core": "0.12.10",
+    "@ffmpeg/ffmpeg": "0.12.15",
     "@fontsource/inter": "5.2.8",
     "framer-motion": "12.34.0",
     "gsap": "3.14.2",

@@ -37,3 +37,7 @@ On the deployed site, the same font notices are available under assets/template/
 ## Short poetry excerpts
 
 The credited notes contain short excerpts from Walt Whitman's A Clear Midnight, William Blake's Auguries of Innocence, and Emily Dickinson's Hope is the thing with feathers. Author and source links remain beside these notes and in the README. These underlying poems are identified as public domain by the cited sources; they are not claimed as original template text or relicensed as such.
+
+## Browser Video Conversion
+
+The optional, lazily loaded converter uses [@ffmpeg/ffmpeg 0.12.15](https://www.npmjs.com/package/@ffmpeg/ffmpeg/v/0.12.15) ([MIT](licenses/ffmpeg-wasm.txt)) and the unmodified [@ffmpeg/core 0.12.10](https://www.npmjs.com/package/@ffmpeg/core/v/0.12.10) single-threaded WASM build (GPL-2.0-or-later). The core is a separate worker program, not included in the site's MIT license. Corresponding source and build recipes: [ffmpeg.wasm core v0.12.10](https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v0.12.10), including its Dockerfile and build scripts. License: [GNU GPL v2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html).

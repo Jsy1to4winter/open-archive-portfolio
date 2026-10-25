@@ -199,7 +199,9 @@ test("owner can add, upload, publish and remove all account videos", async ({
     /\.jpg$/,
   );
   await page.getByRole("button", { name: "保存发布", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("已保存到 GitHub");
+  await expect(page.getByRole("status")).toContainText("已保存到 GitHub", {
+    timeout: 15000,
+  });
   const jsonBlob = writes
     .filter((item) => item.url.endsWith("/git/blobs"))
     .at(-1)!;

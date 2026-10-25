@@ -46,7 +46,9 @@ async function enterModule(page: Page, id: string) {
   );
   await page
     .locator(
-      id === "about" ? ".archive-desk-about-main" : ".archive-desk-" + id,
+      id === "about"
+        ? ".archive-desk-about-main"
+        : ".archive-desk-" + id + " .archive-desk-card-arrow",
     )
     .click();
 }
@@ -140,9 +142,12 @@ test("video limit is ten in editor and validation", async ({ page }) => {
   await expect(page.locator(".editor-video-count")).toHaveText("9 / 10");
 });
 
-test("HEVC upload is rejected without replacing existing playable file", async ({
+test("HEVC upload converts locally without blanking the editor", async ({
   page,
 }) => {
+  test.setTimeout(120000);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
   await loginEditor(page);
   const src = page.locator("#field-accountMedia-videos-0-src");
   const before = await src.inputValue();
@@ -152,8 +157,55 @@ test("HEVC upload is rejected without replacing existing playable file", async (
     .setInputFiles(
       "public/assets/uploads/0c55efa3-231c-45b7-9820-f2c7266a3ea9.mp4",
     );
-  await expect(page.getByRole("status")).toContainText("HEVC/H.265");
+  await expect(page.getByRole("status")).toContainText(
+    /正在加载视频转换器|正在转换/,
+  );
+  await expect(page.getByRole("heading", { name: "编辑作品集" })).toBeVisible();
+  await expect(src).toBeVisible();
+  await page.screenshot({ path: "test-results/video-upload-progress.png" });
+  await expect(page.getByRole("status")).toContainText("文件已加入草稿", {
+    timeout: 100000,
+  });
+  await expect(src).not.toHaveValue(before);
+  await expect(page.locator(".portfolio-editor[open]")).toBeVisible();
+  expect(errors).toEqual([]);
+  await expect(
+    page.locator("#field-accountMedia-videos-0-poster"),
+  ).not.toHaveValue(original.accountMedia.videos[0].poster);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.getByRole("button", { name: "预览", exact: true }).click();
+  await enterModule(page, "fragments");
+  await page.locator(".account-video-poster").first().click();
+  const converted = page.locator(".account-video-player[open] video");
+  await expect
+    .poll(() => converted.evaluate((el: HTMLVideoElement) => el.currentTime))
+    .toBeGreaterThan(0.1);
+  await expect(converted).toHaveJSProperty("videoWidth", 1056);
+  expect(
+    await converted.evaluate((el: HTMLVideoElement) => el.error),
+  ).toBeNull();
+});
+
+test("invalid video leaves the editor and existing draft intact", async ({
+  page,
+}) => {
+  await loginEditor(page);
+  const src = page.locator("#field-accountMedia-videos-0-src");
+  const before = await src.inputValue();
+  await src
+    .locator("..")
+    .locator("input[type=file]")
+    .setInputFiles({
+      name: "broken.mp4",
+      mimeType: "video/mp4",
+      buffer: Buffer.from("not a video"),
+    });
+  await expect(page.getByRole("status")).toContainText(/无法读取|未能读取/, {
+    timeout: 15000,
+  });
   await expect(src).toHaveValue(before);
+  await expect(src).toBeEditable();
+  await expect(page.getByRole("heading", { name: "编辑作品集" })).toBeVisible();
 });
 
 test("About and perspective both show the six existing operations sections", async ({

@@ -415,7 +415,7 @@ export default function PortfolioEditor() {
   }
   async function upload(file: File, path: Path) {
     setBusy(true);
-    setMessage("");
+    setMessage("正在检查并读取文件…");
     let temporaryAddress: string | undefined;
     try {
       const video = path.at(-1) === "src";
@@ -445,7 +445,7 @@ export default function PortfolioEditor() {
       )[file.type];
       const relative = `assets/uploads/${crypto.randomUUID()}.${ext}`;
       const address = `${import.meta.env.BASE_URL}${relative}`;
-      const objectUrl = URL.createObjectURL(file);
+      let objectUrl = URL.createObjectURL(file);
       urls.current.set(address, objectUrl);
       temporaryAddress = address;
       let dimensions: { width: number; height: number } | null = null;
@@ -455,13 +455,34 @@ export default function PortfolioEditor() {
         await image.decode();
         dimensions = { width: image.naturalWidth, height: image.naturalHeight };
       }
-      const bytes = new Uint8Array(await file.arrayBuffer());
+      let bytes = new Uint8Array(await file.arrayBuffer());
       let generatedPoster: { address: string; upload: Upload } | null = null;
       if (video && path[0] === "accountMedia") {
-        const poster = await videoPoster(
-          objectUrl,
-          file.type === "video/mp4" ? (bytes.buffer as ArrayBuffer) : undefined,
-        );
+        let poster: Blob | null;
+        try {
+          poster = await videoPoster(
+            objectUrl,
+            file.type === "video/mp4"
+              ? (bytes.buffer as ArrayBuffer)
+              : undefined,
+          );
+        } catch (error) {
+          if (
+            file.type !== "video/mp4" ||
+            !(error instanceof Error) ||
+            !error.message.includes("HEVC/H.265")
+          )
+            throw error;
+          const { convertVideo } = await import("./convert-video");
+          file = await convertVideo(file, setMessage);
+          if (file.size > 20 * 1024 * 1024)
+            throw new Error("转换后视频超过 20 MB，请压缩或缩短后重试。");
+          URL.revokeObjectURL(objectUrl);
+          objectUrl = URL.createObjectURL(file);
+          urls.current.set(address, objectUrl);
+          bytes = new Uint8Array(await file.arrayBuffer());
+          poster = await videoPoster(objectUrl, bytes.buffer as ArrayBuffer);
+        }
         if (poster) {
           const relativePoster = `assets/uploads/${crypto.randomUUID()}.jpg`;
           const posterAddress = `${import.meta.env.BASE_URL}${relativePoster}`;
@@ -509,6 +530,7 @@ export default function PortfolioEditor() {
         return next;
       });
       setDirty(true);
+      setMessage("文件已加入草稿。可预览检查，点击保存发布后才会更新网站。");
     } catch (error) {
       if (temporaryAddress) {
         const url = urls.current.get(temporaryAddress);
@@ -809,7 +831,7 @@ export default function PortfolioEditor() {
                 </button>
               ))}
             </nav>
-            <fieldset className="editor-body" disabled={busy}>
+            <fieldset className="editor-body" inert={busy} aria-busy={busy}>
               {tab === "contact" ? (
                 <>
                   {field(draft.contactEmail, ["contactEmail"])}
@@ -821,7 +843,12 @@ export default function PortfolioEditor() {
             </fieldset>
             <footer>
               <div className="editor-status" role="status">
-                {message || (dirty ? "有未发布的修改" : "所有修改已保存")}
+                {message ||
+                  (busy
+                    ? "正在处理，请稍候…"
+                    : dirty
+                      ? "有未发布的修改"
+                      : "所有修改已保存")}
               </div>
               {closeAction && (
                 <div className="editor-confirm">
