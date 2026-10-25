@@ -175,8 +175,8 @@
       "bodyLine2": "A place to begin again."
     },
     "fragments": {
-      "title": "AI短视频账号",
-      "subtitle": "萌宠赛道",
+      "title": "AI短视频",
+      "subtitle": "多赛道视频聚合",
       "description": "The daily life of cats"
     },
     "craft": {
@@ -220,7 +220,7 @@
   "accountMedia": {
     "image": "/open-archive-portfolio/assets/uploads/1affb7ae-ed23-470e-a473-4d962e112102.jpg",
     "alt": "白兜兜学姐的小红书账号主页截图",
-    "caption": "白兜兜学姐",
+    "caption": "个人AI视频账号",
     "videos": [
       {
         "id": "item-6ecf7606",
@@ -233,6 +233,30 @@
         "title": "32725aa1c9a3a5e2034144d06826f3fb",
         "src": "/open-archive-portfolio/assets/uploads/d194aca2-8ead-414b-b9cc-5f960bbf4c44-h264.mp4",
         "poster": "/open-archive-portfolio/assets/uploads/d194aca2-8ead-414b-b9cc-5f960bbf4c44-poster.jpg"
+      },
+      {
+        "id": "item-520b7ef4",
+        "title": "32725aa1c9a3a5e2034144d06826f3fb",
+        "src": "/open-archive-portfolio/assets/uploads/a5352a4d-89fa-4820-924f-30504725bba5.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/15db48a0-9b35-44fd-b5f2-1c5fa8532478.jpg"
+      },
+      {
+        "id": "item-a2bc2e59",
+        "title": "32725aa1c9a3a5e2034144d06826f3fb",
+        "src": "/open-archive-portfolio/assets/uploads/858e596e-ca3f-4a9f-a0ec-37e1e139a4a0.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/18daa13b-bcec-46a9-89c3-e5e1d3e87814.jpg"
+      },
+      {
+        "id": "item-c48fe813",
+        "title": "32725aa1c9a3a5e2034144d06826f3fb",
+        "src": "/open-archive-portfolio/assets/uploads/988d91a8-d369-4c6c-b8dd-a2918ee77989.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/1b689538-c600-4194-a0ed-90c12f46128c.jpg"
+      },
+      {
+        "id": "item-007f55e8",
+        "title": "32725aa1c9a3a5e2034144d06826f3fb",
+        "src": "/open-archive-portfolio/assets/uploads/dc36c68d-e598-468e-9a1d-9f6cc3c53152.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/43f095c8-9576-41a0-baaa-b39f89dd5062.jpg"
       }
     ]
   }
