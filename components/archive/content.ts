@@ -1,9 +1,11 @@
 import * as defaults from "./default-content";
+import { defaultStickers } from './stickers';
 import { defaultScreenText } from "./screen-text";
 import { defaultAccountMedia, MAX_ACCOUNT_VIDEOS } from "./account-media";
 export type { Reason, PortfolioWork } from "./default-content";
 
 export const defaultContent = {
+  stickers: defaultStickers,
   accountMedia: defaultAccountMedia,
   screenText: defaultScreenText,
   templateProfile: defaults.templateProfile,
@@ -22,6 +24,7 @@ export function normalizeContent(value: unknown): SiteContent {
   const source = value as Record<string, unknown>;
   const result = {
     ...source,
+    stickers: source.stickers === undefined ? structuredClone(defaultStickers) : source.stickers,
     accountMedia:
       source.accountMedia === undefined
         ? structuredClone(defaultAccountMedia)
@@ -61,6 +64,8 @@ export function validateContent(value: unknown): asserts value is SiteContent {
   if (!shape(value, defaultContent))
     throw new Error("内容格式不完整，请检查所有栏目。");
   const data = value as SiteContent;
+  if (!data.stickers.every(item => item && typeof item.id === 'string' && item.id && typeof item.name === 'string' && typeof item.image === 'string' && Number.isFinite(item.width) && item.width >= 64 && item.width <= 600) || new Set(data.stickers.map(item => item.id)).size !== data.stickers.length)
+    throw new Error('贴纸名称、图片或尺寸无效，宽度须在 64 至 600 像素之间。');
   if (data.accountMedia.videos.length > MAX_ACCOUNT_VIDEOS)
     throw new Error(`视频作品最多可以放 ${MAX_ACCOUNT_VIDEOS} 个。`);
   if (
@@ -103,6 +108,7 @@ export function validateContent(value: unknown): asserts value is SiteContent {
   )
     throw new Error("作品编号不能重复。");
   const urls = [
+    ...data.stickers.map(item => item.image),
     data.accountMedia.image,
     ...data.accountMedia.videos.flatMap((video) => [video.src, video.poster]),
     data.templateProfile.website,
@@ -135,6 +141,7 @@ try {
   console.warn("Using bundled portfolio content.", error);
 }
 export let templateProfile = loaded.templateProfile;
+export let stickers = loaded.stickers;
 export let accountMedia = loaded.accountMedia;
 export let screenText = loaded.screenText;
 export let contactEmail = loaded.contactEmail;
@@ -147,6 +154,7 @@ export let workCategories = loaded.workCategories;
 export let templateResume = loaded.templateResume;
 export function currentContent(): SiteContent {
   return structuredClone({
+    stickers,
     accountMedia,
     screenText,
     templateProfile,
@@ -162,6 +170,7 @@ export function currentContent(): SiteContent {
 export function applyContent(data: SiteContent) {
   validateContent(data);
   ({
+    stickers,
     accountMedia,
     screenText,
     templateProfile,

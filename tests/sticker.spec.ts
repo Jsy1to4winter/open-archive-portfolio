@@ -3,10 +3,10 @@ import { test, expect, type Page } from '@playwright/test';
 async function desk(page: Page) {
   await page.addInitScript(() => {
     (window as any).stickerSounds = [];
-    const play = HTMLMediaElement.prototype.play;
-    HTMLMediaElement.prototype.play = function () {
-      if (this.src.includes('sticker-place.wav')) (window as any).stickerSounds.push(this.src);
-      return play.call(this);
+    const start = AudioBufferSourceNode.prototype.start;
+    AudioBufferSourceNode.prototype.start = function (...args: Parameters<typeof start>) {
+      if (this.buffer?.duration && this.buffer.duration < 1) (window as any).stickerSounds.push({ state: this.context.state, peak: Math.max(...this.buffer.getChannelData(0)), duration: this.buffer.duration });
+      return start.apply(this, args);
     };
   });
   await page.goto('/');
@@ -28,16 +28,19 @@ for (const width of [1440, 390]) {
     const before = (await sticker.boundingBox())!;
     await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
     await page.mouse.down();
-    await page.mouse.move(before.x + before.width / 2 + 40, before.y + before.height / 2 + 130, { steps: 12 });
+    await page.mouse.move(before.x + before.width / 2 + 20, before.y + before.height / 2 + 130, { steps: 12 });
     expect(await page.evaluate(() => (window as any).stickerSounds.length)).toBe(0);
     await page.mouse.up();
     await expect.poll(() => page.evaluate(() => (window as any).stickerSounds.length)).toBe(1);
-    const sound = await page.request.get('/assets/sticker-place.wav');
+    const played = await page.evaluate(() => (window as any).stickerSounds[0]);
+    expect(played.state).toBe('running');
+    expect(played.peak).toBeGreaterThan(0.1);
+    const sound = await page.request.get('/assets/sticker-place-v2.wav');
     expect(sound.ok()).toBe(true);
     expect((await sound.body()).length).toBeGreaterThan(1000);
     const after = (await sticker.boundingBox())!;
     expect(after.y - before.y).toBeCloseTo(130, 0);
-    expect(after.x - before.x).toBeCloseTo(40, 0);
+    expect(after.x - before.x).toBeCloseTo(20, 0);
     await sticker.focus();
     await page.keyboard.press('ArrowDown');
     expect((await sticker.boundingBox())!.y - after.y).toBeCloseTo(8, 0);

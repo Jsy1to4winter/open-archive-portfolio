@@ -32,6 +32,7 @@ import { videoPoster } from "./video-poster";
 import { MAX_ACCOUNT_VIDEOS } from "../archive/account-media";
 
 const labels: Record<string, string> = {
+  stickers: "贴纸",
   accountMedia: "账号和视频",
   videos: "视频作品",
   screenText: "页面文字",
@@ -101,6 +102,7 @@ const labels: Record<string, string> = {
   tools: "技能与工具",
 };
 const tabs = [
+  "stickers",
   "accountMedia",
   "screenText",
   "templateProfile",
@@ -291,6 +293,7 @@ export default function PortfolioEditor() {
   }
   function visibleContent(content: SiteContent) {
     const data = clone(content);
+    data.stickers.forEach(item => { item.image = urls.current.get(item.image) ?? item.image; });
     data.accountMedia.image =
       urls.current.get(data.accountMedia.image) ?? data.accountMedia.image;
     for (const item of data.accountMedia.videos) {
@@ -550,6 +553,12 @@ export default function PortfolioEditor() {
         ? "账号截图"
         : (labels[key] ?? key);
     if (key === "id") return null;
+    if (path[0] === 'stickers' && key === 'width') return (
+      <div className="editor-field" key={path.join('.')}>
+        <label htmlFor={`field-${path.join('-')}`}>贴纸宽度：{String(value)} px</label>
+        <input id={`field-${path.join('-')}`} type="range" min="64" max="600" step="1" value={Number(value)} onChange={e => update(path, Number(e.target.value))} />
+      </div>
+    );
     if (Array.isArray(value))
       return (
         <div className="editor-list" key={path.join(".")}>
@@ -579,6 +588,9 @@ export default function PortfolioEditor() {
                 )
                   return;
                 const sample =
+                  path[0] === 'stickers'
+                    ? { id: '', name: '新贴纸', image: '', width: 220 }
+                    :
                   path[0] === "accountMedia" && key === "videos"
                     ? { id: "", title: "", src: "", poster: "" }
                     : (value[0] ?? "");
@@ -642,6 +654,7 @@ export default function PortfolioEditor() {
                     aria-label="删除"
                     disabled={
                       value.length <= 1 &&
+                      path[0] !== 'stickers' &&
                       !(path[0] === "accountMedia" && key === "videos")
                     }
                     onClick={() =>

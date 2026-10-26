@@ -68,6 +68,25 @@ async function enter(page: Page) {
   await page.getByRole("button", { name: "登录", exact: true }).click();
 }
 
+test("owner uploads and sizes multiple stickers and publishes them", async ({ page }) => {
+  const writes = await mockGithub(page);
+  await enter(page);
+  await page.getByRole('tab', { name: '贴纸', exact: true }).click();
+  await page.getByRole('button', { name: '添加贴纸', exact: true }).click();
+  await page.locator('#field-stickers-1-image').locator('..').locator('input[type=file]').setInputFiles('public/assets/operations/douyin-data-3.jpg');
+  await expect(page.getByRole('status')).toContainText('文件已加入草稿');
+  await page.locator('#field-stickers-1-width').fill('180');
+  await page.getByRole('button', { name: '保存发布', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('已保存到 GitHub', { timeout: 15000 });
+  const blob = writes.filter(item => item.url.endsWith('/git/blobs')).at(-1)!;
+  const saved = JSON.parse(Buffer.from(blob.body.content as string, 'base64').toString('utf8'));
+  expect(saved.stickers).toHaveLength(2);
+  expect(saved.stickers[1].width).toBe(180);
+  expect(saved.stickers[1].image).toContain('uploads/');
+  expect(JSON.stringify(saved)).not.toContain('blob:');
+  expect(saved.accountMedia).toEqual(original.accountMedia);
+});
+
 test("visitor is rejected and never writes", async ({ page }) => {
   const writes = await mockGithub(page, { owner: false });
   await enter(page);
