@@ -1,5 +1,36 @@
 {
-  "stickers": [{ "id": "name-sticker", "name": "suiyixuan", "image": "", "width": 300 }],
+  "stickers": [
+    {
+      "id": "name-sticker",
+      "name": "suiyixuan",
+      "image": "",
+      "width": 204
+    },
+    {
+      "id": "item-5bbecbac",
+      "name": "新贴纸",
+      "image": "/open-archive-portfolio/assets/uploads/8727471d-148b-4fee-ba2b-5b64420fd461.png",
+      "width": 305
+    },
+    {
+      "id": "item-dfea6be7",
+      "name": "新贴纸",
+      "image": "/open-archive-portfolio/assets/uploads/3780b134-4cc5-4ea7-b228-9cae3e12f25f.png",
+      "width": 355
+    },
+    {
+      "id": "item-0933b0c8",
+      "name": "新贴纸",
+      "image": "/open-archive-portfolio/assets/uploads/6e278b03-a200-42e5-8164-0167619f700a.png",
+      "width": 277
+    },
+    {
+      "id": "item-d644ac31",
+      "name": "新贴纸",
+      "image": "/open-archive-portfolio/assets/uploads/edc9036d-1b24-4d6b-a55e-fddf0184777a.png",
+      "width": 220
+    }
+  ],
   "templateProfile": {
     "brand": "STUDIO",
     "name": "隋轶轩",
@@ -187,8 +218,8 @@
       "note": "A practice in progress."
     },
     "perspective": {
-      "titleLine1": "A different",
-      "titleLine2": "way to look.",
+      "titleLine1": "一些运营思路",
+      "titleLine2": "If you want to see it",
       "tag": "ALWAYS CURIOUS",
       "description": "Room for another point of view."
     },
