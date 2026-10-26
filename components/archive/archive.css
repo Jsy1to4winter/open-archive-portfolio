@@ -57,9 +57,9 @@ body.archive-page-open { background: #f3f3f3; color: #171717; overflow: hidden; 
 .archive-frame-loading { position: absolute; left: calc(34px * var(--computer-unit)); bottom: calc(45px * var(--computer-unit)); }
 .archive-frame-loading > span { display: block; height: 1px; width: calc(55px * var(--computer-unit)); background: #777777; }
 .archive-frame-loading i { display: block; width: 100%; height: 100%; background: #fff; transform-origin: left; }
-.archive-desk-layer { position: absolute; inset: 0; z-index: 2; background: var(--canvas); }
+.archive-desk-layer { position: absolute; inset: 0; z-index: 2; background-color: var(--canvas); background-image: radial-gradient(circle at 1px 1px, #17171724 0.8px, transparent 1px); background-size: 22px 22px; }
 .archive-desk-camera { position: absolute; left: 50%; top: 50%; width: 1600px; height: 1000px; transform-origin: 0 0; will-change: transform; }
-.archive-desk { position: relative; width: 1600px; height: 1000px; background: var(--canvas); color: var(--ink); font-family: 'Archive Space', 'Inter', 'PingFang SC', sans-serif; }
+.archive-desk { position: relative; width: 1600px; height: 1000px; background: transparent; color: var(--ink); font-family: 'Archive Space', 'Inter', 'PingFang SC', sans-serif; }
 .archive-desk-module { position: absolute; border: 0; padding: 32px; text-align: left; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); box-shadow: 7px 9px 0 #17171720; }
 .archive-desk-module::before { content: ''; position: absolute; top: -10px; left: 45%; width: 88px; height: 23px; background: #171717; transform: rotate(-4deg); pointer-events: none; }
 .archive-desk-module::after { content: ''; position: absolute; bottom: 0; right: 0; border-left: 25px solid transparent; border-bottom: 25px solid #1717170c; pointer-events: none; }
