@@ -1,6 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
+import fs from 'node:fs';
 
 async function desk(page: Page) {
+  const fixture = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
+  fixture.stickers = [{ id: 'name-sticker', name: 'suiyixuan', width: 220, image: '', x: 0.5, y: 0.02 }];
+  await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(fixture) }));
   await page.addInitScript(() => {
     (window as any).stickerSounds = [];
     const start = AudioBufferSourceNode.prototype.start;

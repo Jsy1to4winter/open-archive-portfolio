@@ -24,7 +24,7 @@ export function normalizeContent(value: unknown): SiteContent {
   const source = value as Record<string, unknown>;
   const result = {
     ...source,
-    stickers: source.stickers === undefined ? structuredClone(defaultStickers) : source.stickers,
+    stickers: source.stickers === undefined ? structuredClone(defaultStickers) : Array.isArray(source.stickers) ? source.stickers.map((item, index) => ({ x: (index % 3) / 2, y: Math.min(0.8, Math.floor(index / 3) * 0.25), ...item })) : source.stickers,
     accountMedia:
       source.accountMedia === undefined
         ? structuredClone(defaultAccountMedia)
@@ -64,6 +64,8 @@ export function validateContent(value: unknown): asserts value is SiteContent {
   if (!shape(value, defaultContent))
     throw new Error("内容格式不完整，请检查所有栏目。");
   const data = value as SiteContent;
+  if (!data.stickers.every(item => Number.isFinite(item.x) && Number.isFinite(item.y) && item.x >= 0 && item.x <= 1 && item.y >= 0 && item.y <= 1))
+    throw new Error('贴纸位置无效。');
   if (!data.stickers.every(item => item && typeof item.id === 'string' && item.id && typeof item.name === 'string' && typeof item.image === 'string' && Number.isFinite(item.width) && item.width >= 64 && item.width <= 600) || new Set(data.stickers.map(item => item.id)).size !== data.stickers.length)
     throw new Error('贴纸名称、图片或尺寸无效，宽度须在 64 至 600 像素之间。');
   if (data.accountMedia.videos.length > MAX_ACCOUNT_VIDEOS)

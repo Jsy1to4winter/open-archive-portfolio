@@ -73,18 +73,65 @@ test("owner uploads and sizes multiple stickers and publishes them", async ({ pa
   await enter(page);
   await page.getByRole('tab', { name: '贴纸', exact: true }).click();
   await page.getByRole('button', { name: '添加贴纸', exact: true }).click();
-  await page.locator('#field-stickers-1-image').locator('..').locator('input[type=file]').setInputFiles('public/assets/operations/douyin-data-3.jpg');
+  const index = original.stickers.length;
+  await page.locator(`#field-stickers-${index}-image`).locator('..').locator('input[type=file]').setInputFiles('public/assets/operations/douyin-data-3.jpg');
   await expect(page.getByRole('status')).toContainText('文件已加入草稿');
-  await page.locator('#field-stickers-1-width').fill('180');
+  await page.locator(`#field-stickers-${index}-width`).fill('180');
   await page.getByRole('button', { name: '保存发布', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('已保存到 GitHub', { timeout: 15000 });
   const blob = writes.filter(item => item.url.endsWith('/git/blobs')).at(-1)!;
   const saved = JSON.parse(Buffer.from(blob.body.content as string, 'base64').toString('utf8'));
-  expect(saved.stickers).toHaveLength(2);
-  expect(saved.stickers[1].width).toBe(180);
-  expect(saved.stickers[1].image).toContain('uploads/');
+  expect(saved.stickers).toHaveLength(index + 1);
+  expect(saved.stickers[index].width).toBe(180);
+  expect(saved.stickers[index].image).toContain('uploads/');
   expect(JSON.stringify(saved)).not.toContain('blob:');
   expect(saved.accountMedia).toEqual(original.accountMedia);
+});
+
+test('owner sticker arrangement publishes and visitors start from it', async ({ page }) => {
+  const writes = await mockGithub(page);
+  await enter(page);
+  await page.getByRole('button', { name: '预览', exact: true }).click();
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await page.locator('.archive-scroll-track').evaluate(async el => {
+    const { progressForModule } = await import('/components/archive/timeline.ts');
+    const { portfolioWorks } = await import('/components/archive/content.ts');
+    el.scrollTop = progressForModule('about', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
+  });
+  const sticker = page.locator('.homepage-sticker').first();
+  await expect(sticker).toBeVisible();
+  await page.waitForTimeout(700);
+  const before = (await sticker.boundingBox())!;
+  await page.mouse.move(before.x + 30, before.y + 30);
+  await page.mouse.down();
+  await page.mouse.move(before.x + 110, before.y + 130, { steps: 12 });
+  await page.mouse.up();
+  const arranged = (await sticker.boundingBox())!;
+  await page.getByRole('button', { name: '编辑作品集', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('贴纸位置已加入草稿');
+  await page.getByRole('button', { name: '保存发布', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('已保存到 GitHub', { timeout: 20000 });
+  const blob = writes.filter(item => item.url.endsWith('/git/blobs')).at(-1)!;
+  const saved = JSON.parse(Buffer.from(blob.body.content as string, 'base64').toString('utf8'));
+  expect(saved.stickers[0].x).toBeGreaterThan(0);
+  expect(saved.stickers[0].y).toBeGreaterThan(0);
+  await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(saved) }));
+  await page.reload();
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await page.locator('.archive-scroll-track').evaluate(async el => {
+    const { progressForModule } = await import('/components/archive/timeline.ts');
+    const { portfolioWorks } = await import('/components/archive/content.ts');
+    el.scrollTop = progressForModule('about', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
+  });
+  await expect(sticker).toBeVisible();
+  await page.waitForTimeout(700);
+  expect((await sticker.boundingBox())!.x).toBeCloseTo(arranged.x, 0);
+  expect((await sticker.boundingBox())!.y).toBeCloseTo(arranged.y, 0);
+  const count = writes.length;
+  await sticker.focus();
+  await page.keyboard.press('ArrowRight');
+  expect(writes.length).toBe(count);
+  expect((await sticker.boundingBox())!.x).toBeGreaterThan(arranged.x);
 });
 
 test("visitor is rejected and never writes", async ({ page }) => {

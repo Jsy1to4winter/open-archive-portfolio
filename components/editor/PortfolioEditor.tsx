@@ -150,6 +150,18 @@ export default function PortfolioEditor() {
   const focusPath = useRef<Path | null>(null);
   const backupInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
+    if (!auth || busy) return;
+    const move = (event: Event) => {
+      const { id, x, y } = (event as CustomEvent).detail;
+      if (typeof id !== 'string' || !Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > 1 || y < 0 || y > 1) return;
+      setDraft(previous => ({ ...previous, stickers: previous.stickers.map(item => item.id === id ? { ...item, x, y } : item) }));
+      setDirty(true);
+      setMessage('贴纸位置已加入草稿，保存发布后访客可见。');
+    };
+    window.addEventListener('portfolio-sticker-move', move);
+    return () => window.removeEventListener('portfolio-sticker-move', move);
+  }, [auth, busy]);
+  useEffect(() => {
     const show = () => setOpen(true);
     window.addEventListener("portfolio-open-editor", show);
     return () => window.removeEventListener("portfolio-open-editor", show);
@@ -553,6 +565,7 @@ export default function PortfolioEditor() {
         ? "账号截图"
         : (labels[key] ?? key);
     if (key === "id") return null;
+    if (path[0] === 'stickers' && ['x', 'y'].includes(key)) return null;
     if (path[0] === 'stickers' && key === 'width') return (
       <div className="editor-field" key={path.join('.')}>
         <label htmlFor={`field-${path.join('-')}`}>贴纸宽度：{String(value)} px</label>
@@ -589,7 +602,7 @@ export default function PortfolioEditor() {
                   return;
                 const sample =
                   path[0] === 'stickers'
-                    ? { id: '', name: '新贴纸', image: '', width: 220 }
+                    ? { id: '', name: '新贴纸', image: '', width: 220, x: 0.5, y: 0.05 }
                     :
                   path[0] === "accountMedia" && key === "videos"
                     ? { id: "", title: "", src: "", poster: "" }

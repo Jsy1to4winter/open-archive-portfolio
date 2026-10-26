@@ -16,6 +16,17 @@ function Sticker({ visible, item, index }: { visible: boolean; item: HomepageSti
   const bounds = useRef<HTMLDivElement>(null);
   const sticker = useRef<HTMLButtonElement>(null);
   const drag = useRef<Draggable | null>(null);
+  const position = useRef({ x: item.x, y: item.y });
+  function recordPosition() {
+    if (!bounds.current || !sticker.current || !drag.current) return;
+    const width = Math.max(0, bounds.current.clientWidth - sticker.current.offsetWidth);
+    const height = Math.max(0, bounds.current.clientHeight - sticker.current.offsetHeight);
+    position.current = {
+      x: width ? Math.min(1, Math.max(0, drag.current.x / width)) : 0,
+      y: height ? Math.min(1, Math.max(0, drag.current.y / height)) : 0,
+    };
+    window.dispatchEvent(new CustomEvent('portfolio-sticker-move', { detail: { id: item.id, ...position.current } }));
+  }
 
   useLayoutEffect(() => {
     if (!visible || !sticker.current || !bounds.current) return;
@@ -33,11 +44,19 @@ function Sticker({ visible, item, index }: { visible: boolean; item: HomepageSti
       onDragEnd(event: Event) {
         sticker.current?.removeAttribute('data-dragging');
         if (event.type.includes('cancel') || document.visibilityState === 'hidden') return;
+        recordPosition();
         playStickerSound();
       },
     });
     drag.current = instance;
-    const resize = new ResizeObserver(() => instance.applyBounds(bounds.current!));
+    const place = () => {
+      const root = bounds.current!, element = sticker.current!;
+      gsap.set(element, { x: position.current.x * Math.max(0, root.clientWidth - element.offsetWidth), y: position.current.y * Math.max(0, root.clientHeight - element.offsetHeight) });
+      instance.update(true);
+      instance.applyBounds(root);
+    };
+    place();
+    const resize = new ResizeObserver(place);
     resize.observe(bounds.current);
     return () => {
       resize.disconnect();
@@ -53,7 +72,7 @@ function Sticker({ visible, item, index }: { visible: boolean; item: HomepageSti
       <button
         ref={sticker}
         className="homepage-sticker"
-        style={{ width: `min(${item.width}px, calc(100vw - 48px))`, height: 'auto', aspectRatio: item.image ? '3 / 2' : '30 / 11', left: `max(0px, calc(50% - ${item.width / 2}px))`, top: `${12 + (index % 4) * 34}px` }}
+        style={{ width: `min(${item.width}px, calc(100vw - 48px))`, height: 'auto', aspectRatio: item.image ? '3 / 2' : '30 / 11', left: 0, top: 0 }}
         type="button"
         aria-label={`拖动 ${item.name} 贴纸`}
         title="拖动贴纸；方向键也可移动"
@@ -67,6 +86,7 @@ function Sticker({ visible, item, index }: { visible: boolean; item: HomepageSti
           gsap.set(sticker.current, { x: instance.x + direction[0] * step, y: instance.y + direction[1] * step });
           instance.update(true);
           instance.applyBounds(bounds.current!);
+          recordPosition();
         }}
       >
         {item.image ? <img src={item.image} alt={item.name} draggable={false} /> : <div className="homepage-sticker-art"><span className="homepage-sticker-name">suiyixuan</span><span className="homepage-sticker-handle">@jsy_1to4</span></div>}
