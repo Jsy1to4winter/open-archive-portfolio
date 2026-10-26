@@ -4,6 +4,7 @@ import { useReducedMotion } from 'framer-motion';
 import ComputerIntro from './ComputerIntro';
 import IntroChrome from './IntroChrome';
 import ArchiveDesk from './ArchiveDesk';
+import HomepageSticker from './HomepageSticker';
 import ArchiveDialog, { type ArchiveDetail } from './ArchiveDialog';
 import ScrollGallery from './ScrollGallery';
 import GalleryNotes from './GalleryNotes';
@@ -205,6 +206,7 @@ export default function PortfolioTemplate() {
       <main ref={track} className="archive-scroll-track" tabIndex={0} aria-label="Portfolio archive. Scroll to explore, select a note to read more.">
         <div className="archive-scroll-runway" style={{ height: timelineRunwayVh(galleryCount) / 100 * viewport.height }}>
           <div className="archive-pinned-stage" data-progress={t}>
+            <HomepageSticker visible={opening.archiveInteractive && !galleryInteractive && !isDetailOpen} />
             <div className="archive-computer-layer" style={{ opacity: opening.computerOpacity, pointerEvents: opening.computerInteractive ? 'auto' : 'none', visibility: opening.computerVisible ? 'visible' : 'hidden' }} aria-hidden={!opening.computerVisible} inert={!opening.computerInteractive}>
               <ComputerIntro width={layout.computerWidth} scale={reducedMotion ? 1 : frame.computerScale} loadingProgress={sceneT > 0.01 && sceneT < 0.12 ? Math.min(1, sceneT / 0.12) : null} playVideo={opening.computerVisible && !isDetailOpen} reducedMotion={Boolean(reducedMotion)} onEnter={() => seek(progressForModule('about', galleryCount))} />
             </div>
