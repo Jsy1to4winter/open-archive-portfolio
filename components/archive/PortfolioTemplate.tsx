@@ -213,12 +213,13 @@ export default function PortfolioTemplate() {
             </div>
             <div className="archive-desk-layer" style={{ opacity: opening.deskOpacity, visibility: opening.archiveVisible ? 'visible' : 'hidden', pointerEvents: opening.archiveInteractive && !galleryInteractive ? 'auto' : 'none' }} aria-hidden={!opening.archiveInteractive || galleryInteractive} inert={!opening.archiveInteractive || galleryInteractive}>
               <div className="archive-desk-camera" style={{
+                '--desk-hover-lift': `${-12 / (zoomThroughCard ? zoomScale : scale)}px`,
                 left: zoomThroughCard ? portal.centerX : desk.center.x,
                 top: zoomThroughCard ? portal.centerY : desk.center.y,
                 transform: zoomThroughCard
                   ? `rotate(${portal.rotation - card.rotation}deg) translate3d(${-cardAnchorX * zoomScale}px, ${-cardAnchorY * zoomScale}px, 0) scale(${zoomScale})`
                   : `translate3d(${-camera.x * scale}px, ${-camera.y * scale}px, 0) scale(${scale})`,
-              }}>
+              } as CSSProperties}>
                 <ArchiveDesk onSelect={openModule} onResume={() => openDetail({ type: 'resume' })} />
               </div>
             </div>
