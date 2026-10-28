@@ -1,4 +1,37 @@
 import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+
+for (const viewport of [{ width: 1440, height: 857 }, { width: 390, height: 769 }]) {
+  test(`homepage data card opens rotating gallery at ${viewport.width}x${viewport.height}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    const content = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
+    content.stickers = [];
+    await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(content) }));
+    await page.goto('/');
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+    await page.locator('.archive-scroll-track').evaluate(async el => {
+      const { progressForModule } = await import('/components/archive/timeline.ts');
+      const { portfolioWorks } = await import('/components/archive/content.ts');
+      el.scrollTop = progressForModule('about', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
+    });
+    await expect(page.locator('.archive-gallery-paper')).toBeVisible();
+    await page.locator('.archive-gallery-paper').click();
+    await expect(page.locator('.data-orbit')).toBeVisible();
+    await expect(page.locator('.archive-gallery-content')).toHaveAttribute('aria-hidden', 'false');
+    await page.mouse.move(0, 0);
+    const first = page.locator('.data-orbit-card').first();
+    const initial = await first.evaluate(el => el.style.transform);
+    await expect.poll(() => first.evaluate(el => el.style.transform), { timeout: 7000 }).not.toBe(initial);
+    await page.getByRole('button', { name: 'Pause rotation', exact: true }).click();
+    for (let index = 1; index < content.portfolioWorks.length; index++) {
+      await page.locator('.data-orbit .archive-gallery-next').click();
+      await expect(page.locator('.data-orbit .archive-gallery-counter')).toHaveText(`${String(index + 1).padStart(2, '0')} / 05`);
+    }
+    await page.locator('.data-orbit .archive-gallery-next').click();
+    await expect(page.locator('.data-orbit .archive-gallery-counter')).toHaveText('01 / 05');
+    await page.screenshot({ path: `test-results/data-card-entry-${viewport.width}.png` });
+  });
+}
 
 for (const width of [1440, 390]) test(`3D data rotation, pause and lightbox at ${width}px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 900 });

@@ -84,7 +84,8 @@ export default function PortfolioTemplate() {
   const zoomScale = scale * cardZoom;
   const cardAnchorX = scale > 0 ? camera.x + (card.centerX - desk.center.x) / scale : camera.x;
   const cardAnchorY = scale > 0 ? camera.y + (card.centerY - desk.center.y) / scale : camera.y;
-  const galleryInteractive = opening.archiveInteractive && expansion >= 1 - 1e-6;
+  // Native scroll offsets round to CSS pixels, so a completed seek can stop just below 1.
+  const galleryInteractive = opening.archiveInteractive && expansion >= 1 - 1e-4;
   const chromeGray = Math.round(243 + 12 * expansion);
 
   useEffect(() => {
