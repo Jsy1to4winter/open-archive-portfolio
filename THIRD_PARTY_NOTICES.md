@@ -4,6 +4,8 @@ The project license applies to the template's original code and placeholder SVGs
 
 ## Computer-screen video
 
+The looping background music (portfolio-background.mp3) is the user's supplied 20261028_165726_0.mp3, preserved unmodified. It is user-provided media and is not relicensed under the template's MIT license.
+
 The active homepage sticker placement sound (sticker-place-v2.wav) is a 0.30-second excerpt from the user's second supplied reference recording, trimmed before applying a limiter and fade. It is user-provided media, not part of the template's MIT-licensed assets.
 
 The computer-screen video is an original work by KAKI (kakizzzzz), released with this template under its MIT license. Its extracted poster is covered by the same license. The web version removes the source's blank black tail, is cropped to the screen and compressed as H.264, and forms a roughly 40-second forward-and-reverse loop without repeating the endpoint frames. Color is retained in the media; a single GPU pass provides the monochrome appearance and a diffuse color reveal around the pointer, with native monochrome playback as the fallback. No third-party stock video is included.

@@ -7,6 +7,7 @@ import "@fontsource/inter/latin-700.css";
 import "./base.css";
 import PortfolioTemplate from "./components/archive/PortfolioTemplate";
 import PortfolioEditor from "./components/editor/PortfolioEditor";
+import BackgroundMusic from './components/archive/BackgroundMusic';
 
 function App() {
   const [revision, setRevision] = useState(0);
@@ -19,6 +20,7 @@ function App() {
     <>
       <PortfolioTemplate key={revision} />
       <PortfolioEditor />
+      <BackgroundMusic />
     </>
   );
 }

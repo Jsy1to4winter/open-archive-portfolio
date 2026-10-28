@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Play, Pause, X, Film } from "lucide-react";
 import { accountMedia } from "./content";
 import type { AccountVideo } from "./account-media";
 import "./account-showcase.css";
+import { holdAudioFocus } from './audio-focus';
 
 gsap.registerPlugin(ScrollTrigger);
 export { ScrollTrigger };
@@ -178,9 +179,11 @@ export default function AccountShowcase() {
 
   useEffect(() => {
     if (selected) {
+      const release = holdAudioFocus();
       player.current?.showModal();
       setError("");
       void video.current?.play().catch(() => {});
+      return release;
     } else player.current?.close();
   }, [selected]);
 
