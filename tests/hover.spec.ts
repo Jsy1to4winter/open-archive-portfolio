@@ -1,6 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
+import fs from 'node:fs';
 
 async function openDesk(page: Page, module = "about") {
+  const content = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
+  content.stickers = [];
+  await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(content) }));
   await page.goto("/");
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
   await page.locator(".archive-scroll-track").evaluate(async (el, module) => {

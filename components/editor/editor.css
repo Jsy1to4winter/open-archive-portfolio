@@ -191,7 +191,8 @@
   font-size: 12px;
 }
 .editor-tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
   overflow-x: auto;
   padding: 12px 20px;
@@ -199,7 +200,13 @@
   flex-shrink: 0;
 }
 .editor-tabs button {
-  white-space: nowrap;
+  white-space: normal;
+  text-align: left;
+  justify-content: flex-start;
+  min-height: 36px;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
   border-color: transparent;
 }
 .editor-tabs button[aria-selected="true"] {
@@ -207,6 +214,8 @@
   border-color: #bed3c8;
   background: #eef5f1;
 }
+.portfolio-editor header h2 { overflow-wrap: anywhere; font-size: 18px; line-height: 1.4; }
+.editor-video-upload video { display: block; width: 100%; max-height: 200px; margin-bottom: 12px; background: #171717; }
 .editor-body {
   padding: 20px 24px;
   margin: 0;
@@ -262,6 +271,8 @@
   background: #f4f4f4;
 }
 .editor-upload {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -272,8 +283,9 @@
 }
 .editor-upload input {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   opacity: 0;
 }
 .portfolio-editor footer {

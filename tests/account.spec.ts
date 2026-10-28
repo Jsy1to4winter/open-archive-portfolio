@@ -18,6 +18,7 @@ const fixture = {
 };
 async function openAccount(page: Page) {
   await page.goto("/");
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
   await page.locator(".archive-scroll-track").evaluate(async (el) => {
     const timeline = await import("/components/archive/timeline.ts");
     const content = await import("/components/archive/content.ts");
@@ -165,6 +166,7 @@ test("owner can add, upload, publish and remove all account videos", async ({
       content: Buffer.from(
         JSON.stringify({
           ...original,
+          stickers: [],
           accountMedia: { ...original.accountMedia, videos: [] },
         }),
       ).toString("base64"),
@@ -176,7 +178,7 @@ test("owner can add, upload, publish and remove all account videos", async ({
     .getByLabel("编辑凭证", { exact: true })
     .fill("test-only-not-a-token");
   await page.getByRole("button", { name: "登录", exact: true }).click();
-  await page.getByRole("tab", { name: "账号和视频", exact: true }).click();
+  await page.getByRole("tab", { name: original.screenText.fragments.title, exact: true }).click();
   await page.getByRole("button", { name: "添加视频作品", exact: true }).click();
   await page
     .locator("#field-accountMedia-image")
@@ -187,17 +189,13 @@ test("owner can add, upload, publish and remove all account videos", async ({
     /uploads/,
   );
   await page
-    .locator("#field-accountMedia-videos-0-src")
-    .locator("..")
-    .locator("input[type=file]")
+    .locator('.editor-video-upload input[type=file]')
     .setInputFiles("public/assets/template/intro-loop.mp4");
-  await expect(page.locator("#field-accountMedia-videos-0-src")).toHaveValue(
-    /\.mp4$/,
+  await expect(page.getByRole('status')).toContainText(
+    '文件已加入草稿',
     { timeout: 15000 },
   );
-  await expect(page.locator("#field-accountMedia-videos-0-poster")).toHaveValue(
-    /\.jpg$/,
-  );
+  await expect(page.locator('.editor-video-upload video')).toBeVisible();
   await page.getByRole("button", { name: "保存发布", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("已保存到 GitHub", {
     timeout: 15000,
@@ -210,9 +208,11 @@ test("owner can add, upload, publish and remove all account videos", async ({
   );
   expect(saved.accountMedia.videos).toHaveLength(1);
   expect(saved.accountMedia.videos[0].src).toContain("uploads");
+  expect(saved.accountMedia.videos[0].poster).toMatch(/\.jpg$/);
   expect(JSON.stringify(saved)).not.toContain("blob:");
   expect(saved.portfolioWorks).toEqual(original.portfolioWorks);
   await page.getByRole("button", { name: "预览", exact: true }).click();
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
   await page.locator(".archive-scroll-track").evaluate(async (el) => {
     const timeline = await import("/components/archive/timeline.ts");
     const content = await import("/components/archive/content.ts");
@@ -232,5 +232,5 @@ test("owner can add, upload, publish and remove all account videos", async ({
     .getByRole("button", { name: "编辑作品集", exact: true })
     .click();
   await page.getByRole("button", { name: "删除", exact: true }).click();
-  await expect(page.locator("#field-accountMedia-videos-0-src")).toHaveCount(0);
+  await expect(page.locator('.editor-video-upload')).toHaveCount(0);
 });

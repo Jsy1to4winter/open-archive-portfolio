@@ -1,10 +1,12 @@
 import * as defaults from "./default-content";
+import { splitModuleCopy } from './module-copy';
 import { defaultStickers } from './stickers';
 import { defaultScreenText } from "./screen-text";
 import { defaultAccountMedia, MAX_ACCOUNT_VIDEOS } from "./account-media";
 export type { Reason, PortfolioWork } from "./default-content";
 
 export const defaultContent = {
+  moduleCopy: splitModuleCopy(defaults.reasons),
   aboutPhotos: [] as Array<{ id: string; title: string; image: string; caption: string }>,
   stickers: defaultStickers,
   accountMedia: defaultAccountMedia,
@@ -23,8 +25,11 @@ export function normalizeContent(value: unknown): SiteContent {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error("内容格式不完整。");
   const source = value as Record<string, unknown>;
+  const profile = source.templateProfile as Record<string, unknown>;
   const result = {
     ...source,
+    moduleCopy: source.moduleCopy === undefined ? splitModuleCopy(Array.isArray(source.reasons) ? source.reasons : defaults.reasons) : source.moduleCopy,
+    templateProfile: { image: '', slipIntroduction: '', ...profile },
     aboutPhotos: source.aboutPhotos === undefined ? [] : source.aboutPhotos,
     stickers: source.stickers === undefined ? structuredClone(defaultStickers) : Array.isArray(source.stickers) ? source.stickers.map((item, index) => ({ x: (index % 3) / 2, y: Math.min(0.8, Math.floor(index / 3) * 0.25), ...item })) : source.stickers,
     accountMedia:
@@ -114,6 +119,8 @@ export function validateContent(value: unknown): asserts value is SiteContent {
   )
     throw new Error("作品编号不能重复。");
   const urls = [
+    data.templateProfile.image,
+    ...Object.values(data.moduleCopy).flatMap(items => items.map(item => item.source)),
     ...data.aboutPhotos.map(item => item.image),
     ...data.stickers.map(item => item.image),
     data.accountMedia.image,
@@ -148,6 +155,7 @@ try {
   console.warn("Using bundled portfolio content.", error);
 }
 export let templateProfile = loaded.templateProfile;
+export let moduleCopy = loaded.moduleCopy;
 export let aboutPhotos = loaded.aboutPhotos;
 export let stickers = loaded.stickers;
 export let accountMedia = loaded.accountMedia;
@@ -162,6 +170,7 @@ export let workCategories = loaded.workCategories;
 export let templateResume = loaded.templateResume;
 export function currentContent(): SiteContent {
   return structuredClone({
+    moduleCopy,
     aboutPhotos,
     stickers,
     accountMedia,
@@ -179,6 +188,7 @@ export function currentContent(): SiteContent {
 export function applyContent(data: SiteContent) {
   validateContent(data);
   ({
+    moduleCopy,
     aboutPhotos,
     stickers,
     accountMedia,

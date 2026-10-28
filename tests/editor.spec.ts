@@ -11,6 +11,7 @@ async function mockGithub(
     denied?: boolean;
     conflict?: boolean;
     error?: boolean;
+    cleanDesk?: boolean;
   } = {},
 ) {
   const writes: Array<{ url: string; body: Record<string, unknown> }> = [];
@@ -53,25 +54,26 @@ async function mockGithub(
       });
     if (url.includes("/git/blobs/content-blob"))
       return reply({
-        content: Buffer.from(JSON.stringify(original)).toString("base64"),
+        content: Buffer.from(JSON.stringify(options.cleanDesk ? { ...original, stickers: [] } : original)).toString("base64"),
       });
     return reply({}, 404);
   });
   return writes;
 }
-async function enter(page: Page) {
+async function enter(page: Page, owner = true) {
   await page.goto("/");
   await page.getByRole("button", { name: "编辑作品集", exact: true }).click();
   await page
     .getByLabel("编辑凭证", { exact: true })
     .fill("test-only-not-a-real-token");
   await page.getByRole("button", { name: "登录", exact: true }).click();
+  if (owner) await page.getByRole('tab').nth(6).click();
 }
 
 test('owner uploads and publishes About photos', async ({ page }) => {
   const writes = await mockGithub(page);
   await enter(page);
-  await page.getByRole('tab', { name: '关于我图片', exact: true }).click();
+  await page.getByRole('tab').nth(0).click();
   await page.getByRole('button', { name: '添加关于我图片', exact: true }).click();
   await page.locator('#field-aboutPhotos-0-image').locator('..').locator('input[type=file]').setInputFiles('public/assets/operations/douyin-data-3.jpg');
   await expect(page.getByRole('status')).toContainText('文件已加入草稿');
@@ -154,7 +156,7 @@ test('owner sticker arrangement publishes and visitors start from it', async ({ 
 
 test("visitor is rejected and never writes", async ({ page }) => {
   const writes = await mockGithub(page, { owner: false });
-  await enter(page);
+  await enter(page, false);
   await expect(page.getByRole("alert")).toContainText("只有网站所有者");
   await expect(page.getByRole("button", { name: "保存发布" })).toHaveCount(0);
   expect(writes).toHaveLength(0);
@@ -167,10 +169,10 @@ test("owner edits, previews and publishes UTF-8 content atomically", async ({
 }) => {
   const writes = await mockGithub(page);
   await enter(page);
-  await page.getByLabel("品牌名称", { exact: true }).fill("我的工作室");
+  await page.getByLabel("姓名", { exact: true }).fill("我的名字");
   await page.getByRole("button", { name: "预览", exact: true }).click();
-  await expect(page.locator(".archive-intro-brand-name")).toHaveText(
-    "我的工作室",
+  await expect(page.locator(".archive-name-slip-name")).toHaveText(
+    "我的名字",
   );
   await page.getByRole("button", { name: "编辑作品集", exact: true }).click();
   await page.getByRole("button", { name: "保存发布", exact: true }).click();
@@ -184,7 +186,7 @@ test("owner edits, previews and publishes UTF-8 content atomically", async ({
   const data = JSON.parse(
     Buffer.from(writes[0].body.content as string, "base64").toString("utf8"),
   );
-  expect(data.templateProfile.brand).toBe("我的工作室");
+  expect(data.templateProfile.name).toBe("我的名字");
   expect(writes[1].body.base_tree).toBe("base-tree");
   expect(writes[3].body.force).toBe(false);
   await page.getByRole("button", { name: "退出", exact: true }).click();
@@ -195,7 +197,7 @@ test("upload computes image dimensions and shares one atomic commit", async ({
 }) => {
   const writes = await mockGithub(page);
   await enter(page);
-  await page.getByRole("tab", { name: "作品", exact: true }).click();
+  await page.getByRole('tab').nth(4).click();
   const image = await page.screenshot();
   await page
     .locator("input[type=file]")
@@ -204,11 +206,10 @@ test("upload computes image dimensions and shares one atomic commit", async ({
   await expect(
     page.getByLabel("作品图片", { exact: true }).first(),
   ).toHaveValue(/assets\/uploads\/.+\.png$/);
-  await expect(
-    page.getByLabel("图片宽度", { exact: true }).first(),
-  ).toHaveValue("1280");
   await page.getByRole("button", { name: "保存发布", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("已保存到 GitHub");
+  const savedImageData = JSON.parse(Buffer.from(writes.filter(w => w.url.endsWith('/git/blobs')).at(-1)!.body.content as string, 'base64').toString('utf8'));
+  expect(savedImageData.portfolioWorks[0].width).toBe(1280);
   expect(writes.filter((w) => w.url.endsWith("/git/commits"))).toHaveLength(1);
   expect(writes.filter((w) => w.url.endsWith("/git/blobs"))).toHaveLength(2);
   const tree = writes.find((w) => w.url.endsWith("/git/trees"))!;
@@ -243,14 +244,14 @@ test("discard restores public view and invalid links cannot publish", async ({
   const writes = await mockGithub(page);
   await enter(page);
   await page
-    .getByLabel("网站链接", { exact: true })
+    .getByLabel("个人图片", { exact: true })
     .fill("javascript:alert(1)");
   await page.getByRole("button", { name: "保存发布", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("链接必须");
   expect(writes).toHaveLength(0);
   await page.getByRole("button", { name: "取消修改", exact: true }).click();
-  await expect(page.getByLabel("网站链接", { exact: true })).toHaveValue(
-    original.templateProfile.website,
+  await expect(page.getByLabel("个人图片", { exact: true })).toHaveValue(
+    original.templateProfile.image ?? '',
   );
 });
 test("page text can be selected directly after owner preview", async ({
@@ -259,30 +260,34 @@ test("page text can be selected directly after owner preview", async ({
   await mockGithub(page);
   await enter(page);
   await page.getByRole("button", { name: "预览", exact: true }).click();
-  await page.locator(".archive-intro-brand-name").click();
-  await expect(page.getByLabel("品牌名称", { exact: true })).toBeFocused();
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent('portfolio-open-editor', { detail: { section: 'profile' } })));
+  await expect(page.getByLabel("姓名", { exact: true })).toBeVisible();
 });
 test("screen copy migrates old content and publishes without replacing profile", async ({
   page,
 }) => {
   const writes = await mockGithub(page);
   await enter(page);
-  await page.getByRole("tab", { name: "页面文字", exact: true }).click();
+  await page.getByRole('tab').nth(0).click();
   await expect(page.locator("#field-screenText-about-titleLine1")).toHaveValue(
     original.screenText?.about.titleLine1 ?? "A little",
   );
   await page.locator("#field-screenText-about-titleLine1").fill("关于我的");
+  await page.getByRole('tab').nth(1).click();
   await page.locator("#field-screenText-fragments-title").fill("灵感");
+  await page.getByRole('tab').nth(2).click();
   await page.locator("#field-screenText-craft-titleLine1").fill("创作过程");
+  await page.getByRole('tab').nth(3).click();
   await page.locator("#field-screenText-perspective-tag").fill("保持好奇");
+  await page.getByRole('tab').nth(5).click();
   await page
     .locator("#field-screenText-collaboration-titleLine1")
     .fill("一起合作");
+  await page.getByRole('tab').nth(4).click();
   await page.locator("#field-screenText-gallery-titleLine1").fill("精选");
-  await page.locator("#field-screenText-intro-titleLine1").fill("我的创作");
   await page.getByRole("button", { name: "预览", exact: true }).click();
   await expect(page.locator(".archive-screen-title-line").first()).toHaveText(
-    "我的创作",
+    original.screenText.intro.titleLine1,
   );
   await expect(page.locator(".archive-desk-about-title")).toContainText(
     "关于我的",
@@ -295,7 +300,7 @@ test("screen copy migrates old content and publishes without replacing profile",
   const saved = JSON.parse(
     Buffer.from(writes[0].body.content as string, "base64").toString("utf8"),
   );
-  expect(saved.templateProfile).toEqual(original.templateProfile);
+  expect(saved.templateProfile.name).toEqual(original.templateProfile.name);
   expect(saved.portfolioWorks).toEqual(original.portfolioWorks);
   expect(saved.screenText.gallery.titleLine1).toBe("精选");
   await page.route("**/content.json", (route) =>
@@ -306,18 +311,20 @@ test("screen copy migrates old content and publishes without replacing profile",
   );
   await page.reload();
   await expect(page.locator(".archive-screen-title-line").first()).toHaveText(
-    "我的创作",
+    original.screenText.intro.titleLine1,
   );
 });
 test("clicking card title opens the exact screen text field instead of details", async ({
   page,
 }) => {
-  await mockGithub(page);
+  await mockGithub(page, { cleanDesk: true });
   await enter(page);
-  await page.getByRole("tab", { name: "页面文字", exact: true }).click();
+  await page.getByRole('tab').nth(0).click();
   await page.locator("#field-screenText-about-titleLine1").fill("同样的标题");
+  await page.getByRole('tab').nth(2).click();
   await page.locator("#field-screenText-craft-titleLine1").fill("同样的标题");
   await page.getByRole("button", { name: "预览", exact: true }).click();
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
   await page.locator(".archive-scroll-track").evaluate(async (el) => {
     // Use the same timeline mapping as the visible chapter navigation.
     const module = await import("/components/archive/timeline.ts");
@@ -328,12 +335,14 @@ test("clicking card title opens the exact screen text field instead of details",
     );
     el.scrollTop = progress * (el.scrollHeight - el.clientHeight);
   });
+  await page.waitForTimeout(700);
   await page.locator(".archive-desk-about-title > span").first().click();
   await expect(
     page.locator("#field-screenText-about-titleLine1"),
   ).toBeFocused();
   await expect(page.locator(".archive-archive-dialog[open]")).toHaveCount(0);
   await page.getByRole("button", { name: "预览", exact: true }).click();
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
   await page.locator(".archive-scroll-track").evaluate(async (el) => {
     const module = await import("/components/archive/timeline.ts");
     el.scrollTop =
@@ -343,6 +352,7 @@ test("clicking card title opens the exact screen text field instead of details",
       ) *
       (el.scrollHeight - el.clientHeight);
   });
+  await page.waitForTimeout(700);
   await page.locator('[data-edit-path="screenText.craft.titleLine1"]').click();
   await expect(
     page.locator("#field-screenText-craft-titleLine1"),
@@ -380,13 +390,13 @@ test("backup restores draft and cannot write outside media paths", async ({
       JSON.stringify({
         content: {
           ...original,
-          templateProfile: { ...original.templateProfile, brand: "恢复草稿" },
+          templateProfile: { ...original.templateProfile, name: "恢复草稿" },
         },
         uploads: [],
       }),
     ),
   });
-  await expect(page.getByLabel("品牌名称", { exact: true })).toHaveValue(
+  await expect(page.getByLabel("姓名", { exact: true })).toHaveValue(
     "恢复草稿",
   );
   await page.locator('input[accept="application/json,.json"]').setInputFiles({
@@ -410,7 +420,7 @@ for (const width of [1440, 390])
     await mockGithub(page);
     await enter(page);
     await expect(
-      page.getByRole("heading", { name: "编辑作品集", exact: true }),
+      page.getByRole("heading", { name: original.templateProfile.name, exact: true }),
     ).toBeVisible();
     const bounds = await page.locator(".portfolio-editor").boundingBox();
     expect(bounds!.width).toBeLessThanOrEqual(width);

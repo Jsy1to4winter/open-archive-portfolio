@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUpRight, ChevronLeft, ChevronRight, X, Pencil } from 'lucide-react';
-import { contactEmail, contactPhone, otherPortfolioUrl, portfolioWorks, reasons, screenText } from './content';
+import { contactEmail, contactPhone, otherPortfolioUrl, portfolioWorks, reasons, screenText, moduleCopy } from './content';
 import AccountShowcase from './AccountShowcase';
 import { portfolioModules } from './modules';
 import type { ModuleId } from './timeline';
@@ -26,7 +26,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
   const module = detail?.type === 'module' ? portfolioModules.find(item => item.id === detail.id) : undefined;
   const workIndex = detail?.type === 'work' ? portfolioWorks.findIndex(work => work.id === detail.id) : -1;
   const work = portfolioWorks[workIndex];
-  const selectedReasons = module?.id === 'about' ? reasons : reasons.filter(reason => module?.reasonIds.includes(reason.id));
+  const selectedReasons = module && module.id in moduleCopy ? moduleCopy[module.id as keyof typeof moduleCopy] : reasons.filter(reason => module?.reasonIds.includes(reason.id));
   const isResume = detail?.type === 'resume';
   const [aboutReady, setAboutReady] = useState(false);
 
@@ -52,6 +52,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
   return (
     <dialog
       ref={dialog}
+      data-editor-section={isResume ? 'profile' : work ? 'works' : module?.id}
       className={`archive-archive-dialog${module?.id === 'about' ? ' archive-about-dialog' : ''}${isResume ? ' archive-resume-dialog' : ''}${work ? ' archive-image-dialog' : ''}${module?.id === 'fragments' ? ' archive-account-dialog' : ''}`}
       onClose={event => { if (!event.currentTarget.open) onClose(); }}
       onCancel={event => { event.preventDefault(); requestClose(); }}
@@ -60,12 +61,12 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
       aria-label={isResume ? 'Profile' : undefined}
     >
       {detail && <div className="archive-detail-paper">
-        <button className="portfolio-edit-trigger" type="button" aria-label="编辑作品集" title="编辑作品集" onClick={() => window.dispatchEvent(new Event('portfolio-open-editor'))}><Pencil size={14}/></button>
+        <button className="portfolio-edit-trigger" type="button" aria-label="编辑作品集" title="编辑作品集" onClick={() => window.dispatchEvent(new CustomEvent('portfolio-open-editor', { detail: { section: isResume ? 'profile' : work ? 'works' : module?.id } }))}><Pencil size={14}/></button>
         <button ref={closeButton} type="button" className="archive-detail-close" onClick={requestClose} aria-label="Close details"><X size={20} /></button>
         {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || (module?.id === 'about' ? '关于我' : module?.id === 'fragments' ? screenText.fragments.title : module?.id === 'perspective' ? screenText.perspective.titleLine1 : module?.label)}</h2>}
         {module?.id === 'fragments' && <AccountShowcase/>}
-        {module?.id === 'about' && <>{aboutReady && <AboutPhotos />}<section className="about-photo-introduction" aria-label="关于我介绍">{reasons.slice(0, 2).map(reason => <ReasonEntry key={reason.id} reason={reason} animated={false} large />)}</section></>}
-        {module && module.id !== 'fragments' && module.id !== 'about' && selectedReasons.map(reason => <ReasonEntry key={`${module.id}-${reason.id}`} reason={reason} animated={module.id === 'perspective'} large={module.id === 'perspective'} />)}
+        {module?.id === 'about' && <>{aboutReady && <AboutPhotos />}<section className="about-photo-introduction" aria-label="关于我介绍">{moduleCopy.about.slice(0, 2).map((reason, index) => <ReasonEntry key={reason.id} reason={reason} animated={false} large editPath={`moduleCopy.about.${index}`} />)}</section></>}
+        {module && module.id !== 'fragments' && module.id !== 'about' && selectedReasons.map((reason, index) => <ReasonEntry key={`${module.id}-${reason.id}`} reason={reason} animated={module.id === 'perspective'} large={module.id === 'perspective'} editPath={module.id in moduleCopy ? `moduleCopy.${module.id}.${index}` : undefined} />)}
         {module?.id === 'works' && <div className="archive-detail-works">
           {portfolioWorks.map(item => <article key={item.id}>
             <button className="archive-detail-work-button" type="button" onClick={() => onView(item.id)} aria-label={`View ${item.title}`}>

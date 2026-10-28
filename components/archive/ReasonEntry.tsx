@@ -4,7 +4,7 @@ import { useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
 import type { Reason } from './content';
 
-export default function ReasonEntry({ reason, animated, large }: { reason: Reason; animated: boolean; large: boolean }) {
+export default function ReasonEntry({ reason, animated, large, editPath }: { reason: Reason; animated: boolean; large: boolean; editPath?: string }) {
   const text = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   function reveal() {
@@ -31,8 +31,8 @@ export default function ReasonEntry({ reason, animated, large }: { reason: Reaso
       aria-describedby={animated ? `reason-copy-${reason.id}` : undefined}
       onClick={animated ? event => { if (!(event.target as Element).closest('a') && !window.getSelection()?.toString()) reveal(); } : undefined}
       onKeyDown={animated ? event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); reveal(); } } : undefined}>
-      <h3>{reason.title}</h3>
-      <p id={`reason-copy-${reason.id}`} className={large ? 'archive-about-copy' : reason.author ? 'archive-poem' : undefined}>{reason.body}</p>
+      <h3 data-edit-path={editPath ? `${editPath}.title` : undefined}>{reason.title}</h3>
+      <p data-edit-path={editPath ? `${editPath}.body` : undefined} id={`reason-copy-${reason.id}`} className={large ? 'archive-about-copy' : reason.author ? 'archive-poem' : undefined}>{reason.body}</p>
       {reason.author && <a className="archive-poem-credit" href={reason.source} target="_blank" rel="noopener noreferrer">— {reason.author} <ArrowUpRight size={12} aria-hidden="true" /></a>}
     </div>
   </article>;

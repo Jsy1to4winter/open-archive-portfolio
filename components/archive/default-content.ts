@@ -20,6 +20,8 @@ export const templateProfile = {
   website: 'https://example.com',
   location: 'Your city',
   introduction: 'A space for ideas, observations, and work in progress.',
+  image: '',
+  slipIntroduction: '',
   biography: 'Replace this with a short introduction to your creative practice. Describe what you make, what you notice, and what you would like to explore next.',
 };
 

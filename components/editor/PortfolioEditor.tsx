@@ -30,6 +30,8 @@ import {
 import "./editor.css";
 import { videoPoster } from "./video-poster";
 import { MAX_ACCOUNT_VIDEOS } from "../archive/account-media";
+import { sections, sectionTitle, sectionForPath, type EditorSection } from './sections';
+import { profileBiography } from '../archive/profile-copy';
 
 const labels: Record<string, string> = {
   aboutPhotos: '关于我图片',
@@ -69,6 +71,7 @@ const labels: Record<string, string> = {
   templateResume: "履历",
   brand: "品牌名称",
   name: "姓名",
+  slipIntroduction: '姓名下方简介',
   role: "身份",
   discipline: "专业标题",
   disciplines: "专业方向",
@@ -102,19 +105,7 @@ const labels: Record<string, string> = {
   practice: "个人实践",
   tools: "技能与工具",
 };
-const tabs = [
-  'aboutPhotos',
-  "stickers",
-  "accountMedia",
-  "screenText",
-  "templateProfile",
-  "reasons",
-  "portfolioWorks",
-  "templateResume",
-  "introMedia",
-  "workCategories",
-  "contact",
-] as const;
+const tabs = sections;
 type Path = Array<string | number>;
 const clone = <T,>(value: T): T => structuredClone(value);
 const get = (data: unknown, path: Path): unknown =>
@@ -141,7 +132,7 @@ export default function PortfolioEditor() {
   );
   const [draft, setDraft] = useState(currentContent);
   const [baseline, setBaseline] = useState(currentContent);
-  const [tab, setTab] = useState<(typeof tabs)[number]>("templateProfile");
+  const [tab, setTab] = useState<EditorSection>('about');
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [message, setMessage] = useState("");
@@ -164,7 +155,12 @@ export default function PortfolioEditor() {
     return () => window.removeEventListener('portfolio-sticker-move', move);
   }, [auth, busy]);
   useEffect(() => {
-    const show = () => setOpen(true);
+    const show = (event: Event) => {
+      const section = (event as CustomEvent).detail?.section ?? document.querySelector<HTMLElement>('.archive-archive-dialog[open]')?.dataset.editorSection;
+      if (sections.includes(section)) setTab(section);
+      focusPath.current = null;
+      setOpen(true);
+    };
     window.addEventListener("portfolio-open-editor", show);
     return () => window.removeEventListener("portfolio-open-editor", show);
   }, []);
@@ -190,6 +186,7 @@ export default function PortfolioEditor() {
     function collect(value: unknown, path: Path) {
       if (
         typeof value === "string" &&
+        sectionForPath(path) &&
         value.trim() &&
         !["id", "image", "thumbnail", "src", "poster"].includes(
           String(path.at(-1)),
@@ -205,7 +202,7 @@ export default function PortfolioEditor() {
       if (
         !(target instanceof Element) ||
         target.closest(
-          ".portfolio-editor,.portfolio-edit-trigger,.account-video-poster,.account-video-controls,.account-video-player,.homepage-sticker,.archive-reason-interactive,.about-photo-gallery",
+          ".portfolio-editor,.portfolio-edit-trigger,.account-video-poster,.account-video-controls,.account-video-player,.homepage-sticker,.archive-reason-interactive,.about-photo-gallery,.archive-name-slip",
         )
       )
         return null;
@@ -243,14 +240,12 @@ export default function PortfolioEditor() {
     const select = (e: MouseEvent) => {
       const path = match(e.target);
       if (!path) return;
+      const section = sectionForPath(path);
+      if (!section) return;
       e.preventDefault();
       e.stopPropagation();
       focusPath.current = path;
-      setTab(
-        path[0] === "contactEmail" || path[0] === "contactPhone"
-          ? "contact"
-          : (path[0] as (typeof tabs)[number]),
-      );
+      setTab(section);
       setOpen(true);
     };
     document.addEventListener("mouseover", hover, true);
@@ -307,6 +302,7 @@ export default function PortfolioEditor() {
   }
   function visibleContent(content: SiteContent) {
     const data = clone(content);
+    data.templateProfile.image = urls.current.get(data.templateProfile.image) ?? data.templateProfile.image;
     data.aboutPhotos.forEach(item => { item.image = urls.current.get(item.image) ?? item.image; });
     data.stickers.forEach(item => { item.image = urls.current.get(item.image) ?? item.image; });
     data.accountMedia.image =
@@ -564,10 +560,22 @@ export default function PortfolioEditor() {
   function field(value: unknown, path: Path): React.ReactNode {
     const key = String(path[path.length - 1]);
     const name =
+      path[0] === 'templateProfile' && key === 'image' ? '个人图片' :
       path[0] === "accountMedia" && key === "image"
         ? "账号截图"
         : (labels[key] ?? key);
     if (key === "id") return null;
+    if (path[0] === 'portfolioWorks' && ['width', 'height', 'thumbnail', 'category', 'alt'].includes(key)) return null;
+    if (path[0] === 'accountMedia' && path[1] === 'videos' && path.length === 3 && value && typeof value === 'object') {
+      const item = value as { src: string; poster: string };
+      const source = urls.current.get(item.src) ?? item.src;
+      return <div className="editor-video-upload" key={path.join('.')}>
+        {source && <video controls playsInline preload="metadata" src={source} poster={urls.current.get(item.poster) ?? (item.poster || undefined)} />}
+        <label className="editor-upload"><UploadIcon size={15} />{source ? '替换视频' : '上传视频'}
+          <input type="file" accept="video/mp4,video/webm" onChange={event => { const file = event.target.files?.[0]; if (file) void upload(file, [...path, 'src']); event.target.value = ''; }} />
+        </label>
+      </div>;
+    }
     if (path[0] === 'stickers' && ['x', 'y'].includes(key)) return null;
     if (path[0] === 'stickers' && key === 'width') return (
       <div className="editor-field" key={path.join('.')}>
@@ -769,6 +777,28 @@ export default function PortfolioEditor() {
       </div>
     );
   }
+  function renderCopy(section: keyof SiteContent['moduleCopy']) {
+    return draft.moduleCopy[section].map((item, index) => <div className="editor-entry" key={item.id}>
+      {field(item.title, ['moduleCopy', section, index, 'title'])}
+      {field(item.body, ['moduleCopy', section, index, 'body'])}
+    </div>);
+  }
+  function renderSection() {
+    const textSection = { about: 'about', fragments: 'fragments', craft: 'craft', perspective: 'perspective', works: 'gallery', collaboration: 'collaboration' } as const;
+    if (tab === 'stickers') return field(draft.stickers, ['stickers']);
+    if (tab === 'profile') return <>{(['name', 'slipIntroduction', 'image', 'biography', 'disciplines', 'location'] as const).map(key => field(key === 'biography' ? profileBiography(draft.templateProfile[key]) : draft.templateProfile[key], ['templateProfile', key]))}</>;
+    const group = textSection[tab];
+    const text = draft.screenText[group];
+    return <>
+      {Object.entries(text).filter(([key]) => tab !== 'works' || ['titleLine1', 'titleLine2', 'bodyLine1', 'bodyLine2'].includes(key)).map(([key, value]) => field(value, ['screenText', group, key]))}
+      {tab === 'about' && <>{field(draft.aboutPhotos, ['aboutPhotos'])}{renderCopy('about')}</>}
+      {tab === 'fragments' && <>{field(draft.accountMedia.image, ['accountMedia', 'image'])}{field(draft.accountMedia.caption, ['accountMedia', 'caption'])}{field(draft.accountMedia.videos, ['accountMedia', 'videos'])}</>}
+      {tab === 'craft' && renderCopy('craft')}
+      {tab === 'perspective' && renderCopy('perspective')}
+      {tab === 'works' && field(draft.portfolioWorks, ['portfolioWorks'])}
+      {tab === 'collaboration' && <>{field(draft.contactEmail, ['contactEmail'])}{field(draft.contactPhone, ['contactPhone'])}{renderCopy('collaboration')}</>}
+    </>;
+  }
   return (
     <>
       <button
@@ -794,7 +824,7 @@ export default function PortfolioEditor() {
             <span className="editor-eyebrow">
               {auth ? "OWNER ACCESS" : "PORTFOLIO"}
             </span>
-            <h2 id="editor-title">{auth ? "编辑作品集" : "所有者登录"}</h2>
+            <h2 id="editor-title">{auth ? sectionTitle(draft, tab) : "所有者登录"}</h2>
           </div>
           <button
             title="关闭"
@@ -850,27 +880,23 @@ export default function PortfolioEditor() {
           </form>
         ) : (
           <>
-            <nav className="editor-tabs" aria-label="编辑栏目">
+            <nav className="editor-tabs" role="tablist" aria-label="编辑栏目">
               {tabs.map((item) => (
                 <button
                   key={item}
+                  id={`editor-section-${item}`}
                   role="tab"
+                  aria-controls="editor-section-content"
                   aria-selected={tab === item}
+                  disabled={busy}
                   onClick={() => setTab(item)}
                 >
-                  {labels[item] ?? "联系方式"}
+                  {sectionTitle(draft, item)}
                 </button>
               ))}
             </nav>
-            <fieldset className="editor-body" inert={busy} aria-busy={busy}>
-              {tab === "contact" ? (
-                <>
-                  {field(draft.contactEmail, ["contactEmail"])}
-                  {field(draft.contactPhone, ["contactPhone"])}
-                </>
-              ) : (
-                field(draft[tab], [tab])
-              )}
+            <fieldset id="editor-section-content" className="editor-body" role="tabpanel" aria-labelledby={`editor-section-${tab}`} inert={busy} aria-busy={busy}>
+              {renderSection()}
             </fieldset>
             <footer>
               <div className="editor-status" role="status">
