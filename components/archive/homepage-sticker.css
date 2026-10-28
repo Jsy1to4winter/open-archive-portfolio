@@ -42,6 +42,11 @@
 .homepage-sticker[data-dragging] { cursor: grabbing; }
 .homepage-sticker { container-type: inline-size; }
 .homepage-sticker img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.homepage-sticker-face { width: 100%; height: 100%; }
+.homepage-sticker-peel { position: absolute; inset: -40%; pointer-events: none; visibility: hidden; }
+.homepage-sticker-peel canvas { pointer-events: none; }
+.homepage-sticker[data-peel-active="true"] .homepage-sticker-face { opacity: 0; }
+.homepage-sticker[data-peel-active="true"] .homepage-sticker-peel { visibility: visible; }
 .homepage-sticker .homepage-sticker-name { font-size: 18cqw; }
 .homepage-sticker .homepage-sticker-handle { font-size: 8.5cqw; }
 .homepage-sticker:focus-visible { outline: 2px dashed #555; outline-offset: 4px; }

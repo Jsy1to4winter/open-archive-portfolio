@@ -12,6 +12,12 @@ The computer-screen video is an original work by KAKI (kakizzzzz), released with
 
 ## Runtime software
 
+Homepage sticker peeling uses CatsJuice/sticker-forge's Three.js renderer,
+geometry and shaders (commit 068caa49eef69745564a5debbc01bab3fcd31042).
+See [Sticker Forge MIT license](licenses/sticker-forge.txt) and the retained
+runtime source in vendor/sticker-forge. Its bundled audio is not played;
+the portfolio retains the user's existing placement sound.
+
 The interactive handwritten Artist ink adapts Da0Mine/text-particleization's
 pixel-sampling, pointer-repulsion and spring/damping model. It samples the
 user's red artwork instead of replacing it with a system font, and keeps the

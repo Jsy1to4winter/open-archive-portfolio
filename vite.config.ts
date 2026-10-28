@@ -6,5 +6,5 @@ export default defineConfig({
   plugins: [react()],
   optimizeDeps: { exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/core"] },
   server: { host: "127.0.0.1" },
-  build: { target: "es2022", sourcemap: false, rollupOptions: { output: { manualChunks: { swiper: ['swiper/react', 'swiper/modules'] } } } },
+  build: { target: "es2022", sourcemap: false, rollupOptions: { output: { manualChunks: { swiper: ['swiper/react', 'swiper/modules'], three: ['three'] } } } },
 });
