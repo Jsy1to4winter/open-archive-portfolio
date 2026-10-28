@@ -36,8 +36,21 @@ for (const width of [1440, 390]) test(`edge peels stay anchored and center moves
     const anchored = (await sticker.boundingBox())!;
     const edgeX = anchored.x + 12, edgeY = anchored.y + anchored.height / 2;
     await page.mouse.move(edgeX, edgeY);
-    await expect.poll(async () => Number(await surface.getAttribute('data-progress'))).toBeGreaterThan(0);
+    await page.mouse.move(edgeX + 1, edgeY + 8, { steps: 4 });
+    await page.mouse.move(edgeX, edgeY, { steps: 4 });
+    await page.waitForTimeout(150);
+    await expect(surface).toHaveAttribute('data-progress', '0');
+    await expect(sticker).not.toHaveAttribute('data-peel-active', 'true');
+    // A click or sub-threshold pointer jitter must not curl the edge either.
     await page.mouse.down();
+    await page.mouse.move(edgeX + 1, edgeY + 1);
+    await expect(surface).toHaveAttribute('data-progress', '0');
+    await page.mouse.up();
+    await expect(sticker).not.toHaveAttribute('data-peel-active', 'true');
+    await page.mouse.move(edgeX, edgeY);
+    await page.mouse.down();
+    await page.waitForTimeout(100);
+    await expect(surface).toHaveAttribute('data-progress', '0');
     await page.mouse.move(edgeX + 40, edgeY + 65, { steps: 8 });
     await expect(sticker).toHaveAttribute('data-peel-active', 'true');
     await expect.poll(async () => Number(await surface.getAttribute('data-progress'))).toBeGreaterThan(.1);
@@ -56,14 +69,14 @@ for (const width of [1440, 390]) test(`edge peels stay anchored and center moves
     expect((await sticker.boundingBox())!.y).toBeCloseTo(anchored.y, 1);
     await page.mouse.up();
     await expect(surface).toHaveAttribute('data-progress', '0');
-    await expect(sticker).toHaveAttribute('data-peel-active', 'true');
-    await expect(surface).toHaveAttribute('data-material', 'holographic');
-    await expect(sticker.locator('.homepage-sticker-face')).toHaveCSS('opacity', '0');
+    await expect(sticker).not.toHaveAttribute('data-peel-active', 'true');
+    await expect(surface).toHaveAttribute('data-material', 'original');
+    await expect(sticker.locator('.homepage-sticker-face')).toHaveCSS('opacity', '1');
     expect((await sticker.boundingBox())!.y - before.y).toBeCloseTo(65, 0);
     await page.screenshot({ path: `test-results/peel-returned-${width}-${i}.png` });
     await page.mouse.move(0, 0);
     await page.mouse.move(anchored.x + 12, anchored.y + anchored.height / 2);
-    await expect.poll(async () => Number(await surface.getAttribute('data-progress'))).toBeGreaterThan(0);
+    await expect(surface).toHaveAttribute('data-progress', '0');
     await page.mouse.move(0, 0);
     await expect(surface).toHaveAttribute('data-progress', '0');
   }

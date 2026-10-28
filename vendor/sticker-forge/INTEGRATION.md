@@ -13,12 +13,14 @@ used without replacing the user's artwork. Local compatibility changes:
 
 The application adapter separates gestures at pointer-down: the image edge
 controls setPeelProgress without translating the sticker, while its central
-handle uses GSAP Draggable without curling. Hovering an edge lifts it slightly;
-release or pointer-leave smoothly returns progress to zero. Drag positions,
+handle uses GSAP Draggable without curling. Hovering or clicking an edge does
+not lift it; a held pointer must move at least 4 CSS pixels to begin peeling.
+Release smoothly returns progress to zero. Drag positions,
 editor size controls, normalized placement and keyboard movement remain owned
 by HomepageSticker. Native sound and native detachment are disabled: only the
-existing user-supplied placement sound plays on drop. The original holographic
-material stays visible after return. Static HTML/image artwork is retained as
-the fallback when WebGL is unavailable or reduced motion is preferred.
+existing user-supplied placement sound plays on drop, not on an idle click.
+The renderer uses the original material without a holographic finish. After
+return the static HTML/image artwork is restored unchanged; it is also the
+fallback when WebGL is unavailable or reduced motion is preferred.
 Renderer initialization is lazy on hover, press or focus,
 and all Three.js resources are disposed when the sticker unmounts.

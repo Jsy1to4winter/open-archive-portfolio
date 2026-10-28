@@ -12,6 +12,7 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
   let tween: gsap.core.Tween | undefined;
   let ratio = 30 / 11;
   let alpha: ImageData | undefined;
+  host.dataset.progress = '0';
   const pose = { value: 0 };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let motion: StickerPlaybackMotion = { origin: { x: 0, y: .5 }, target: { x: 1, y: .5 } };
@@ -33,14 +34,12 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
     pendingPreview = false;
     tween?.kill(); pose.value = 0;
     instance?.reset();
-    if (instance && !reduced.matches) button.dataset.peelActive = 'true';
-    else delete button.dataset.peelActive;
+    delete button.dataset.peelActive;
     host.dataset.progress = '0';
   }
   function release() {
     tween?.kill();
-    if (!instance) { pendingPreview = pose.value > 0; pose.value = 0; return; }
-    if (reduced.matches) { reset(); return; }
+    if (!instance || !pose.value || reduced.matches) { reset(); return; }
     tween = gsap.to(pose, { value: 0, duration: .55, ease: 'power3.out', onUpdate: paint, onComplete: reset });
   }
   const observer = new ResizeObserver(resize);
@@ -79,14 +78,13 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
       peel: { radius: .12, stiffness: .72, grabWidth: 22, maxAngle: 3.55, release: 'reset', residue: false },
       shadow: { opacity: .22, blur: 22, distance: 16, angle: 42, color: '#191823' },
       back: { color: '#f7f5f2', gloss: .7, roughness: .3 },
-      material: { type: 'holographic', intensity: 1, scale: 1, holographicGrain: .72, holographicColors: ['#ff55b5', '#36e6c6', '#8c74ff'] },
+      material: { type: 'original' },
       sound: { enabled: false }, wind: 0, tilt: 0, quality: 'low',
     });
     if (disposed) { instance.destroy(); return; }
     const canvas = host.querySelector('canvas')!;
     canvas.tabIndex = -1; canvas.removeAttribute('role'); canvas.setAttribute('aria-hidden', 'true');
-    resize(); host.dataset.ready = 'true'; host.dataset.material = 'holographic';
-    if (!reduced.matches) button.dataset.peelActive = 'true';
+    resize(); host.dataset.ready = 'true'; host.dataset.material = 'original';
     if (pendingPreview) { pendingPreview = false; pose.value = .45; paint(); release(); }
     else if (pose.value) paint();
   })().catch(() => { if (!disposed) host.dataset.ready = 'false'; });
@@ -113,13 +111,14 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
       return { edge, x: Math.max(0, Math.min(1, x)), y: Math.max(0, Math.min(1, y)) };
     },
     begin(x: number, y: number) {
-      tween?.kill();
+      reset();
       motion = { origin: { x, y }, target: { x: 1 - x, y: 1 - y } };
-      pose.value = .1; paint();
     },
     drag(dx: number, dy: number) {
+      const distance = Math.hypot(dx, dy);
+      if (distance < 4 && !pose.value) return;
       tween?.kill();
-      pose.value = Math.min(.95, .1 + Math.hypot(dx, dy) / Math.max(80, button.clientWidth * .8)); paint();
+      pose.value = Math.min(.95, distance / Math.max(80, button.clientWidth * .8)); paint();
     },
     preview() { if (reduced.matches) return; if (!instance) { pendingPreview = true; return; } pose.value = .45; paint(); release(); },
     release,
