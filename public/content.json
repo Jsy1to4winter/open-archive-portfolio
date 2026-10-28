@@ -1,8 +1,8 @@
 {
   "stickers": [
     {
-      "x": 0.6209876543209876,
-      "y": 0.05171717171717172,
+      "x": 0.6055555555555555,
+      "y": 0.06620402414486921,
       "id": "name-sticker",
       "name": "suiyixuan",
       "image": "",
@@ -14,26 +14,26 @@
       "id": "item-5bbecbac",
       "name": "新贴纸",
       "image": "/open-archive-portfolio/assets/uploads/8727471d-148b-4fee-ba2b-5b64420fd461.png",
-      "width": 283
+      "width": 261
     },
     {
-      "x": 0.9277402309058616,
-      "y": 0.933932507739938,
+      "x": 0.9291612788632326,
+      "y": 0.9710842105263157,
       "id": "item-dfea6be7",
       "name": "新贴纸",
       "image": "/open-archive-portfolio/assets/uploads/3780b134-4cc5-4ea7-b228-9cae3e12f25f.png",
       "width": 374
     },
     {
-      "x": 0.10596892886345052,
-      "y": 0,
+      "x": 0.11165161799526441,
+      "y": 0.047961630695443645,
       "id": "item-0933b0c8",
       "name": "新贴纸",
       "image": "/open-archive-portfolio/assets/uploads/6e278b03-a200-42e5-8164-0167619f700a.png",
       "width": 233
     },
     {
-      "x": 0.161875,
+      "x": 0.15812500000000002,
       "y": 1,
       "id": "item-d644ac31",
       "name": "新贴纸",
