@@ -6,6 +6,7 @@ import { portfolioModules } from './modules';
 import type { ModuleId } from './timeline';
 import ResumeDetails from './ResumeDetails';
 import ReasonEntry from './ReasonEntry';
+import SkillApps from './SkillApps';
 import './about-photos.css';
 import AboutPhotos from './AboutPhotos';
 
@@ -65,7 +66,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
         <button ref={closeButton} type="button" className="archive-detail-close" onClick={requestClose} aria-label="Close details"><X size={20} /></button>
         {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || (module?.id === 'about' ? '关于我' : module?.id === 'fragments' ? screenText.fragments.title : module?.id === 'perspective' ? screenText.perspective.titleLine1 : module?.label)}</h2>}
         {module?.id === 'fragments' && <AccountShowcase/>}
-        {module?.id === 'about' && <>{aboutReady && <AboutPhotos />}<section className="about-photo-introduction" aria-label="关于我介绍">{moduleCopy.about.slice(0, 2).map((reason, index) => <ReasonEntry key={reason.id} reason={reason} animated={false} large editPath={`moduleCopy.about.${index}`} />)}</section></>}
+        {module?.id === 'about' && <>{aboutReady && <AboutPhotos />}<section className="about-photo-introduction" aria-label="关于我介绍">{moduleCopy.about.slice(0, 2).map((reason, index) => <ReasonEntry key={reason.id} reason={reason} animated={false} large editPath={`moduleCopy.about.${index}`}>{index === 1 && <SkillApps />}</ReasonEntry>)}</section></>}
         {module && module.id !== 'fragments' && module.id !== 'about' && selectedReasons.map((reason, index) => <ReasonEntry key={`${module.id}-${reason.id}`} reason={reason} animated={module.id === 'perspective'} large={module.id === 'perspective'} editPath={module.id in moduleCopy ? `moduleCopy.${module.id}.${index}` : undefined} />)}
         {module?.id === 'works' && <div className="archive-detail-works">
           {portfolioWorks.map(item => <article key={item.id}>

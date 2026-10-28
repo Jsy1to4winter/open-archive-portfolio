@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
 import type { Reason } from './content';
 
-export default function ReasonEntry({ reason, animated, large, editPath }: { reason: Reason; animated: boolean; large: boolean; editPath?: string }) {
+export default function ReasonEntry({ reason, animated, large, editPath, children }: { reason: Reason; animated: boolean; large: boolean; editPath?: string; children?: ReactNode }) {
   const text = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   function reveal() {
@@ -34,6 +34,7 @@ export default function ReasonEntry({ reason, animated, large, editPath }: { rea
       <h3 data-edit-path={editPath ? `${editPath}.title` : undefined}>{reason.title}</h3>
       <p data-edit-path={editPath ? `${editPath}.body` : undefined} id={`reason-copy-${reason.id}`} className={large ? 'archive-about-copy' : reason.author ? 'archive-poem' : undefined}>{reason.body}</p>
       {reason.author && <a className="archive-poem-credit" href={reason.source} target="_blank" rel="noopener noreferrer">— {reason.author} <ArrowUpRight size={12} aria-hidden="true" /></a>}
+      {children}
     </div>
   </article>;
 }
