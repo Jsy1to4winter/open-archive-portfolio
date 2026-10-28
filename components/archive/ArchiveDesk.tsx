@@ -3,6 +3,7 @@ import { ArrowUpRight, Circle, Box, Pencil } from 'lucide-react';
 import { contactEmail, contactPhone, templateProfile, screenText } from './content';
 import ResumeSlip from './ResumeSlip';
 import type { ModuleId } from './timeline';
+import { prepareAboutPhotos } from './prepare-about-photos';
 
 type ArchiveDeskProps = {
   onSelect: (id: ModuleId) => void;
@@ -21,7 +22,7 @@ export default function ArchiveDesk({ onSelect, onResume }: ArchiveDeskProps) {
   return (
     <div className="archive-desk">
       <div className="archive-desk-module archive-desk-about" data-module="about">
-        <button className="archive-desk-about-main" type="button" onClick={() => onSelect('about')} aria-label="Read about this archive">
+        <button className="archive-desk-about-main" type="button" onPointerEnter={() => void prepareAboutPhotos()} onFocus={() => void prepareAboutPhotos()} onClick={() => onSelect('about')} aria-label="Read about this archive">
           <span className="archive-desk-about-sheet">
             <span className="archive-desk-eyebrow">01 / {templateProfile.brand}</span>
             <strong className="archive-desk-about-title"><span data-edit-path="screenText.about.titleLine1">{screenText.about.titleLine1}</span><br /><span data-edit-path="screenText.about.titleLine2" className="archive-desk-title-accent">{screenText.about.titleLine2}</span></strong>

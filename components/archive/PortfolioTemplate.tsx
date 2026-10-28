@@ -19,6 +19,8 @@ import { getGalleryNotesLayout } from './galleryNotesLayout';
 import useViewport from './useViewport';
 import './archive.css';
 import gsap from 'gsap';
+import { flushSync } from 'react-dom';
+import { prepareAboutPhotos } from './prepare-about-photos';
 
 type DialogScrollSnapshot = {
   progress: number;
@@ -37,6 +39,10 @@ export default function PortfolioTemplate() {
   const restoreFrame = useRef(0);
   const zoomCleanup = useRef<(() => void) | null>(null);
   useEffect(() => () => zoomCleanup.current?.(), []);
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void prepareAboutPhotos(); }, 400);
+    return () => window.clearTimeout(timer);
+  }, []);
   const [t, setT] = useState(0);
   const viewport = useViewport();
   const [detail, setDetail] = useState<ArchiveDetail | null>(null);
@@ -181,6 +187,7 @@ export default function PortfolioTemplate() {
     if (id === 'about' && !reducedMotion && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const card = track.current?.querySelector<HTMLElement>('.archive-desk-about');
       if (card) {
+        void prepareAboutPhotos();
         const rect = card.getBoundingClientRect();
         const overlay = document.createElement('div');
         overlay.className = 'about-zoom-overlay';
@@ -191,11 +198,13 @@ export default function PortfolioTemplate() {
         document.body.append(overlay);
         gsap.set(clone, { position: 'absolute', left: 0, top: 0, margin: 0, width: card.offsetWidth, height: card.offsetHeight, transformOrigin: '0 0', x: rect.left, y: rect.top, scale: rect.width / card.offsetWidth, rotation: 0.4, pointerEvents: 'none', fontFamily: getComputedStyle(card).fontFamily });
         const targetScale = Math.max(window.innerWidth / card.offsetWidth, window.innerHeight / card.offsetHeight) * 1.06;
-        const tween = gsap.to(clone, { x: (window.innerWidth - card.offsetWidth * targetScale) / 2, y: (window.innerHeight - card.offsetHeight * targetScale) / 2, scale: targetScale, rotation: 0, duration: 0.65, ease: 'power3.inOut', onComplete: () => {
+        const tween = gsap.timeline({ onComplete: () => {
           zoomCleanup.current = null;
-          openDetail({ type: 'module', id: 'about' });
+          flushSync(() => openDetail({ type: 'module', id: 'about' }));
           overlay.remove();
         } });
+        tween.to(clone, { x: (window.innerWidth - card.offsetWidth * targetScale) / 2, y: (window.innerHeight - card.offsetHeight * targetScale) / 2, scale: targetScale, rotation: 0, duration: 0.52, ease: 'power2.inOut', force3D: true });
+        tween.to(clone.querySelector('.archive-desk-about-main'), { opacity: 0, duration: 0.16 }, 0.34);
         zoomCleanup.current = () => { tween.kill(); overlay.remove(); zoomCleanup.current = null; };
         return;
       }

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, lazy, Suspense } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUpRight, ChevronLeft, ChevronRight, X, Pencil } from 'lucide-react';
 import { contactEmail, contactPhone, otherPortfolioUrl, portfolioWorks, reasons, screenText } from './content';
 import AccountShowcase from './AccountShowcase';
@@ -7,7 +7,7 @@ import type { ModuleId } from './timeline';
 import ResumeDetails from './ResumeDetails';
 import ReasonEntry from './ReasonEntry';
 import './about-photos.css';
-const AboutPhotos = lazy(() => import('./AboutPhotos'));
+import AboutPhotos from './AboutPhotos';
 
 export type ArchiveDetail =
   | { type: 'module'; id: ModuleId }
@@ -28,6 +28,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
   const work = portfolioWorks[workIndex];
   const selectedReasons = module?.id === 'about' ? reasons : reasons.filter(reason => module?.reasonIds.includes(reason.id));
   const isResume = detail?.type === 'resume';
+  const [aboutReady, setAboutReady] = useState(false);
 
   useLayoutEffect(() => {
     const element = dialog.current;
@@ -38,6 +39,8 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
     }
     if (!detail && element.open) element.close();
     element.scrollTop = 0;
+    // Swiper must measure inside the already-open native dialog, not display:none.
+    setAboutReady(detail?.type === 'module' && detail.id === 'about');
   }, [detail]);
 
   const requestClose = () => {
@@ -61,7 +64,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
         <button ref={closeButton} type="button" className="archive-detail-close" onClick={requestClose} aria-label="Close details"><X size={20} /></button>
         {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || (module?.id === 'about' ? '关于我' : module?.id === 'fragments' ? screenText.fragments.title : module?.id === 'perspective' ? screenText.perspective.titleLine1 : module?.label)}</h2>}
         {module?.id === 'fragments' && <AccountShowcase/>}
-        {module?.id === 'about' && <><Suspense fallback={<div className="about-photo-empty" role="status">加载中…</div>}><AboutPhotos /></Suspense><section className="about-photo-introduction" aria-label="关于我介绍">{reasons.slice(0, 2).map(reason => <ReasonEntry key={reason.id} reason={reason} animated={false} large />)}</section></>}
+        {module?.id === 'about' && <>{aboutReady && <AboutPhotos />}<section className="about-photo-introduction" aria-label="关于我介绍">{reasons.slice(0, 2).map(reason => <ReasonEntry key={reason.id} reason={reason} animated={false} large />)}</section></>}
         {module && module.id !== 'fragments' && module.id !== 'about' && selectedReasons.map(reason => <ReasonEntry key={`${module.id}-${reason.id}`} reason={reason} animated={module.id === 'perspective'} large={module.id === 'perspective'} />)}
         {module?.id === 'works' && <div className="archive-detail-works">
           {portfolioWorks.map(item => <article key={item.id}>

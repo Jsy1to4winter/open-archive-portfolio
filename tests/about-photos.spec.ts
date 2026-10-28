@@ -15,6 +15,8 @@ for (const width of [1440, 390]) test(`About zoom, Cover Flow, wheel and return 
     el.scrollTop = progressForModule('about', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
   });
   await page.waitForTimeout(700);
+  const lateAlbumRequests: string[] = [];
+  page.on('request', request => { if (request.url().includes('AboutPhotos')) lateAlbumRequests.push(request.url()); });
   const scroll = await page.locator('.archive-scroll-track').evaluate(el => el.scrollTop);
   await page.locator('.archive-desk-about-main').click();
   await expect(page.locator('.about-zoom-overlay')).toBeVisible();
@@ -26,6 +28,13 @@ for (const width of [1440, 390]) test(`About zoom, Cover Flow, wheel and return 
   await expect(active.locator('img')).toHaveAttribute('alt', '相册照片 2');
   await expect(active).toHaveCSS('opacity', '1');
   await expect(active).toHaveCSS('filter', 'none');
+  await expect(active.locator('img')).toHaveCSS('border-radius', '8px');
+  const imageRect = (await active.locator('img').boundingBox())!;
+  expect(imageRect.width).toBeLessThanOrEqual(300);
+  expect(imageRect.height).toBeLessThanOrEqual(width < 600 ? 378 : 420);
+  expect(lateAlbumRequests).toEqual([]);
+  await expect(page.locator('.archive-about-dialog [role=status]')).toHaveCount(0);
+  await expect(page.locator('.about-photo-gallery .swiper-initialized')).toBeVisible();
   await expect(page.locator('.about-photo-gallery .swiper-slide-next')).toHaveCSS('opacity', '0.42');
   expect(await active.locator('img').evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
   await active.hover();
