@@ -20,6 +20,14 @@ for (const width of [1440, 390]) test(`personal intro and operated accounts have
   await expect(page.locator('.archive-about-dialog[open] .profile-about-image img')).toBeVisible();
   await expect(page.locator('.archive-about-dialog .about-photo-gallery')).toHaveCount(0);
   await expect(page.locator('.profile-about-copy h3')).toContainText(data.templateProfile.name);
+  await expect(page.locator('.profile-about-image')).toHaveCSS('padding', '1px');
+  const space = await page.locator('.profile-about-layout').evaluate(el => {
+    const children = [...el.children].map(child => child.getBoundingClientRect().bottom);
+    return el.getBoundingClientRect().bottom - Math.max(...children);
+  });
+  expect(space).toBeLessThan(2);
+  const introGap = await page.locator('.about-photo-introduction').evaluate(el => el.getBoundingClientRect().top - document.querySelector('.archive-resume-details')!.getBoundingClientRect().bottom);
+  expect(introGap).toBeLessThanOrEqual(32);
   await page.screenshot({ path: `test-results/relocated-profile-${width}.png` });
   await page.getByRole('button', { name: 'Close details', exact: true }).click();
   await page.locator('.archive-desk-craft').evaluate((el: HTMLElement) => el.click());
