@@ -1,6 +1,4 @@
 let context: AudioContext | undefined;
-import { holdAudioFocus } from './audio-focus';
-let releaseFocus: (() => void) | undefined;
 let buffer: AudioBuffer | undefined;
 let loading: Promise<void> | undefined;
 let source: AudioBufferSourceNode | undefined;
@@ -17,8 +15,6 @@ export function prepareStickerSound() {
 export function stopStickerSound() {
   source?.stop();
   source = undefined;
-  releaseFocus?.();
-  releaseFocus = undefined;
 }
 export function unlockStickerSound() {
   prepareStickerSound();
@@ -34,8 +30,6 @@ export function playStickerSound() {
   gain.gain.value = 0.8;
   source.connect(gain).connect(context.destination);
   const playing = source;
-  const release = holdAudioFocus();
-  releaseFocus = release;
-  playing.onended = () => { playing.disconnect(); gain.disconnect(); release(); if (source === playing) { source = undefined; releaseFocus = undefined; } };
+  playing.onended = () => { playing.disconnect(); gain.disconnect(); if (source === playing) source = undefined; };
   playing.start();
 }

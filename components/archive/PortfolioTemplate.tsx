@@ -18,6 +18,7 @@ import { getGalleryComposition } from './galleryComposition';
 import { getGalleryNotesLayout } from './galleryNotesLayout';
 import useViewport from './useViewport';
 import './archive.css';
+import gsap from 'gsap';
 
 type DialogScrollSnapshot = {
   progress: number;
@@ -34,6 +35,8 @@ export default function PortfolioTemplate() {
   const scrollProgress = useRef(0);
   const dialogScroll = useRef<DialogScrollSnapshot | null>(null);
   const restoreFrame = useRef(0);
+  const zoomCleanup = useRef<(() => void) | null>(null);
+  useEffect(() => () => zoomCleanup.current?.(), []);
   const [t, setT] = useState(0);
   const viewport = useViewport();
   const [detail, setDetail] = useState<ArchiveDetail | null>(null);
@@ -174,6 +177,29 @@ export default function PortfolioTemplate() {
   };
 
   const openModule = (id: ModuleId) => {
+    if (zoomCleanup.current) return;
+    if (id === 'about' && !reducedMotion && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const card = track.current?.querySelector<HTMLElement>('.archive-desk-about');
+      if (card) {
+        const rect = card.getBoundingClientRect();
+        const overlay = document.createElement('div');
+        overlay.className = 'about-zoom-overlay';
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.addEventListener('wheel', event => event.preventDefault(), { passive: false });
+        const clone = card.cloneNode(true) as HTMLElement;
+        overlay.append(clone);
+        document.body.append(overlay);
+        gsap.set(clone, { position: 'absolute', left: 0, top: 0, margin: 0, width: card.offsetWidth, height: card.offsetHeight, transformOrigin: '0 0', x: rect.left, y: rect.top, scale: rect.width / card.offsetWidth, rotation: 0.4, pointerEvents: 'none', fontFamily: getComputedStyle(card).fontFamily });
+        const targetScale = Math.max(window.innerWidth / card.offsetWidth, window.innerHeight / card.offsetHeight) * 1.06;
+        const tween = gsap.to(clone, { x: (window.innerWidth - card.offsetWidth * targetScale) / 2, y: (window.innerHeight - card.offsetHeight * targetScale) / 2, scale: targetScale, rotation: 0, duration: 0.65, ease: 'power3.inOut', onComplete: () => {
+          zoomCleanup.current = null;
+          openDetail({ type: 'module', id: 'about' });
+          overlay.remove();
+        } });
+        zoomCleanup.current = () => { tween.kill(); overlay.remove(); zoomCleanup.current = null; };
+        return;
+      }
+    }
     if (id === 'works') seek(progressForModule(id, galleryCount));
     else openDetail({ type: 'module', id });
   };

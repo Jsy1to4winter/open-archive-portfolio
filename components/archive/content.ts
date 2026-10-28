@@ -5,6 +5,7 @@ import { defaultAccountMedia, MAX_ACCOUNT_VIDEOS } from "./account-media";
 export type { Reason, PortfolioWork } from "./default-content";
 
 export const defaultContent = {
+  aboutPhotos: [] as Array<{ id: string; title: string; image: string; caption: string }>,
   stickers: defaultStickers,
   accountMedia: defaultAccountMedia,
   screenText: defaultScreenText,
@@ -24,6 +25,7 @@ export function normalizeContent(value: unknown): SiteContent {
   const source = value as Record<string, unknown>;
   const result = {
     ...source,
+    aboutPhotos: source.aboutPhotos === undefined ? [] : source.aboutPhotos,
     stickers: source.stickers === undefined ? structuredClone(defaultStickers) : Array.isArray(source.stickers) ? source.stickers.map((item, index) => ({ x: (index % 3) / 2, y: Math.min(0.8, Math.floor(index / 3) * 0.25), ...item })) : source.stickers,
     accountMedia:
       source.accountMedia === undefined
@@ -64,6 +66,8 @@ export function validateContent(value: unknown): asserts value is SiteContent {
   if (!shape(value, defaultContent))
     throw new Error("内容格式不完整，请检查所有栏目。");
   const data = value as SiteContent;
+  if (!data.aboutPhotos.every(item => item && ['id', 'title', 'image', 'caption'].every(key => typeof (item as Record<string, unknown>)[key] === 'string') && item.id && item.image.trim()) || new Set(data.aboutPhotos.map(item => item.id)).size !== data.aboutPhotos.length)
+    throw new Error('请为每张关于我图片上传文件，并保留唯一编号。');
   if (!data.stickers.every(item => Number.isFinite(item.x) && Number.isFinite(item.y) && item.x >= 0 && item.x <= 1 && item.y >= 0 && item.y <= 1))
     throw new Error('贴纸位置无效。');
   if (!data.stickers.every(item => item && typeof item.id === 'string' && item.id && typeof item.name === 'string' && typeof item.image === 'string' && Number.isFinite(item.width) && item.width >= 64 && item.width <= 600) || new Set(data.stickers.map(item => item.id)).size !== data.stickers.length)
@@ -110,6 +114,7 @@ export function validateContent(value: unknown): asserts value is SiteContent {
   )
     throw new Error("作品编号不能重复。");
   const urls = [
+    ...data.aboutPhotos.map(item => item.image),
     ...data.stickers.map(item => item.image),
     data.accountMedia.image,
     ...data.accountMedia.videos.flatMap((video) => [video.src, video.poster]),
@@ -143,6 +148,7 @@ try {
   console.warn("Using bundled portfolio content.", error);
 }
 export let templateProfile = loaded.templateProfile;
+export let aboutPhotos = loaded.aboutPhotos;
 export let stickers = loaded.stickers;
 export let accountMedia = loaded.accountMedia;
 export let screenText = loaded.screenText;
@@ -156,6 +162,7 @@ export let workCategories = loaded.workCategories;
 export let templateResume = loaded.templateResume;
 export function currentContent(): SiteContent {
   return structuredClone({
+    aboutPhotos,
     stickers,
     accountMedia,
     screenText,
@@ -172,6 +179,7 @@ export function currentContent(): SiteContent {
 export function applyContent(data: SiteContent) {
   validateContent(data);
   ({
+    aboutPhotos,
     stickers,
     accountMedia,
     screenText,

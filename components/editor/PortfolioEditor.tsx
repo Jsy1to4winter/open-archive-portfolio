@@ -32,6 +32,7 @@ import { videoPoster } from "./video-poster";
 import { MAX_ACCOUNT_VIDEOS } from "../archive/account-media";
 
 const labels: Record<string, string> = {
+  aboutPhotos: '关于我图片',
   stickers: "贴纸",
   accountMedia: "账号和视频",
   videos: "视频作品",
@@ -102,6 +103,7 @@ const labels: Record<string, string> = {
   tools: "技能与工具",
 };
 const tabs = [
+  'aboutPhotos',
   "stickers",
   "accountMedia",
   "screenText",
@@ -203,7 +205,7 @@ export default function PortfolioEditor() {
       if (
         !(target instanceof Element) ||
         target.closest(
-          ".portfolio-editor,.portfolio-edit-trigger,.account-video-poster,.account-video-controls,.account-video-player,.homepage-sticker,.archive-reason-interactive",
+          ".portfolio-editor,.portfolio-edit-trigger,.account-video-poster,.account-video-controls,.account-video-player,.homepage-sticker,.archive-reason-interactive,.about-photo-gallery",
         )
       )
         return null;
@@ -305,6 +307,7 @@ export default function PortfolioEditor() {
   }
   function visibleContent(content: SiteContent) {
     const data = clone(content);
+    data.aboutPhotos.forEach(item => { item.image = urls.current.get(item.image) ?? item.image; });
     data.stickers.forEach(item => { item.image = urls.current.get(item.image) ?? item.image; });
     data.accountMedia.image =
       urls.current.get(data.accountMedia.image) ?? data.accountMedia.image;
@@ -601,6 +604,7 @@ export default function PortfolioEditor() {
                 )
                   return;
                 const sample =
+                  path[0] === 'aboutPhotos' ? { id: '', title: '', image: '', caption: '' } :
                   path[0] === 'stickers'
                     ? { id: '', name: '新贴纸', image: '', width: 220, x: 0.5, y: 0.05 }
                     :
@@ -667,6 +671,7 @@ export default function PortfolioEditor() {
                     aria-label="删除"
                     disabled={
                       value.length <= 1 &&
+                      path[0] !== 'aboutPhotos' &&
                       path[0] !== 'stickers' &&
                       !(path[0] === "accountMedia" && key === "videos")
                     }

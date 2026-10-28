@@ -12,6 +12,8 @@ The computer-screen video is an original work by KAKI (kakizzzzz), released with
 
 ## Runtime software
 
+The personal photo Cover Flow uses Swiper 11.2.10, copyright Vladimir Kharlampidi, under the MIT license; see [Swiper license](licenses/swiper.txt).
+
 | Component | License text |
 | --- | --- |
 | React | [MIT — Meta Platforms](licenses/react.txt) |

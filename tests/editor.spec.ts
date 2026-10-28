@@ -68,6 +68,24 @@ async function enter(page: Page) {
   await page.getByRole("button", { name: "登录", exact: true }).click();
 }
 
+test('owner uploads and publishes About photos', async ({ page }) => {
+  const writes = await mockGithub(page);
+  await enter(page);
+  await page.getByRole('tab', { name: '关于我图片', exact: true }).click();
+  await page.getByRole('button', { name: '添加关于我图片', exact: true }).click();
+  await page.locator('#field-aboutPhotos-0-image').locator('..').locator('input[type=file]').setInputFiles('public/assets/operations/douyin-data-3.jpg');
+  await expect(page.getByRole('status')).toContainText('文件已加入草稿');
+  await page.locator('#field-aboutPhotos-0-title').fill('我的照片');
+  await page.getByRole('button', { name: '保存发布', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('已保存到 GitHub', { timeout: 15000 });
+  const blob = writes.filter(item => item.url.endsWith('/git/blobs')).at(-1)!;
+  const saved = JSON.parse(Buffer.from(blob.body.content as string, 'base64').toString('utf8'));
+  expect(saved.aboutPhotos[0].title).toBe('我的照片');
+  expect(saved.aboutPhotos[0].image).toContain('uploads/');
+  expect(saved.reasons).toEqual(original.reasons);
+  expect(JSON.stringify(saved)).not.toContain('blob:');
+});
+
 test("owner uploads and sizes multiple stickers and publishes them", async ({ page }) => {
   const writes = await mockGithub(page);
   await enter(page);

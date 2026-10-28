@@ -61,7 +61,7 @@ for (const width of [1440, 390]) test(`video dialog suspends music until closed 
   await expect(music).toHaveJSProperty('paused', false);
 });
 
-test('sticker sound takes audio focus only for its audible duration', async ({ page }) => {
+test('sticker sound layers over background music without pausing it', async ({ page }) => {
   const music = await start(page);
   await page.evaluate(async () => {
     const { prepareStickerSound, unlockStickerSound } = await import('/components/archive/sticker-sound.ts');
@@ -70,7 +70,7 @@ test('sticker sound takes audio focus only for its audible duration', async ({ p
   await page.evaluate(async () => {
     const { playStickerSound } = await import('/components/archive/sticker-sound.ts');
     playStickerSound();
-    if (!(document.querySelector('[data-background-music]') as HTMLAudioElement).paused) throw new Error('Music overlaps sticker sound');
+    if ((document.querySelector('[data-background-music]') as HTMLAudioElement).paused) throw new Error('Sticker unexpectedly paused music');
   });
   await expect(music).toHaveJSProperty('paused', false);
 });

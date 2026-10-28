@@ -208,12 +208,12 @@ test("invalid video leaves the editor and existing draft intact", async ({
   await expect(page.getByRole("heading", { name: "编辑作品集" })).toBeVisible();
 });
 
-test("About and perspective both show the six existing operations sections", async ({
+test("perspective retains all six operations sections", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  for (const id of ["about", "perspective", "about"]) {
+  for (const id of ["perspective"]) {
     await enterModule(page, id);
     const dialog = page.locator(".archive-archive-dialog[open]");
     await expect(dialog.locator(".archive-detail-reason")).toHaveCount(6);

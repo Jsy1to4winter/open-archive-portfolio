@@ -1,0 +1,46 @@
+import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+
+for (const width of [1440, 390]) test(`About zoom, Cover Flow, wheel and return at ${width}px`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
+  const content = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
+  content.stickers = [];
+  content.aboutPhotos = ['douyin-data-1', 'douyin-data-2', 'douyin-data-3', 'xhs-data-1', 'xhs-data-2'].map((name, i) => ({ id: `photo-${i}`, title: `相册照片 ${i + 1}`, caption: '测试照片', image: `/assets/operations/${name}.jpg` }));
+  await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(content) }));
+  await page.goto('/');
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await page.locator('.archive-scroll-track').evaluate(async el => {
+    const { progressForModule } = await import('/components/archive/timeline.ts');
+    const { portfolioWorks } = await import('/components/archive/content.ts');
+    el.scrollTop = progressForModule('about', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
+  });
+  await page.waitForTimeout(700);
+  const scroll = await page.locator('.archive-scroll-track').evaluate(el => el.scrollTop);
+  await page.locator('.archive-desk-about-main').click();
+  await expect(page.locator('.about-zoom-overlay')).toBeVisible();
+  await expect(page.locator('.archive-about-dialog[open]')).toBeVisible();
+  await expect(page.locator('.about-zoom-overlay')).toHaveCount(0);
+  await expect(page.locator('.about-photo-introduction .archive-detail-reason')).toHaveCount(2);
+  expect(await page.locator('.about-photo-introduction h3').allTextContents()).toEqual(content.reasons.slice(0, 2).map((item: any) => item.title));
+  const active = page.locator('.about-photo-gallery .swiper-slide-active');
+  await expect(active.locator('img')).toHaveAttribute('alt', '相册照片 2');
+  await expect(active).toHaveCSS('opacity', '1');
+  await expect(active).toHaveCSS('filter', 'none');
+  await expect(page.locator('.about-photo-gallery .swiper-slide-next')).toHaveCSS('opacity', '0.42');
+  expect(await active.locator('img').evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+  await active.hover();
+  await page.mouse.wheel(0, 160);
+  await expect(active.locator('img')).toHaveAttribute('alt', '相册照片 3');
+  await expect(active).toHaveCSS('opacity', '1');
+  await page.waitForTimeout(700);
+  await page.screenshot({ path: `test-results/about-flow-${width}.png` });
+  await page.getByRole('button', { name: '上一张个人照片', exact: true }).click();
+  await expect(active.locator('img')).toHaveAttribute('alt', '相册照片 2');
+  await page.getByRole('button', { name: 'Close details', exact: true }).click();
+  await expect(page.locator('.archive-about-dialog[open]')).toHaveCount(0);
+  expect(await page.locator('.archive-scroll-track').evaluate(el => el.scrollTop)).toBeCloseTo(scroll, 0);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.locator('.archive-desk-about-main').click();
+  await expect(page.locator('.archive-about-dialog[open]')).toBeVisible();
+  await expect(page.locator('.about-zoom-overlay')).toHaveCount(0);
+});
