@@ -796,7 +796,7 @@ export default function PortfolioEditor() {
       {tab === 'craft' && renderCopy('craft')}
       {tab === 'perspective' && renderCopy('perspective')}
       {tab === 'works' && field(draft.portfolioWorks, ['portfolioWorks'])}
-      {tab === 'collaboration' && <>{field(draft.contactEmail, ['contactEmail'])}{field(draft.contactPhone, ['contactPhone'])}{renderCopy('collaboration')}</>}
+      {tab === 'collaboration' && <>{field(draft.contactEmail, ['contactEmail'])}{field(draft.contactPhone, ['contactPhone'])}</>}
     </>;
   }
   return (
