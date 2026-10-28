@@ -1,6 +1,6 @@
-.skill-apps { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 72px)); gap: 18px; padding: 0; margin: 32px 0 4px; }
-.skill-apps li { position: relative; min-width: 0; aspect-ratio: 1; transition: translate 200ms ease-out, filter 200ms ease-out; filter: drop-shadow(0 5px 4px #17171720); }
-.skill-app-icon { display: block; width: 100%; height: 100%; background-position: var(--app-position) center; background-size: 500% auto; background-repeat: no-repeat; }
+.skill-apps { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 0; margin: 32px 0 4px; }
+.skill-apps li { position: relative; flex: 0 1 88px; min-width: 0; aspect-ratio: 1; transition: translate 200ms ease-out, filter 200ms ease-out; filter: drop-shadow(0 5px 4px #17171720); }
+.skill-app-icon { display: block; width: 100%; height: 100%; background-position: var(--app-position) center; background-size: 500% auto; background-repeat: no-repeat; clip-path: inset(4% 7% round 22%); }
 .skill-app-tooltip { position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); background: #171717; color: white; padding: 5px 8px; font: 12px/1.4 Inter, sans-serif; white-space: nowrap; border-radius: 4px; opacity: 0; pointer-events: none; transition: opacity 150ms; }
 .skill-apps li:is(:hover, :focus-visible) .skill-app-tooltip { opacity: 1; }
 .skill-apps li:focus-visible { outline: 2px solid #555; outline-offset: 4px; border-radius: 8px; }
