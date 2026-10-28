@@ -247,7 +247,7 @@ export default function ComputerIntro({ onEnter, width: computerWidth, scale, lo
             )}
             {/* One video texture; pointer changes only the lightweight shader uniforms. */}
             <canvas ref={canvasRef} className="archive-screen-renderer" width={900} height={600} aria-hidden="true" />
-            <span className="archive-screen-eyebrow">{templateProfile.brand} / <span>{screenText.intro.selectedWork}</span></span>
+            <span className="archive-screen-eyebrow"><span data-edit-path="templateProfile.brand">{templateProfile.brand}</span> / <span data-edit-path="screenText.intro.selectedWork">{screenText.intro.selectedWork}</span></span>
             <span className="archive-screen-title">
               <span data-edit-path="screenText.intro.titleLine1" className="archive-screen-title-line">{screenText.intro.titleLine1}</span>
               <span className="archive-screen-title-line">

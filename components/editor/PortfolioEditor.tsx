@@ -471,7 +471,7 @@ export default function PortfolioEditor() {
       }
       let bytes = new Uint8Array(await file.arrayBuffer());
       let generatedPoster: { address: string; upload: Upload } | null = null;
-      if (video && path[0] === "accountMedia") {
+      if (video && ['accountMedia', 'introMedia'].includes(String(path[0]))) {
         let poster: Blob | null;
         try {
           poster = await videoPoster(
@@ -517,6 +517,7 @@ export default function PortfolioEditor() {
       ]);
       setDraft((previous) => {
         let next = replace(previous, path, address);
+        if (video && path[0] === 'introMedia' && generatedPoster) next = replace(next, ['introMedia', 'poster'], generatedPoster.address);
         if (video && path[0] === "accountMedia") {
           const titlePath = [...path.slice(0, -1), "title"];
           if (!get(next, titlePath))
@@ -565,6 +566,16 @@ export default function PortfolioEditor() {
         ? "账号截图"
         : (labels[key] ?? key);
     if (key === "id") return null;
+    if (path[0] === 'introMedia' && path.length === 1) {
+      const item = value as SiteContent['introMedia'];
+      return <div className="editor-video-upload" key="intro-video">
+        {item.src && <video controls playsInline preload="metadata" src={urls.current.get(item.src) ?? item.src} poster={urls.current.get(item.poster ?? '') ?? (item.poster || undefined)} />}
+        <label className="editor-upload"><UploadIcon size={15} />{item.src ? '替换展示页视频' : '上传展示页视频'}
+          <input type="file" accept="video/mp4,video/webm" onChange={event => { const file = event.target.files?.[0]; if (file) void upload(file, ['introMedia', 'src']); event.target.value = ''; }} />
+        </label>
+        {field(item.poster, ['introMedia', 'poster'])}
+      </div>;
+    }
     if (path[0] === 'titleSizes') return <div className="editor-field" key={path.join('.')}>
       <label htmlFor={`field-${path.join('-')}`}>首页标题字号：{String(value)} px</label>
       <input id={`field-${path.join('-')}`} type="range" min="12" max="120" step="1" value={Number(value)} onChange={event => update(path, Number(event.target.value))} />
@@ -790,6 +801,12 @@ export default function PortfolioEditor() {
   function renderSection() {
     const textSection = { about: 'about', fragments: 'fragments', craft: 'craft', perspective: 'perspective', works: 'gallery', collaboration: 'collaboration' } as const;
     if (tab === 'stickers') return field(draft.stickers, ['stickers']);
+    if (tab === 'intro') return <>
+      {field(draft.templateProfile.brand, ['templateProfile', 'brand'])}
+      {field(draft.templateProfile.discipline, ['templateProfile', 'discipline'])}
+      {Object.entries(draft.screenText.intro).map(([key, value]) => field(value, ['screenText', 'intro', key]))}
+      {field(draft.introMedia, ['introMedia'])}
+    </>;
     const group = textSection[tab];
     const text = draft.screenText[group];
     return <>

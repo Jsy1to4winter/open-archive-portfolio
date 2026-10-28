@@ -52,7 +52,7 @@ body.archive-page-open { background: #f3f3f3; color: #171717; overflow: hidden; 
 .archive-screen-arrow svg { width: calc(82px * var(--computer-unit)); height: calc(48px * var(--computer-unit)); display: block; }
 .archive-screen-scroll-hint { font: 400 var(--screen-label-size)/1.5 'Archive Mono', 'PingFang SC', monospace; letter-spacing: calc(1px * var(--computer-unit)); white-space: nowrap; color: #fff; }
 .archive-intro-footer { position: absolute; bottom: 0; left: 0; right: 0; height: var(--footer-height); padding: 0 var(--page-gutter); display: flex; align-items: center; justify-content: space-between; gap: 12px; font: 400 9px/1.5 'Archive Mono', monospace; letter-spacing: 1.1px; color: #555555; }
-.archive-intro-footer button { pointer-events: auto; padding: 10px 0 10px 16px; border: 0; background: none; color: #171717; font-size: 10px; letter-spacing: 1.3px; }
+.archive-intro-footer button { margin-left: auto; pointer-events: auto; padding: 10px 0 10px 16px; border: 0; background: none; color: #171717; font-size: 10px; letter-spacing: 1.3px; }
 .archive-intro-credit { pointer-events: auto; }
 .archive-frame-loading { position: absolute; left: calc(34px * var(--computer-unit)); bottom: calc(45px * var(--computer-unit)); }
 .archive-frame-loading > span { display: block; height: 1px; width: calc(55px * var(--computer-unit)); background: #777777; }
