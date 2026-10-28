@@ -47,6 +47,7 @@ export default function PortfolioTemplate() {
   const viewport = useViewport();
   const [detail, setDetail] = useState<ArchiveDetail | null>(null);
   const [orbitIndex, setOrbitIndex] = useState(0);
+  const [galleryVisit, setGalleryVisit] = useState(0);
   const isDetailOpen = detail !== null;
   const galleryCount = portfolioWorks.length;
   const layout = getResponsiveLayout(viewport);
@@ -156,6 +157,11 @@ export default function PortfolioTemplate() {
     const saved = dialogScroll.current;
     const element = track.current;
     if (!saved || saved.closing || !element) return;
+    if (detail?.type === 'work') {
+      saved.progress = progressForGalleryProgress(0, galleryCount);
+      setOrbitIndex(0);
+      setGalleryVisit(value => value + 1);
+    }
     saved.closing = true;
     setDetail(null);
     const restore = () => {
@@ -291,7 +297,7 @@ export default function PortfolioTemplate() {
                 transform: `translate(-50%, -50%) rotate(${portal.rotation}deg) scale(${portal.scale})`,
                 pointerEvents: galleryInteractive ? 'auto' : 'none',
               }}>
-                <ScrollGallery layout={gallery} composition={galleryComposition} progress={displayedGalleryProgress} active={galleryInteractive} suspended={isDetailOpen} reducedMotion={!!reducedMotion} onView={openWork} onSeek={seekImage} onIndexChange={setOrbitIndex} />
+                <ScrollGallery key={galleryVisit} layout={gallery} composition={galleryComposition} progress={displayedGalleryProgress} active={galleryInteractive} suspended={isDetailOpen} reducedMotion={!!reducedMotion} onView={openWork} onSeek={seekImage} onIndexChange={setOrbitIndex} />
               </div>
             </div>
             <div className="archive-archive-chrome" style={{ opacity: opening.deskOpacity, visibility: opening.archiveVisible ? 'visible' : 'hidden', '--chrome-surface': `rgb(${chromeGray}, ${chromeGray}, ${chromeGray})` } as CSSProperties} aria-hidden={!opening.archiveInteractive} inert={!opening.archiveInteractive}>

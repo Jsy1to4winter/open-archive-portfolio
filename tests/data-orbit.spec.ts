@@ -74,7 +74,7 @@ for (const width of [1440, 390]) test(`3D data rotation, pause and lightbox at $
   expect(await transform()).toBe(during);
   await page.getByRole('button', { name: 'Close details', exact: true }).click();
   await expect(orbit).toBeVisible();
-  await expect(orbit.locator('.archive-gallery-counter')).toHaveText('02 / 05');
+  await expect(orbit.locator('.archive-gallery-counter')).toHaveText('01 / 05');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(orbit.getByRole('button', { name: 'Pause rotation' })).toHaveCount(0);
   const reduced = await transform();

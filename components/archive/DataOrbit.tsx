@@ -14,6 +14,14 @@ type Props = {
 };
 
 export default function DataOrbit({ index, suspended, reducedMotion, onView, onSeek, onIndexChange }: Props) {
+  const [systemReduced, setSystemReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setSystemReduced(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  reducedMotion = reducedMotion || systemReduced;
   const root = useRef<HTMLElement>(null);
   const phase = useRef({ value: index });
   const target = useRef(index);
