@@ -72,7 +72,7 @@ export default function DataOrbit({ index, suspended, reducedMotion, onView, onS
     };
     let previousVersion = targetVersion.current;
     let settle: gsap.core.Tween | undefined;
-    let idleUntil = performance.now() + 1800;
+    let idleUntil = performance.now() + 350;
     const tick = (_time: number, delta: number) => {
       if (targetVersion.current !== previousVersion) {
         previousVersion = targetVersion.current;
@@ -81,6 +81,7 @@ export default function DataOrbit({ index, suspended, reducedMotion, onView, onS
         let distance = target.current - wrapped;
         if (distance > count / 2) distance -= count;
         if (distance < -count / 2) distance += count;
+        if (Math.abs(distance) < 0.0001) { render(); return; }
         if (reducedMotion) phase.current.value += distance;
         else settle = gsap.to(phase.current, { value: phase.current.value + distance, duration: 0.75, ease: 'power3.inOut' });
         idleUntil = performance.now() + 2500;

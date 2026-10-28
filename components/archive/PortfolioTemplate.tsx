@@ -297,7 +297,7 @@ export default function PortfolioTemplate() {
                 transform: `translate(-50%, -50%) rotate(${portal.rotation}deg) scale(${portal.scale})`,
                 pointerEvents: galleryInteractive ? 'auto' : 'none',
               }}>
-                <ScrollGallery key={galleryVisit} layout={gallery} composition={galleryComposition} progress={displayedGalleryProgress} active={galleryInteractive} suspended={isDetailOpen} reducedMotion={!!reducedMotion} onView={openWork} onSeek={seekImage} onIndexChange={setOrbitIndex} />
+                <ScrollGallery key={galleryVisit} layout={gallery} composition={galleryComposition} progress={displayedGalleryProgress} active={galleryInteractive} expansion={expansion} suspended={isDetailOpen} reducedMotion={!!reducedMotion} onView={openWork} onSeek={seekImage} onIndexChange={setOrbitIndex} />
               </div>
             </div>
             <div className="archive-archive-chrome" style={{ opacity: opening.deskOpacity, visibility: opening.archiveVisible ? 'visible' : 'hidden', '--chrome-surface': `rgb(${chromeGray}, ${chromeGray}, ${chromeGray})` } as CSSProperties} aria-hidden={!opening.archiveInteractive} inert={!opening.archiveInteractive}>

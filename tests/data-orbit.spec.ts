@@ -1,6 +1,26 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 
+test('orbit is initialized before the paper finishes expanding', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await page.locator('.archive-scroll-track').evaluate(async el => {
+    const { progressForModule } = await import('/components/archive/timeline.ts');
+    const { portfolioWorks } = await import('/components/archive/content.ts');
+    el.scrollTop = progressForModule('works', portfolioWorks.length) * 0.73 / 0.74 * (el.scrollHeight - el.clientHeight);
+  });
+  await expect(page.locator('.archive-orbit-transition')).toHaveAttribute('aria-hidden', 'true');
+  await page.locator('.data-orbit').evaluate(el => { el.setAttribute('data-prepared', 'yes'); });
+  await expect.poll(() => page.locator('.data-orbit-card').first().evaluate(el => el.style.transform)).not.toBe('');
+  await page.locator('.archive-scroll-track').evaluate(async el => {
+    const { progressForModule } = await import('/components/archive/timeline.ts');
+    const { portfolioWorks } = await import('/components/archive/content.ts');
+    el.scrollTop = progressForModule('works', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
+  });
+  await expect(page.locator('.archive-orbit-transition')).toHaveAttribute('aria-hidden', 'false');
+  await expect(page.locator('.data-orbit')).toHaveAttribute('data-prepared', 'yes');
+});
+
 for (const viewport of [{ width: 1440, height: 857 }, { width: 390, height: 769 }]) {
   test(`homepage data card opens rotating gallery at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport);

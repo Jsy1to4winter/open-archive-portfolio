@@ -11,13 +11,14 @@ type ScrollGalleryProps = {
   progress: number;
   reducedMotion?: boolean;
   active?: boolean;
+  expansion?: number;
   suspended?: boolean;
   onIndexChange: (index: number) => void;
   onView: (id: string) => void;
   onSeek: (index: number) => void;
 };
 
-export default function ScrollGallery({ layout, composition, progress, reducedMotion = false, active = false, suspended = false, onView, onSeek, onIndexChange }: ScrollGalleryProps) {
+export default function ScrollGallery({ layout, composition, progress, reducedMotion = false, active = false, expansion = 0, suspended = false, onView, onSeek, onIndexChange }: ScrollGalleryProps) {
   const count = portfolioWorks.length;
   const clampedProgress = Number.isFinite(progress) ? Math.max(0, Math.min(1, progress)) : 0;
   const galleryFrame = sampleGalleryLayoutProgress(clampedProgress, layout);
@@ -26,10 +27,15 @@ export default function ScrollGallery({ layout, composition, progress, reducedMo
   const ribbonPosition = reducedMotion ? layout.positions[index] * layout.maxTravel : galleryFrame.position;
   const maxAspectRatio = Math.max(...portfolioWorks.map(work => work.width / work.height));
 
-  if (active) return <DataOrbit index={index} suspended={suspended} reducedMotion={reducedMotion} onView={onView} onSeek={onSeek} onIndexChange={onIndexChange} />;
+  const blend = reducedMotion ? Number(active) : Math.max(0, Math.min(1, (expansion - 0.72) / 0.24));
 
   return (
-    <section className="archive-scroll-gallery" data-ribbon={layout.compact} aria-label="Selected work gallery" style={{
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    {(active || expansion > 0.65) && <div className="archive-orbit-transition" aria-hidden={!active} inert={!active} style={{ position: 'absolute', inset: 0, opacity: blend, pointerEvents: active ? 'auto' : 'none' }}>
+      <DataOrbit index={index} suspended={suspended || !active} reducedMotion={reducedMotion} onView={onView} onSeek={onSeek} onIndexChange={onIndexChange} />
+    </div>}
+    {!active && <section className="archive-scroll-gallery" data-ribbon={layout.compact} aria-label="Selected work gallery" style={{
+      opacity: 1 - blend,
       '--gallery-max-ratio': maxAspectRatio,
       '--gallery-image-height': `${layout.imageHeight}px`,
     } as CSSProperties}>
@@ -105,6 +111,7 @@ export default function ScrollGallery({ layout, composition, progress, reducedMo
           Elsewhere <ArrowUpRight size={16} aria-hidden="true" />
         </a>
       </footer>
-    </section>
+    </section>}
+    </div>
   );
 }
