@@ -46,6 +46,7 @@ export default function PortfolioTemplate() {
   const [t, setT] = useState(0);
   const viewport = useViewport();
   const [detail, setDetail] = useState<ArchiveDetail | null>(null);
+  const [orbitIndex, setOrbitIndex] = useState(0);
   const isDetailOpen = detail !== null;
   const galleryCount = portfolioWorks.length;
   const layout = getResponsiveLayout(viewport);
@@ -214,9 +215,9 @@ export default function PortfolioTemplate() {
   };
   const openWork = (id: string) => openDetail({ type: 'work', id });
   const seekImage = (index: number) => seek(progressForGalleryProgress(gallery.positions[Math.max(0, Math.min(galleryCount - 1, index))], galleryCount));
-  const hasGalleryNext = current?.id === 'works' && frame.galleryProgress < 1;
+  const hasGalleryNext = current?.id === 'works' && (galleryInteractive || frame.galleryProgress < 1);
   const next = () => {
-    if (hasGalleryNext) seekImage(Math.min(galleryCount - 1, galleryFrame.currentIndex + 1));
+    if (hasGalleryNext) seekImage(galleryInteractive ? (orbitIndex + 1) % galleryCount : Math.min(galleryCount - 1, galleryFrame.currentIndex + 1));
     else {
       const index = modules.findIndex(item => item.id === current?.id);
       seek(progressForModule(modules[(index + 1) % modules.length].id, galleryCount));
@@ -289,7 +290,7 @@ export default function PortfolioTemplate() {
                 transform: `translate(-50%, -50%) rotate(${portal.rotation}deg) scale(${portal.scale})`,
                 pointerEvents: galleryInteractive ? 'auto' : 'none',
               }}>
-                <ScrollGallery layout={gallery} composition={galleryComposition} progress={displayedGalleryProgress} reducedMotion={!!reducedMotion} onView={openWork} onSeek={seekImage} />
+                <ScrollGallery layout={gallery} composition={galleryComposition} progress={displayedGalleryProgress} active={galleryInteractive} suspended={isDetailOpen} reducedMotion={!!reducedMotion} onView={openWork} onSeek={seekImage} onIndexChange={setOrbitIndex} />
               </div>
             </div>
             <div className="archive-archive-chrome" style={{ opacity: opening.deskOpacity, visibility: opening.archiveVisible ? 'visible' : 'hidden', '--chrome-surface': `rgb(${chromeGray}, ${chromeGray}, ${chromeGray})` } as CSSProperties} aria-hidden={!opening.archiveInteractive} inert={!opening.archiveInteractive}>

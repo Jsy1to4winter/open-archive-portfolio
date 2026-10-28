@@ -35,6 +35,7 @@ for (const width of [1440, 390])
     await expect(page.locator(".archive-gallery-counter")).toHaveText(
       "01 / 05",
     );
+    await expect(page.locator('.data-orbit')).toBeVisible();
     const first = page.locator(".archive-gallery-slide").first().locator("img");
     await expect(first).toHaveAttribute(
       "src",
@@ -51,11 +52,10 @@ for (const width of [1440, 390])
         page.locator(".archive-gallery-slide").nth(i).locator("img"),
       ).toHaveJSProperty("naturalWidth", content.portfolioWorks[i].width);
     }
-    await expect(page.locator(".archive-gallery-next")).toBeDisabled();
+    await expect(page.locator(".archive-gallery-next")).toBeEnabled();
     await page
       .locator(".archive-gallery-slide")
       .last()
-      .locator("button")
       .click();
     await expect(
       page.locator(".archive-archive-dialog[open] .archive-lightbox img"),

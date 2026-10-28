@@ -202,6 +202,7 @@ test("perspective retains all six operations sections", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(localContent()) }));
   await page.goto("/");
   for (const id of ["perspective"]) {
     await enterModule(page, id);

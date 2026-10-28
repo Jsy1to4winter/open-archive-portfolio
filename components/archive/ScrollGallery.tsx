@@ -3,17 +3,21 @@ import type { CSSProperties } from 'react';
 import { otherPortfolioUrl, portfolioWorks } from './content';
 import { sampleGalleryLayoutProgress, type GalleryLayout } from './galleryLayout';
 import type { GalleryComposition } from './galleryComposition';
+import DataOrbit from './DataOrbit';
 
 type ScrollGalleryProps = {
   layout: GalleryLayout;
   composition: GalleryComposition;
   progress: number;
   reducedMotion?: boolean;
+  active?: boolean;
+  suspended?: boolean;
+  onIndexChange: (index: number) => void;
   onView: (id: string) => void;
   onSeek: (index: number) => void;
 };
 
-export default function ScrollGallery({ layout, composition, progress, reducedMotion = false, onView, onSeek }: ScrollGalleryProps) {
+export default function ScrollGallery({ layout, composition, progress, reducedMotion = false, active = false, suspended = false, onView, onSeek, onIndexChange }: ScrollGalleryProps) {
   const count = portfolioWorks.length;
   const clampedProgress = Number.isFinite(progress) ? Math.max(0, Math.min(1, progress)) : 0;
   const galleryFrame = sampleGalleryLayoutProgress(clampedProgress, layout);
@@ -21,6 +25,8 @@ export default function ScrollGallery({ layout, composition, progress, reducedMo
   const position = reducedMotion ? index : clampedProgress * (count - 1);
   const ribbonPosition = reducedMotion ? layout.positions[index] * layout.maxTravel : galleryFrame.position;
   const maxAspectRatio = Math.max(...portfolioWorks.map(work => work.width / work.height));
+
+  if (active) return <DataOrbit index={index} suspended={suspended} reducedMotion={reducedMotion} onView={onView} onSeek={onSeek} onIndexChange={onIndexChange} />;
 
   return (
     <section className="archive-scroll-gallery" data-ribbon={layout.compact} aria-label="Selected work gallery" style={{
