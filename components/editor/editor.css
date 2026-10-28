@@ -294,6 +294,16 @@
   background: #fafafa;
   flex-shrink: 0;
 }
+.editor-deployment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.editor-deployment span { flex-basis: 100%; }
+.editor-deployment a { color: inherit; text-decoration: underline; }
 .editor-status {
   font-size: 12px;
   color: #555;

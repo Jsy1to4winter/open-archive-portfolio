@@ -146,8 +146,9 @@ export function validateContent(value: unknown): asserts value is SiteContent {
 }
 let loaded = defaultContent;
 try {
-  const response = await fetch(`${import.meta.env.BASE_URL}content.json`, {
-    cache: "no-cache",
+  const fresh = import.meta.env.PROD ? `?v=${Date.now()}` : '';
+  const response = await fetch(`${import.meta.env.BASE_URL}content.json${fresh}`, {
+    cache: "no-store",
   });
   if (
     response.ok &&

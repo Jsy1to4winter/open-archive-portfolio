@@ -124,9 +124,10 @@ test('owner sticker arrangement publishes and visitors start from it', async ({ 
   await expect(sticker).toBeVisible();
   await page.waitForTimeout(700);
   const before = (await sticker.boundingBox())!;
-  await page.mouse.move(before.x + 30, before.y + 30);
+  const centerX = before.x + before.width / 2, centerY = before.y + before.height / 2;
+  await page.mouse.move(centerX, centerY);
   await page.mouse.down();
-  await page.mouse.move(before.x + 110, before.y + 130, { steps: 12 });
+  await page.mouse.move(centerX + 80, centerY + 100, { steps: 12 });
   await page.mouse.up();
   const arranged = (await sticker.boundingBox())!;
   await page.getByRole('button', { name: '编辑作品集', exact: true }).click();
@@ -224,6 +225,7 @@ test("upload computes image dimensions and shares one atomic commit", async ({
 test("concurrent update cannot overwrite repository", async ({ page }) => {
   const writes = await mockGithub(page, { conflict: true });
   await enter(page);
+  await page.getByRole('tab').nth(0).click();
   await page.getByLabel("姓名", { exact: true }).fill("Changed");
   await page.getByRole("button", { name: "保存发布", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("仓库已发生更新");

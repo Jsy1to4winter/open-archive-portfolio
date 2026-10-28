@@ -32,6 +32,7 @@ import { videoPoster } from "./video-poster";
 import { MAX_ACCOUNT_VIDEOS } from "../archive/account-media";
 import { sections, sectionTitle, sectionForPath, type EditorSection } from './sections';
 import { profileBiography } from '../archive/profile-copy';
+import { contentDigest, isDeployed, type DeploymentStatus } from './deployment';
 
 const labels: Record<string, string> = {
   aboutPhotos: '运营过的账号主页',
@@ -136,6 +137,28 @@ export default function PortfolioEditor() {
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [message, setMessage] = useState("");
+  const [published, setPublished] = useState<{ head: string; hash: string } | null>(null);
+  const [deployment, setDeployment] = useState<DeploymentStatus>('pending');
+  useEffect(() => {
+    if (!published) return;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const controller = new AbortController();
+    const deadline = Date.now() + 180000;
+    const check = async () => {
+      try {
+        if (await isDeployed(published.head, published.hash, controller.signal)) {
+          if (!cancelled) setDeployment('live');
+          return;
+        }
+      } catch { /* A failed check is not evidence that publishing failed. */ }
+      if (cancelled) return;
+      if (Date.now() >= deadline) setDeployment('unconfirmed');
+      else timer = setTimeout(() => void check(), 5000);
+    };
+    void check();
+    return () => { cancelled = true; clearTimeout(timer); controller.abort(); };
+  }, [published]);
   const [uploads, setUploads] = useState<Upload[]>([]);
   const urls = useRef(new Map<string, string>());
   const dialog = useRef<HTMLDialogElement>(null);
@@ -336,13 +359,16 @@ export default function PortfolioEditor() {
     setMessage("");
     try {
       validateContent(draft);
+      const hash = await contentDigest(draft);
       const next = await publish(token.current, auth, draft, uploads);
       setAuth(next);
       setBaseline(clone(draft));
       applyContent(visibleContent(draft));
       setUploads([]);
       setDirty(false);
-      setMessage("已保存到 GitHub。网站部署完成后，所有访客会看到更新。");
+      setDeployment('pending');
+      setPublished({ head: next.head, hash });
+      setMessage("已保存到 GitHub，正在等待公开网站部署。当前预览不代表访客版本已更新。");
     } catch (error) {
       setMessage((error as Error).message);
     } finally {
@@ -350,6 +376,7 @@ export default function PortfolioEditor() {
     }
   }
   function logout() {
+    setPublished(null);
     token.current = "";
     setAuth(null);
     setTokenInput("");
@@ -928,6 +955,11 @@ export default function PortfolioEditor() {
                       ? "有未发布的修改"
                       : "所有修改已保存")}
               </div>
+              {published && <div className="editor-deployment" aria-live="polite">
+                <span>{deployment === 'live' ? '已确认公开版本更新，访客可见。' : deployment === 'unconfirmed' ? '尚未确认上线，请查看部署进度；保存的内容仍在仓库中。' : '等待部署：分享链接目前可能仍显示上一个版本。'}</span>
+                <a href={`https://github.com/${OWNER}/${REPO}/actions/workflows/pages.yml`} target="_blank" rel="noopener noreferrer">查看部署进度</a>
+                {deployment === 'live' && <a href={`https://${OWNER.toLowerCase()}.github.io/${REPO}/?v=${published.head}`} target="_blank" rel="noopener noreferrer">打开已更新的作品集</a>}
+              </div>}
               {closeAction && (
                 <div className="editor-confirm">
                   <p>退出会丢弃未发布的修改。</p>
