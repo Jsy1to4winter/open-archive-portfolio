@@ -20,9 +20,20 @@ function Sticker({ visible, item, index }: { visible: boolean; item: HomepageSti
   const position = useRef({ x: item.x, y: item.y });
   const surface = useRef<HTMLDivElement>(null);
   const peel = useRef<ReturnType<typeof createStickerPeel> | null>(null);
-  const dragOrigin = useRef({ x: 0, y: 0 });
-  const lastDragEnd = useRef(-Infinity);
-  useEffect(() => () => peel.current?.destroy(), []);
+  const edgePress = useRef<{ id: number; x: number; y: number } | null>(null);
+  const hoveringEdge = useRef(false);
+  useEffect(() => () => { peel.current?.destroy(); peel.current = null; }, []);
+  useEffect(() => {
+    const cancel = () => {
+      edgePress.current = null; hoveringEdge.current = false;
+      if (sticker.current) delete sticker.current.dataset.interaction;
+      peel.current?.reset();
+    };
+    const visibility = () => { if (document.hidden) cancel(); };
+    window.addEventListener('blur', cancel);
+    document.addEventListener('visibilitychange', visibility);
+    return () => { window.removeEventListener('blur', cancel); document.removeEventListener('visibilitychange', visibility); };
+  }, []);
   function preparePeel() {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (!peel.current && visible && sticker.current && surface.current) peel.current = createStickerPeel(sticker.current, surface.current, item);
@@ -39,7 +50,7 @@ function Sticker({ visible, item, index }: { visible: boolean; item: HomepageSti
   }
 
   useLayoutEffect(() => {
-    if (!visible || !sticker.current || !bounds.current) { peel.current?.reset(); return; }
+    if (!visible || !sticker.current || !bounds.current) { edgePress.current = null; hoveringEdge.current = false; peel.current?.reset(); return; }
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches) void prepareStickerPeel().catch(() => {});
     void prepareStickerSound();
     const [instance] = Draggable.create(sticker.current, {
@@ -47,15 +58,12 @@ function Sticker({ visible, item, index }: { visible: boolean; item: HomepageSti
       bounds: bounds.current,
       edgeResistance: 1,
       dragClickables: true,
-      onPress() { preparePeel(); unlockStickerSound(); dragOrigin.current = { x: this.x, y: this.y }; },
+      onPress() { preparePeel(); unlockStickerSound(); peel.current?.reset(); hoveringEdge.current = false; },
       onDragStart() {
         stopStickerSound();
         sticker.current?.setAttribute('data-dragging', 'true');
       },
-      onDrag() { peel.current?.drag(this.x - dragOrigin.current.x, this.y - dragOrigin.current.y); },
       onDragEnd(event: Event) {
-        lastDragEnd.current = performance.now();
-        peel.current?.release();
         sticker.current?.removeAttribute('data-dragging');
         if (event.type.includes('cancel') || document.visibilityState === 'hidden') return;
         recordPosition();
@@ -89,11 +97,45 @@ function Sticker({ visible, item, index }: { visible: boolean; item: HomepageSti
         style={{ width: `min(${item.width}px, calc(100vw - 48px))`, height: 'auto', aspectRatio: item.image ? '3 / 2' : '30 / 11', left: 0, top: 0 }}
         type="button"
         aria-label={`拖动 ${item.name} 贴纸`}
-        title="拖动撕开，松手贴回；方向键也可移动"
+        title="边缘撕开，松手回贴；中间拖动；方向键移动"
         onPointerEnter={preparePeel}
         onFocus={preparePeel}
-        onClick={() => { preparePeel(); if (performance.now() - lastDragEnd.current > 200) peel.current?.preview(); }}
+        onPointerDownCapture={event => {
+          if (!event.isPrimary || event.button !== 0) return;
+          preparePeel(); unlockStickerSound();
+          const hit = peel.current?.hit(event.clientX, event.clientY);
+          if (!hit?.edge) { hoveringEdge.current = false; peel.current?.reset(); return; }
+          event.preventDefault(); event.stopPropagation();
+          stopStickerSound();
+          edgePress.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+          event.currentTarget.setPointerCapture(event.pointerId);
+          peel.current?.begin(hit.x, hit.y);
+          event.currentTarget.dataset.interaction = 'peel';
+        }}
+        onMouseDownCapture={event => { if (edgePress.current) { event.preventDefault(); event.stopPropagation(); } }}
+        onTouchStartCapture={event => { if (edgePress.current) event.stopPropagation(); }}
+        onPointerMove={event => {
+          const press = edgePress.current;
+          if (press) { if (press.id === event.pointerId) peel.current?.drag(event.clientX - press.x, event.clientY - press.y); return; }
+          if (drag.current?.isPressed || event.buttons || event.pointerType === 'touch') return;
+          preparePeel();
+          const hit = peel.current?.hit(event.clientX, event.clientY);
+          event.currentTarget.dataset.interaction = hit?.edge ? 'edge' : 'move';
+          if (hit?.edge) { hoveringEdge.current = true; peel.current?.begin(hit.x, hit.y); }
+          else if (hoveringEdge.current) { hoveringEdge.current = false; peel.current?.release(); }
+        }}
+        onPointerLeave={() => { if (!edgePress.current && hoveringEdge.current) { hoveringEdge.current = false; peel.current?.release(); } }}
+        onPointerUp={event => {
+          if (edgePress.current?.id !== event.pointerId) return;
+          edgePress.current = null; hoveringEdge.current = false;
+          peel.current?.release(); delete event.currentTarget.dataset.interaction;
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+          playStickerSound();
+        }}
+        onPointerCancel={() => { edgePress.current = null; hoveringEdge.current = false; peel.current?.release(); }}
+        onLostPointerCapture={() => { if (edgePress.current) { edgePress.current = null; peel.current?.release(); } }}
         onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); preparePeel(); peel.current?.preview(); return; }
           const direction = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
           const instance = drag.current;
           if (!direction || !instance || !sticker.current) return;

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
-for (const width of [1440, 390]) test(`name and uploaded stickers curl and return at ${width}`, async ({ page }) => {
+for (const width of [1440, 390]) test(`edge peels stay anchored and center moves without curling at ${width}`, async ({ page }) => {
   await page.setViewportSize({ width, height: 900 });
   const data = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
   data.stickers = [
@@ -30,6 +30,15 @@ for (const width of [1440, 390]) test(`name and uploaded stickers curl and retur
     const x = before.x + before.width / 2, y = before.y + before.height / 2;
     await page.mouse.move(x, y); await page.mouse.down();
     await page.mouse.move(x + 15, y + 65, { steps: 8 });
+    await expect(surface).toHaveAttribute('data-progress', '0');
+    await page.mouse.up();
+    expect((await sticker.boundingBox())!.y - before.y).toBeCloseTo(65, 0);
+    const anchored = (await sticker.boundingBox())!;
+    const edgeX = anchored.x + 12, edgeY = anchored.y + anchored.height / 2;
+    await page.mouse.move(edgeX, edgeY);
+    await expect.poll(async () => Number(await surface.getAttribute('data-progress'))).toBeGreaterThan(0);
+    await page.mouse.down();
+    await page.mouse.move(edgeX + 40, edgeY + 65, { steps: 8 });
     await expect(sticker).toHaveAttribute('data-peel-active', 'true');
     await expect.poll(async () => Number(await surface.getAttribute('data-progress'))).toBeGreaterThan(.1);
     const curled = await canvas.evaluate((el: HTMLCanvasElement) => el.toDataURL());
@@ -43,11 +52,20 @@ for (const width of [1440, 390]) test(`name and uploaded stickers curl and retur
     });
     expect(ink).toBeGreaterThan(100);
     await page.screenshot({ path: `test-results/peel-curled-${width}-${i}.png` });
+    expect((await sticker.boundingBox())!.x).toBeCloseTo(anchored.x, 1);
+    expect((await sticker.boundingBox())!.y).toBeCloseTo(anchored.y, 1);
     await page.mouse.up();
-    await expect(sticker).not.toHaveAttribute('data-peel-active', 'true');
-    await expect(sticker.locator('.homepage-sticker-face')).toHaveCSS('opacity', '1');
     await expect(surface).toHaveAttribute('data-progress', '0');
+    await expect(sticker).toHaveAttribute('data-peel-active', 'true');
+    await expect(surface).toHaveAttribute('data-material', 'holographic');
+    await expect(sticker.locator('.homepage-sticker-face')).toHaveCSS('opacity', '0');
     expect((await sticker.boundingBox())!.y - before.y).toBeCloseTo(65, 0);
+    await page.screenshot({ path: `test-results/peel-returned-${width}-${i}.png` });
+    await page.mouse.move(0, 0);
+    await page.mouse.move(anchored.x + 12, anchored.y + anchored.height / 2);
+    await expect.poll(async () => Number(await surface.getAttribute('data-progress'))).toBeGreaterThan(0);
+    await page.mouse.move(0, 0);
+    await expect(surface).toHaveAttribute('data-progress', '0');
   }
   expect(errors).toEqual([]);
 });
@@ -69,9 +87,9 @@ test('touch peel returns without scrolling the page', async ({ browser, baseURL 
   const sticker = page.locator('.homepage-sticker');
   await sticker.tap();
   await expect(sticker.locator('.homepage-sticker-peel')).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
-  await expect(sticker).not.toHaveAttribute('data-peel-active', 'true');
+  await expect(sticker.locator('.homepage-sticker-peel')).toHaveAttribute('data-progress', '0');
   const rect = (await sticker.boundingBox())!;
-  const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
+  const x = rect.x + 12, y = rect.y + rect.height / 2;
   const scroll = await page.locator('.archive-scroll-track').evaluate(el => el.scrollTop);
   const cdp = await context.newCDPSession(page);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
@@ -79,7 +97,9 @@ test('touch peel returns without scrolling the page', async ({ browser, baseURL 
   await expect(sticker).toHaveAttribute('data-peel-active', 'true');
   await page.screenshot({ path: 'test-results/peel-touch.png' });
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await expect(sticker).not.toHaveAttribute('data-peel-active', 'true');
+  await expect(sticker.locator('.homepage-sticker-peel')).toHaveAttribute('data-progress', '0');
+  expect((await sticker.boundingBox())!.x).toBeCloseTo(rect.x, 1);
+  expect((await sticker.boundingBox())!.y).toBeCloseTo(rect.y, 1);
   expect(await page.locator('.archive-scroll-track').evaluate(el => el.scrollTop)).toBe(scroll);
   await context.close();
 });

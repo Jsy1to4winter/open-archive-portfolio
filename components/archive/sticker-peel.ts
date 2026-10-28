@@ -11,6 +11,7 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
   let pendingPreview = false;
   let tween: gsap.core.Tween | undefined;
   let ratio = 30 / 11;
+  let alpha: ImageData | undefined;
   const pose = { value: 0 };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let motion: StickerPlaybackMotion = { origin: { x: 0, y: .5 }, target: { x: 1, y: .5 } };
@@ -32,7 +33,8 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
     pendingPreview = false;
     tween?.kill(); pose.value = 0;
     instance?.reset();
-    delete button.dataset.peelActive;
+    if (instance && !reduced.matches) button.dataset.peelActive = 'true';
+    else delete button.dataset.peelActive;
     host.dataset.progress = '0';
   }
   function release() {
@@ -64,6 +66,11 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
     }
     const image = new Image(); image.src = src; await image.decode();
     ratio = image.naturalWidth / image.naturalHeight;
+    const mask = document.createElement('canvas');
+    mask.width = 256; mask.height = Math.max(1, Math.round(256 / ratio));
+    const maskContext = mask.getContext('2d', { willReadFrequently: true })!;
+    maskContext.drawImage(image, 0, 0, mask.width, mask.height);
+    alpha = maskContext.getImageData(0, 0, mask.width, mask.height);
     if (disposed) return;
     instance = await createSticker(host, {
       source: { type: 'image', src, padding: 0, textureMaxEdge: 1024 },
@@ -72,24 +79,47 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
       peel: { radius: .12, stiffness: .72, grabWidth: 22, maxAngle: 3.55, release: 'reset', residue: false },
       shadow: { opacity: .22, blur: 22, distance: 16, angle: 42, color: '#191823' },
       back: { color: '#f7f5f2', gloss: .7, roughness: .3 },
+      material: { type: 'holographic', intensity: 1, scale: 1, holographicGrain: .72, holographicColors: ['#ff55b5', '#36e6c6', '#8c74ff'] },
       sound: { enabled: false }, wind: 0, tilt: 0, quality: 'low',
     });
     if (disposed) { instance.destroy(); return; }
     const canvas = host.querySelector('canvas')!;
     canvas.tabIndex = -1; canvas.removeAttribute('role'); canvas.setAttribute('aria-hidden', 'true');
-    resize(); host.dataset.ready = 'true';
+    resize(); host.dataset.ready = 'true'; host.dataset.material = 'holographic';
+    if (!reduced.matches) button.dataset.peelActive = 'true';
     if (pendingPreview) { pendingPreview = false; pose.value = .45; paint(); release(); }
     else if (pose.value) paint();
   })().catch(() => { if (!disposed) host.dataset.ready = 'false'; });
   return {
+    hit(clientX: number, clientY: number) {
+      const rect = button.getBoundingClientRect();
+      const width = Math.min(rect.width - 20, (rect.height - 20) * ratio);
+      const height = width / ratio;
+      const x = (clientX - rect.x - (rect.width - width) / 2) / width;
+      const y = (clientY - rect.y - (rect.height - height) / 2) / height;
+      const band = Math.min(22, Math.min(width, height) * .24);
+      const solid = (px: number, py: number) => !alpha
+        ? px >= 0 && px <= 1 && py >= 0 && py <= 1
+        : px >= 0 && px < 1 && py >= 0 && py < 1 && alpha.data[(Math.floor(py * alpha.height) * alpha.width + Math.floor(px * alpha.width)) * 4 + 3] > 40;
+      // Keep a generous central handle; elsewhere follow the actual PNG silhouette.
+      let edge = !(x > .27 && x < .73 && y > .27 && y < .73);
+      if (edge && solid(x, y)) {
+        edge = false;
+        for (let a = 0; a < 16; a++) {
+          const angle = a * Math.PI / 8;
+          if (!solid(x + Math.cos(angle) * band / width, y + Math.sin(angle) * band / height)) { edge = true; break; }
+        }
+      }
+      return { edge, x: Math.max(0, Math.min(1, x)), y: Math.max(0, Math.min(1, y)) };
+    },
+    begin(x: number, y: number) {
+      tween?.kill();
+      motion = { origin: { x, y }, target: { x: 1 - x, y: 1 - y } };
+      pose.value = .1; paint();
+    },
     drag(dx: number, dy: number) {
       tween?.kill();
-      const length = Math.hypot(dx, dy);
-      const horizontal = Math.abs(dx) > Math.abs(dy);
-      motion = horizontal
-        ? { origin: { x: dx >= 0 ? 0 : 1, y: .5 }, target: { x: dx >= 0 ? 1 : 0, y: .5 } }
-        : { origin: { x: .5, y: dy >= 0 ? 0 : 1 }, target: { x: .5, y: dy >= 0 ? 1 : 0 } };
-      pose.value = Math.min(.62, length / Math.max(100, button.clientWidth)); paint();
+      pose.value = Math.min(.95, .1 + Math.hypot(dx, dy) / Math.max(80, button.clientWidth * .8)); paint();
     },
     preview() { if (reduced.matches) return; if (!instance) { pendingPreview = true; return; } pose.value = .45; paint(); release(); },
     release,
