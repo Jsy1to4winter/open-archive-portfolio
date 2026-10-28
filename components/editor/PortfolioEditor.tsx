@@ -34,7 +34,7 @@ import { sections, sectionTitle, sectionForPath, type EditorSection } from './se
 import { profileBiography } from '../archive/profile-copy';
 
 const labels: Record<string, string> = {
-  aboutPhotos: '关于我图片',
+  aboutPhotos: '运营过的账号主页',
   stickers: "贴纸",
   accountMedia: "账号和视频",
   videos: "视频作品",
@@ -786,14 +786,13 @@ export default function PortfolioEditor() {
   function renderSection() {
     const textSection = { about: 'about', fragments: 'fragments', craft: 'craft', perspective: 'perspective', works: 'gallery', collaboration: 'collaboration' } as const;
     if (tab === 'stickers') return field(draft.stickers, ['stickers']);
-    if (tab === 'profile') return <>{(['name', 'slipIntroduction', 'image', 'biography', 'disciplines', 'location'] as const).map(key => field(key === 'biography' ? profileBiography(draft.templateProfile[key]) : draft.templateProfile[key], ['templateProfile', key]))}</>;
     const group = textSection[tab];
     const text = draft.screenText[group];
     return <>
       {Object.entries(text).filter(([key]) => tab !== 'works' || ['titleLine1', 'titleLine2', 'bodyLine1', 'bodyLine2'].includes(key)).map(([key, value]) => field(value, ['screenText', group, key]))}
-      {tab === 'about' && <>{field(draft.aboutPhotos, ['aboutPhotos'])}{renderCopy('about')}</>}
+      {tab === 'about' && <>{(['name', 'image', 'biography', 'disciplines', 'location'] as const).map(key => field(key === 'biography' ? profileBiography(draft.templateProfile[key]) : draft.templateProfile[key], ['templateProfile', key]))}{renderCopy('about')}</>}
       {tab === 'fragments' && <>{field(draft.accountMedia.image, ['accountMedia', 'image'])}{field(draft.accountMedia.caption, ['accountMedia', 'caption'])}{field(draft.accountMedia.videos, ['accountMedia', 'videos'])}</>}
-      {tab === 'craft' && renderCopy('craft')}
+      {tab === 'craft' && field(draft.aboutPhotos, ['aboutPhotos'])}
       {tab === 'perspective' && renderCopy('perspective')}
       {tab === 'works' && field(draft.portfolioWorks, ['portfolioWorks'])}
       {tab === 'collaboration' && <>{field(draft.contactEmail, ['contactEmail'])}{field(draft.contactPhone, ['contactPhone'])}</>}

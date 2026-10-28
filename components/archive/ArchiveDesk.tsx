@@ -1,7 +1,6 @@
 import React from 'react';
 import { ArrowUpRight, Circle, Box, Pencil } from 'lucide-react';
 import { contactEmail, contactPhone, templateProfile, screenText } from './content';
-import ResumeSlip from './ResumeSlip';
 import type { ModuleId } from './timeline';
 import { prepareAboutPhotos } from './prepare-about-photos';
 
@@ -32,7 +31,6 @@ export default function ArchiveDesk({ onSelect, onResume }: ArchiveDeskProps) {
           <CardArrow />
         </button>
       </div>
-      <ResumeSlip onOpen={onResume} />
 
       <button type="button" className="archive-desk-module archive-desk-fragments" data-module="fragments" onClick={() => onSelect('fragments')} aria-label="Open collected fragments">
         <span className="archive-desk-eyebrow">02</span>

@@ -14,8 +14,8 @@ export default function AboutPhotos() {
   const [index, setIndex] = useState(first);
   const swiper = useRef<SwiperInstance | null>(null);
   const reduced = useReducedMotion();
-  if (!aboutPhotos.length) return <section className="about-photo-empty"><Image size={36} strokeWidth={1} /><h3>个人相册</h3></section>;
-  return <section className="about-photo-gallery" aria-label="关于我个人相册">
+  if (!aboutPhotos.length) return <section className="about-photo-empty"><Image size={36} strokeWidth={1} /><h3>运营过的账号主页</h3></section>;
+  return <section className="about-photo-gallery" aria-label="运营过的账号主页">
     <Swiper modules={[EffectCoverflow, Mousewheel, Keyboard, A11y]} effect="coverflow" centeredSlides slidesPerView="auto" initialSlide={first}
       speed={reduced ? 0 : 650} grabCursor preventInteractionOnTransition keyboard={{ enabled: true, onlyInViewport: true }}
       mousewheel={{ thresholdDelta: 25, releaseOnEdges: true }}
@@ -28,10 +28,10 @@ export default function AboutPhotos() {
       </SwiperSlide>)}
     </Swiper>
     <div className="about-photo-caption" aria-live="polite"><h3>{aboutPhotos[index]?.title}</h3><p>{aboutPhotos[index]?.caption}</p></div>
-    <nav className="about-photo-controls" aria-label="切换个人照片">
-      <button type="button" aria-label="上一张个人照片" title="上一张" disabled={index === 0} onClick={() => swiper.current?.slidePrev()}><ChevronLeft size={20} /></button>
+    <nav className="about-photo-controls" aria-label="切换运营账号主页">
+      <button type="button" aria-label="上一个账号主页" title="上一张" disabled={index === 0} onClick={() => swiper.current?.slidePrev()}><ChevronLeft size={20} /></button>
       <span aria-live="polite">{String(index + 1).padStart(2, '0')} / {String(aboutPhotos.length).padStart(2, '0')}</span>
-      <button type="button" aria-label="下一张个人照片" title="下一张" disabled={index === aboutPhotos.length - 1} onClick={() => swiper.current?.slideNext()}><ChevronRight size={20} /></button>
+      <button type="button" aria-label="下一个账号主页" title="下一张" disabled={index === aboutPhotos.length - 1} onClick={() => swiper.current?.slideNext()}><ChevronRight size={20} /></button>
     </nav>
   </section>;
 }

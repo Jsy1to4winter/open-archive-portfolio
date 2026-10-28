@@ -1,0 +1,35 @@
+import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+for (const width of [1440, 390]) test(`personal intro and operated accounts have separate homes at ${width}`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const data = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
+  data.stickers = [];
+  data.templateProfile.image = data.templateProfile.image.replace('/open-archive-portfolio/', '/');
+  data.aboutPhotos.forEach((photo: any) => { photo.image = photo.image.replace('/open-archive-portfolio/', '/'); });
+  await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(data) }));
+  await page.goto('/');
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await page.locator('.archive-scroll-track').evaluate(async el => {
+    const { progressForModule } = await import('/components/archive/timeline.ts');
+    const { portfolioWorks } = await import('/components/archive/content.ts');
+    el.scrollTop = progressForModule('about', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
+  });
+  await expect(page.locator('.archive-name-slip')).toHaveCount(0);
+  await page.locator('.archive-desk-about-main').click();
+  await expect(page.locator('.archive-about-dialog[open] .profile-about-image img')).toBeVisible();
+  await expect(page.locator('.archive-about-dialog .about-photo-gallery')).toHaveCount(0);
+  await expect(page.locator('.profile-about-copy h3')).toContainText(data.templateProfile.name);
+  await page.screenshot({ path: `test-results/relocated-profile-${width}.png` });
+  await page.getByRole('button', { name: 'Close details', exact: true }).click();
+  await page.locator('.archive-desk-craft').evaluate((el: HTMLElement) => el.click());
+  const dialog = page.locator('.archive-archive-dialog[open]');
+  await expect(dialog).toContainText('这是我运营过的账号主页');
+  await expect(dialog.locator('.swiper-initialized')).toBeVisible();
+  await expect(dialog.locator('.swiper-slide')).toHaveCount(data.aboutPhotos.length);
+  await expect(dialog.locator('.archive-detail-reason')).toHaveCount(0);
+  const index = await dialog.locator('.about-photo-controls span').textContent();
+  await dialog.getByRole('button', { name: '下一个账号主页', exact: true }).click();
+  await expect(dialog.locator('.about-photo-controls span')).not.toHaveText(index!);
+  await page.screenshot({ path: `test-results/relocated-accounts-${width}.png` });
+});

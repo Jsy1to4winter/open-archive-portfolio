@@ -1,5 +1,5 @@
 import type { SiteContent } from '../archive/content';
-export const sections = ['about', 'fragments', 'craft', 'perspective', 'works', 'collaboration', 'profile', 'stickers'] as const;
+export const sections = ['about', 'fragments', 'craft', 'perspective', 'works', 'collaboration', 'stickers'] as const;
 export type EditorSection = typeof sections[number];
 export function sectionTitle(data: SiteContent, section: EditorSection) {
   const text = data.screenText;
@@ -8,7 +8,7 @@ export function sectionTitle(data: SiteContent, section: EditorSection) {
 }
 export function sectionForPath(path: Array<string | number>): EditorSection | null {
   const root = String(path[0]);
-  if (root === 'screenText') return ({ about: 'about', fragments: 'fragments', craft: 'craft', perspective: 'perspective', gallery: 'works', collaboration: 'collaboration', profile: 'profile' } as Record<string, EditorSection>)[String(path[1])] ?? null;
+  if (root === 'screenText') return ({ about: 'about', fragments: 'fragments', craft: 'craft', perspective: 'perspective', gallery: 'works', collaboration: 'collaboration', profile: 'about' } as Record<string, EditorSection>)[String(path[1])] ?? null;
   if (root === 'moduleCopy') return String(path[1]) as EditorSection;
-  return ({ aboutPhotos: 'about', accountMedia: 'fragments', portfolioWorks: 'works', templateProfile: 'profile', contactEmail: 'collaboration', contactPhone: 'collaboration', stickers: 'stickers' } as Record<string, EditorSection>)[root] ?? null;
+  return ({ aboutPhotos: 'craft', accountMedia: 'fragments', portfolioWorks: 'works', templateProfile: 'about', contactEmail: 'collaboration', contactPhone: 'collaboration', stickers: 'stickers' } as Record<string, EditorSection>)[root] ?? null;
 }
