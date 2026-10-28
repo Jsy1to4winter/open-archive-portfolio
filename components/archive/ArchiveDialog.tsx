@@ -5,6 +5,7 @@ import AccountShowcase from './AccountShowcase';
 import { portfolioModules } from './modules';
 import type { ModuleId } from './timeline';
 import ResumeDetails from './ResumeDetails';
+import ReasonEntry from './ReasonEntry';
 
 export type ArchiveDetail =
   | { type: 'module'; id: ModuleId }
@@ -58,9 +59,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
         <button ref={closeButton} type="button" className="archive-detail-close" onClick={requestClose} aria-label="Close details"><X size={20} /></button>
         {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || (module?.id === 'fragments' ? screenText.fragments.title : module?.id === 'perspective' ? screenText.perspective.titleLine1 : module?.label)}</h2>}
         {module?.id === 'fragments' && <AccountShowcase/>}
-        {module && module.id !== 'fragments' && selectedReasons.map(reason => <article key={reason.id} className="archive-detail-reason">
-          <span>{reason.id}</span><div><h3>{reason.title}</h3><p className={module.id === 'about' || module.id === 'perspective' ? 'archive-about-copy' : reason.author ? 'archive-poem' : undefined}>{reason.body}</p>{reason.author && <a className="archive-poem-credit" href={reason.source} target="_blank" rel="noopener noreferrer">— {reason.author} <ArrowUpRight size={12} aria-hidden="true" /></a>}</div>
-        </article>)}
+        {module && module.id !== 'fragments' && selectedReasons.map(reason => <ReasonEntry key={`${module.id}-${reason.id}`} reason={reason} animated={module.id === 'perspective'} large={module.id === 'about' || module.id === 'perspective'} />)}
         {module?.id === 'works' && <div className="archive-detail-works">
           {portfolioWorks.map(item => <article key={item.id}>
             <button className="archive-detail-work-button" type="button" onClick={() => onView(item.id)} aria-label={`View ${item.title}`}>

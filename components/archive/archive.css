@@ -192,6 +192,13 @@ body.archive-page-open { background: #f3f3f3; color: #171717; overflow: hidden; 
 .archive-detail-paper h2 { font-family: 'Archive Space', 'PingFang SC', sans-serif; font-size: 36px; font-weight: 700; line-height: 1.3; letter-spacing: -1px; margin-bottom: 24px; }
 .archive-detail-intro { font-size: 14px; line-height: 1.9; margin-bottom: 20px !important; }
 .archive-detail-reason { display: flex; align-items: flex-start; gap: 22px; padding: 24px 0; border-top: 1px solid #17171725; }
+.archive-reason-interactive { overflow: clip; }
+.archive-reason-interactive > div { min-width: 0; cursor: pointer; }
+.archive-reason-interactive > div:focus-visible { outline-offset: -2px; }
+.archive-sticker-hint { font-size: 10px; line-height: 1.5; text-align: center; }
+@media (prefers-reduced-motion: reduce) {
+  .archive-reason-interactive > div { opacity: 1 !important; transform: none !important; }
+}
 .archive-detail-reason > span { padding-top: 2px; font: 700 18px/1.5 'Archive Space', sans-serif; color: #171717; }
 .archive-detail-reason h3 { font-size: 17px; font-weight: 650; line-height: 1.6; }
 .archive-detail-reason p { font-size: 14px; line-height: 1.95; color: #444444; margin-top: 12px; }

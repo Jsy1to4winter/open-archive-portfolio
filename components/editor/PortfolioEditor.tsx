@@ -203,7 +203,7 @@ export default function PortfolioEditor() {
       if (
         !(target instanceof Element) ||
         target.closest(
-          ".portfolio-editor,.portfolio-edit-trigger,.account-video-poster,.account-video-controls,.account-video-player,.homepage-sticker",
+          ".portfolio-editor,.portfolio-edit-trigger,.account-video-poster,.account-video-controls,.account-video-player,.homepage-sticker,.archive-reason-interactive",
         )
       )
         return null;

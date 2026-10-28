@@ -260,7 +260,7 @@ export default function PortfolioTemplate() {
             <div className="archive-archive-chrome" style={{ opacity: opening.deskOpacity, visibility: opening.archiveVisible ? 'visible' : 'hidden', '--chrome-surface': `rgb(${chromeGray}, ${chromeGray}, ${chromeGray})` } as CSSProperties} aria-hidden={!opening.archiveInteractive} inert={!opening.archiveInteractive}>
               <header><button type="button" onClick={() => seek(0)}>{templateProfile.brand}<span> / ARCHIVE</span></button><button type="button" onClick={() => openModule('collaboration')}>Say hello <ArrowUpRight size={13} /></button></header>
               <nav className="archive-focus-nav" aria-label="Archive sections">{modules.map((item, index) => <button key={item.id} type="button" onClick={() => seek(progressForModule(item.id, galleryCount))} aria-current={current?.id === item.id ? 'location' : undefined} aria-label={`Explore ${item.label}`}>{index + 1}</button>)}</nav>
-              <footer><span>{current ? current.label : 'Overview'}</span><button type="button" onClick={next}>{hasGalleryNext ? 'Next image' : 'Next chapter'} <ArrowDown size={12} /></button><span className="archive-t-readout">{String(modules.findIndex(item => item.id === current?.id) + 1).padStart(2, '0')} / 06</span></footer>
+              <footer><span>{current ? current.label : 'Overview'}</span>{hasGalleryNext ? <button type="button" onClick={next}>Next image <ArrowDown size={12} /></button> : <span className="archive-sticker-hint">拖动贴纸，试着互动一下</span>}<span className="archive-t-readout">{String(modules.findIndex(item => item.id === current?.id) + 1).padStart(2, '0')} / 06</span></footer>
             </div>
           </div>
         </div>
