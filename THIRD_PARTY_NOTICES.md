@@ -12,6 +12,11 @@ The computer-screen video is an original work by KAKI (kakizzzzz), released with
 
 ## Runtime software
 
+The interactive handwritten Artist ink adapts Da0Mine/text-particleization's
+pixel-sampling, pointer-repulsion and spring/damping model. It samples the
+user's red artwork instead of replacing it with a system font, and keeps the
+photo and frame static. See [source and MIT notice](licenses/text-particleization.txt).
+
 The personal photo Cover Flow uses Swiper 11.2.10, copyright Vladimir Kharlampidi, under the MIT license; see [Swiper license](licenses/swiper.txt).
 
 | Component | License text |

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 import { profileBiography } from '../components/archive/profile-copy';
-for (const width of [1440, 390]) test(`transparent Artist artwork writes left to right at ${width}`, async ({ page }) => {
+for (const width of [1440, 390]) test(`Artist particles react and return without moving the photo at ${width}`, async ({ page }) => {
   await page.setViewportSize({ width, height: 1000 });
   const data = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
   const biography = data.templateProfile.biography;
@@ -19,12 +19,24 @@ for (const width of [1440, 390]) test(`transparent Artist artwork writes left to
   await page.locator('.archive-desk-about-main').click();
   const artwork = page.locator('.artist-portrait');
   await expect(artwork).toBeVisible();
-  const writing = artwork.locator('clipPath[id$="-writing"] rect');
-  const initial = Number(await writing.getAttribute('width'));
-  await expect.poll(async () => Number(await writing.getAttribute('width'))).toBeGreaterThan(initial);
-  await page.screenshot({ path: `test-results/artist-writing-${width}.png` });
-  await expect.poll(async () => Number(await writing.getAttribute('width')), { timeout: 6000 }).toBe(1416);
-  await page.screenshot({ path: `test-results/artist-complete-${width}.png` });
+  const particles = page.locator('.artist-particles');
+  await expect(page.locator('.artist-interactive')).toHaveAttribute('data-interactive', 'true');
+  await expect.poll(async () => Number(await particles.getAttribute('data-particles'))).toBeGreaterThan(100);
+  const box = (await particles.boundingBox())!;
+  const photoBefore = await artwork.boundingBox();
+  const staticPhoto = await artwork.evaluate(el => el.outerHTML);
+  const pixels = await particles.evaluate((el: HTMLCanvasElement) => { const data = el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data; let ink = 0; for (let i = 3; i < data.length; i += 4) if (data[i]) ink++; return ink; });
+  expect(pixels).toBeGreaterThan(100);
+  await page.screenshot({ path: `test-results/artist-particles-rest-${width}.png` });
+  await page.mouse.move(box.x + box.width * .4, box.y + box.height * .45);
+  await expect.poll(async () => Number(await particles.getAttribute('data-displacement'))).toBeGreaterThan(1);
+  await page.waitForTimeout(500);
+  expect(await artwork.boundingBox()).toEqual(photoBefore);
+  expect(await artwork.evaluate(el => el.outerHTML)).toBe(staticPhoto);
+  await page.screenshot({ path: `test-results/artist-particles-react-${width}.png` });
+  await page.mouse.move(0, 0);
+  await expect.poll(async () => Number(await particles.getAttribute('data-displacement')), { timeout: 10000 }).toBeLessThan(.1);
+  expect((await artwork.boundingBox())!.width).toBeLessThanOrEqual(width < 600 ? 300 : 480);
   const font = width < 600 ? '13px' : '14px';
   await expect(page.locator('.profile-about-copy p')).toHaveCSS('font-size', font);
   await expect(page.locator('.profile-about-copy h3')).toHaveCount(0);
@@ -39,4 +51,7 @@ for (const width of [1440, 390]) test(`transparent Artist artwork writes left to
     return ctx.getImageData(0, 0, 1, 1).data[3];
   });
   expect(alpha).toBe(0);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(particles).not.toBeVisible();
+  await expect(artwork).toBeVisible();
 });
