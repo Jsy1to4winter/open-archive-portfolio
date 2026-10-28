@@ -565,6 +565,10 @@ export default function PortfolioEditor() {
         ? "账号截图"
         : (labels[key] ?? key);
     if (key === "id") return null;
+    if (path[0] === 'titleSizes') return <div className="editor-field" key={path.join('.')}>
+      <label htmlFor={`field-${path.join('-')}`}>首页标题字号：{String(value)} px</label>
+      <input id={`field-${path.join('-')}`} type="range" min="12" max="120" step="1" value={Number(value)} onChange={event => update(path, Number(event.target.value))} />
+    </div>;
     if (path[0] === 'portfolioWorks' && ['width', 'height', 'thumbnail', 'category', 'alt'].includes(key)) return null;
     if (path[0] === 'accountMedia' && path[1] === 'videos' && path.length === 3 && value && typeof value === 'object') {
       const item = value as { src: string; poster: string };
@@ -789,6 +793,7 @@ export default function PortfolioEditor() {
     const group = textSection[tab];
     const text = draft.screenText[group];
     return <>
+      {field(draft.titleSizes[group], ['titleSizes', group])}
       {Object.entries(text).filter(([key]) => tab !== 'works' || ['titleLine1', 'titleLine2', 'bodyLine1', 'bodyLine2'].includes(key)).map(([key, value]) => field(value, ['screenText', group, key]))}
       {tab === 'about' && <>{(['name', 'image', 'biography', 'disciplines', 'location'] as const).map(key => field(key === 'biography' ? profileBiography(draft.templateProfile[key]) : draft.templateProfile[key], ['templateProfile', key]))}{renderCopy('about')}</>}
       {tab === 'fragments' && <>{field(draft.accountMedia.image, ['accountMedia', 'image'])}{field(draft.accountMedia.caption, ['accountMedia', 'caption'])}{field(draft.accountMedia.videos, ['accountMedia', 'videos'])}</>}

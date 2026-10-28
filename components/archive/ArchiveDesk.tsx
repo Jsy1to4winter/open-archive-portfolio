@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowUpRight, Circle, Box, Pencil } from 'lucide-react';
-import { contactEmail, contactPhone, templateProfile, screenText } from './content';
+import { contactEmail, contactPhone, templateProfile, screenText, titleSizes } from './content';
 import type { ModuleId } from './timeline';
 import { prepareAboutPhotos } from './prepare-about-photos';
 
@@ -18,8 +18,32 @@ function CardArrow() {
 }
 
 export default function ArchiveDesk({ onSelect, onResume }: ArchiveDeskProps) {
+  const desk = React.useRef<HTMLDivElement>(null);
+  React.useLayoutEffect(() => {
+    const fit = () => {
+      desk.current?.querySelectorAll<HTMLElement>('.archive-desk-about-title, .archive-desk-stat, .archive-desk-module-title').forEach(title => {
+        title.style.fontSize = '';
+        const card = title.closest<HTMLElement>('button')!;
+        let high = parseFloat(getComputedStyle(title).fontSize);
+        const overflows = () => card.scrollHeight > card.clientHeight + 1 || title.scrollWidth > title.clientWidth + 1;
+        if (!overflows()) return;
+        let low = 12;
+        while (high - low > 1) {
+          const size = Math.floor((high + low) / 2);
+          title.style.fontSize = `${size}px`;
+          if (overflows()) high = size;
+          else low = size;
+        }
+        title.style.fontSize = `${low}px`;
+      });
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    document.fonts.ready.then(() => { if (desk.current) fit(); });
+    return () => window.removeEventListener('resize', fit);
+  }, [titleSizes, screenText]);
   return (
-    <div className="archive-desk">
+    <div ref={desk} className="archive-desk" style={Object.fromEntries(Object.entries(titleSizes).map(([key, size]) => [`--title-${key}`, `${size}px`])) as React.CSSProperties}>
       <div className="archive-desk-module archive-desk-about" data-module="about">
         <button className="archive-desk-about-main" type="button" onPointerEnter={() => void prepareAboutPhotos()} onFocus={() => void prepareAboutPhotos()} onClick={() => onSelect('about')} aria-label="Read about this archive">
           <span className="archive-desk-about-sheet">

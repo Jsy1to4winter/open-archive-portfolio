@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { GalleryNotesLayout } from './galleryNotesLayout';
-import { screenText } from './content';
+import { screenText, titleSizes } from './content';
 
 export default function GalleryNotes({ layout }: { layout: GalleryNotesLayout }) {
   if (layout.level === 'hidden') return null;
@@ -18,7 +18,7 @@ export default function GalleryNotes({ layout }: { layout: GalleryNotesLayout })
     <div className="archive-gallery-notes" data-density={layout.level} data-tight={tight} aria-hidden="true" style={{
       opacity: layout.opacity,
       '--note-unit': layout.fontUnit,
-      '--note-heading': `${headingSize}px`,
+      '--note-heading': `${Math.min(headingSize * titleSizes.gallery / 34, Math.max(12, screenHeight * .18), layout.left.width / layout.fontUnit / 4)}px`,
     } as CSSProperties}>
       <div className="archive-gallery-note archive-gallery-note-left" style={rectStyle(layout.left)}>
         <span className="archive-gallery-note-label">{layout.level === 'minimal' ? '05' : 'ARCHIVE / 05'}</span>

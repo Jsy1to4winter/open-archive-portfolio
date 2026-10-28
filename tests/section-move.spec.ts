@@ -20,7 +20,7 @@ for (const width of [1440, 390]) test(`personal intro and operated accounts have
   await expect(page.locator('.archive-about-dialog[open] .profile-about-image img')).toBeVisible();
   await expect(page.locator('.archive-about-dialog .about-photo-gallery')).toHaveCount(0);
   await expect(page.locator('.profile-about-copy h3')).toContainText(data.templateProfile.name);
-  await expect(page.locator('.profile-about-image')).toHaveCSS('padding', '1px');
+  await expect(page.locator('.profile-about-image')).toHaveCSS('padding', '2px');
   const space = await page.locator('.profile-about-layout').evaluate(el => {
     const children = [...el.children].map(child => child.getBoundingClientRect().bottom);
     return el.getBoundingClientRect().bottom - Math.max(...children);

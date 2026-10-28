@@ -6,6 +6,7 @@ import { defaultAccountMedia, MAX_ACCOUNT_VIDEOS } from "./account-media";
 export type { Reason, PortfolioWork } from "./default-content";
 
 export const defaultContent = {
+  titleSizes: { about: 76, fragments: 72, craft: 37, perspective: 39, gallery: 34, collaboration: 26 },
   moduleCopy: splitModuleCopy(defaults.reasons),
   aboutPhotos: [] as Array<{ id: string; title: string; image: string; caption: string }>,
   stickers: defaultStickers,
@@ -28,6 +29,7 @@ export function normalizeContent(value: unknown): SiteContent {
   const profile = source.templateProfile as Record<string, unknown>;
   const result = {
     ...source,
+    titleSizes: source.titleSizes === undefined ? structuredClone(defaultContent.titleSizes) : source.titleSizes,
     moduleCopy: source.moduleCopy === undefined ? splitModuleCopy(Array.isArray(source.reasons) ? source.reasons : defaults.reasons) : source.moduleCopy,
     templateProfile: { image: '', slipIntroduction: '', ...profile },
     aboutPhotos: source.aboutPhotos === undefined ? [] : source.aboutPhotos,
@@ -71,6 +73,8 @@ export function validateContent(value: unknown): asserts value is SiteContent {
   if (!shape(value, defaultContent))
     throw new Error("内容格式不完整，请检查所有栏目。");
   const data = value as SiteContent;
+  if (!Object.values(data.titleSizes).every(size => Number.isFinite(size) && size >= 12 && size <= 120))
+    throw new Error('首页标题字号须在 12 至 120 像素之间。');
   if (!data.aboutPhotos.every(item => item && ['id', 'title', 'image', 'caption'].every(key => typeof (item as Record<string, unknown>)[key] === 'string') && item.id && item.image.trim()) || new Set(data.aboutPhotos.map(item => item.id)).size !== data.aboutPhotos.length)
     throw new Error('请为每张关于我图片上传文件，并保留唯一编号。');
   if (!data.stickers.every(item => Number.isFinite(item.x) && Number.isFinite(item.y) && item.x >= 0 && item.x <= 1 && item.y >= 0 && item.y <= 1))
@@ -155,6 +159,7 @@ try {
   console.warn("Using bundled portfolio content.", error);
 }
 export let templateProfile = loaded.templateProfile;
+export let titleSizes = loaded.titleSizes;
 export let moduleCopy = loaded.moduleCopy;
 export let aboutPhotos = loaded.aboutPhotos;
 export let stickers = loaded.stickers;
@@ -170,6 +175,7 @@ export let workCategories = loaded.workCategories;
 export let templateResume = loaded.templateResume;
 export function currentContent(): SiteContent {
   return structuredClone({
+    titleSizes,
     moduleCopy,
     aboutPhotos,
     stickers,
@@ -188,6 +194,7 @@ export function currentContent(): SiteContent {
 export function applyContent(data: SiteContent) {
   validateContent(data);
   ({
+    titleSizes,
     moduleCopy,
     aboutPhotos,
     stickers,

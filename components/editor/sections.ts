@@ -8,6 +8,7 @@ export function sectionTitle(data: SiteContent, section: EditorSection) {
 }
 export function sectionForPath(path: Array<string | number>): EditorSection | null {
   const root = String(path[0]);
+  if (root === 'titleSizes') return path[1] === 'gallery' ? 'works' : String(path[1]) as EditorSection;
   if (root === 'screenText') return ({ about: 'about', fragments: 'fragments', craft: 'craft', perspective: 'perspective', gallery: 'works', collaboration: 'collaboration', profile: 'about' } as Record<string, EditorSection>)[String(path[1])] ?? null;
   if (root === 'moduleCopy') return String(path[1]) as EditorSection;
   return ({ aboutPhotos: 'craft', accountMedia: 'fragments', portfolioWorks: 'works', templateProfile: 'about', contactEmail: 'collaboration', contactPhone: 'collaboration', stickers: 'stickers' } as Record<string, EditorSection>)[root] ?? null;
