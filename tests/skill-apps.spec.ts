@@ -22,8 +22,12 @@ for (const width of [1440, 390]) test(`fixed app icons below skills at ${width}`
   const gaps = boxes.slice(1).map((box, i) => box.x - boxes[i].right);
   expect(Math.max(...gaps) - Math.min(...gaps)).toBeLessThan(1);
   await expect(icons.locator('[draggable=true]')).toHaveCount(0);
-  const image = await icons.locator('.skill-app-icon').first().evaluate(el => getComputedStyle(el).backgroundImage);
-  const response = await page.request.get(image.slice(5, -2));
-  expect(response.ok()).toBeTruthy();
+  await expect(icons.locator('img.skill-app-original')).toHaveCount(4);
+  for (const image of await icons.locator('img.skill-app-original').all()) {
+    await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+    await expect(image).toHaveCSS('object-fit', 'contain');
+    await expect(image).toHaveCSS('clip-path', 'none');
+    expect((await page.request.get(await image.getAttribute('src') ?? '')).ok()).toBeTruthy();
+  }
   await page.screenshot({ path: `test-results/skill-apps-${width}.png` });
 });
