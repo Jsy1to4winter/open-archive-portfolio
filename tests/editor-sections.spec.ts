@@ -102,7 +102,10 @@ for (const width of [1440, 390]) {
     expect(left.x + left.width).toBeLessThan(right.x);
     expect(left.y).toBeCloseTo(right.y, 0);
     await expect(image).toHaveCSS('border-radius', '8px');
-    await expect(copy.locator('h3')).toHaveText('About');
+    await expect(copy.locator('h3')).toHaveText(`About${original.templateProfile.name}`);
+    const sizes = await copy.locator('h3 > span').evaluateAll(elements => elements.map(element => getComputedStyle(element).fontSize));
+    expect(sizes[0]).toBe(sizes[1]);
+    await expect(page.locator('.archive-resume-details-name')).toHaveCount(0);
     await expect(copy).not.toContainText('Replace this');
     await expect(page.locator('.archive-resume-section')).toHaveCount(0);
     expect((await page.locator('.profile-about-layout').boundingBox())!.height).toBeGreaterThanOrEqual(620);
