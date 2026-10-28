@@ -1,30 +1,40 @@
 {
   "stickers": [
     {
+      "x": 0.1006172839506173,
+      "y": 0.8937373737373737,
       "id": "name-sticker",
       "name": "suiyixuan",
       "image": "",
       "width": 204
     },
     {
+      "x": 0.8494559832635984,
+      "y": 0.0065040650406504065,
       "id": "item-5bbecbac",
       "name": "新贴纸",
       "image": "/open-archive-portfolio/assets/uploads/8727471d-148b-4fee-ba2b-5b64420fd461.png",
       "width": 305
     },
     {
+      "x": 0.9503930131004367,
+      "y": 1,
       "id": "item-dfea6be7",
       "name": "新贴纸",
       "image": "/open-archive-portfolio/assets/uploads/3780b134-4cc5-4ea7-b228-9cae3e12f25f.png",
       "width": 355
     },
     {
+      "x": 0.10596892886345052,
+      "y": 0,
       "id": "item-0933b0c8",
       "name": "新贴纸",
       "image": "/open-archive-portfolio/assets/uploads/6e278b03-a200-42e5-8164-0167619f700a.png",
       "width": 277
     },
     {
+      "x": 0.33875,
+      "y": 0.5267058823529411,
       "id": "item-d644ac31",
       "name": "新贴纸",
       "image": "/open-archive-portfolio/assets/uploads/edc9036d-1b24-4d6b-a55e-fddf0184777a.png",
@@ -256,39 +266,39 @@
     "videos": [
       {
         "id": "item-6ecf7606",
-        "title": "32725aa1c9a3a5e2034144d06826f3fb",
-        "src": "/open-archive-portfolio/assets/uploads/0c55efa3-231c-45b7-9820-f2c7266a3ea9-h264.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/0c55efa3-231c-45b7-9820-f2c7266a3ea9-poster.jpg"
+        "title": "变装",
+        "src": "/open-archive-portfolio/assets/uploads/61d87c66-faf4-4590-8180-b20b2119924b.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/8148026e-dc9d-4bee-a40d-be7de3e8f8e4.jpg"
       },
       {
         "id": "item-a0ffdfec",
-        "title": "32725aa1c9a3a5e2034144d06826f3fb",
-        "src": "/open-archive-portfolio/assets/uploads/d194aca2-8ead-414b-b9cc-5f960bbf4c44-h264.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/d194aca2-8ead-414b-b9cc-5f960bbf4c44-poster.jpg"
+        "title": "AI漫剧《一纸婚书》",
+        "src": "/open-archive-portfolio/assets/uploads/d45567b0-8e1a-44dd-a70f-13ff94a36965.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/f3ac1daf-9c0e-4b83-9c28-275ae023e85d.jpg"
       },
       {
         "id": "item-520b7ef4",
         "title": "32725aa1c9a3a5e2034144d06826f3fb",
-        "src": "/open-archive-portfolio/assets/uploads/a5352a4d-89fa-4820-924f-30504725bba5.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/15db48a0-9b35-44fd-b5f2-1c5fa8532478.jpg"
+        "src": "/open-archive-portfolio/assets/uploads/8b5bdf20-1168-4e8e-bc84-9d401d923b05.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/107c6a22-8a23-4861-a94b-5a959ddbb835.jpg"
       },
       {
         "id": "item-a2bc2e59",
-        "title": "32725aa1c9a3a5e2034144d06826f3fb",
-        "src": "/open-archive-portfolio/assets/uploads/858e596e-ca3f-4a9f-a0ec-37e1e139a4a0.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/18daa13b-bcec-46a9-89c3-e5e1d3e87814.jpg"
+        "title": "生活化场景",
+        "src": "/open-archive-portfolio/assets/uploads/05d4f293-2f37-4969-8774-652d507b8701.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/933e3591-9c5b-425b-a0e5-9505d98867c5.jpg"
       },
       {
         "id": "item-c48fe813",
-        "title": "32725aa1c9a3a5e2034144d06826f3fb",
-        "src": "/open-archive-portfolio/assets/uploads/988d91a8-d369-4c6c-b8dd-a2918ee77989.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/1b689538-c600-4194-a0ed-90c12f46128c.jpg"
+        "title": "AI漫剧第五集 丹体",
+        "src": "/open-archive-portfolio/assets/uploads/3679f45a-2863-4bee-8810-547b6605221d.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/b83d8f56-e002-4e98-abc2-ae897e286da8.jpg"
       },
       {
         "id": "item-007f55e8",
-        "title": "32725aa1c9a3a5e2034144d06826f3fb",
-        "src": "/open-archive-portfolio/assets/uploads/dc36c68d-e598-468e-9a1d-9f6cc3c53152.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/43f095c8-9576-41a0-baaa-b39f89dd5062.jpg"
+        "title": "水龙头变装",
+        "src": "/open-archive-portfolio/assets/uploads/4037035b-f371-470e-bb04-4e06dd12efd3.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/7ff331cd-a97c-4733-856e-3d8d668894aa.jpg"
       }
     ]
   }
