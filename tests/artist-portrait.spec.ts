@@ -1,0 +1,42 @@
+import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+import { profileBiography } from '../components/archive/profile-copy';
+for (const width of [1440, 390]) test(`transparent Artist artwork writes left to right at ${width}`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 });
+  const data = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
+  const biography = data.templateProfile.biography;
+  data.stickers = [];
+  data.templateProfile.image = '/assets/artist-portrait.png';
+  await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(data) }));
+  await page.goto('/');
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await page.locator('.archive-scroll-track').evaluate(async el => {
+    const { progressForModule } = await import('/components/archive/timeline.ts');
+    const { portfolioWorks } = await import('/components/archive/content.ts');
+    el.scrollTop = progressForModule('about', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
+  });
+  await page.waitForTimeout(400);
+  await page.locator('.archive-desk-about-main').click();
+  const artwork = page.locator('.artist-portrait');
+  await expect(artwork).toBeVisible();
+  const writing = artwork.locator('clipPath[id$="-writing"] rect');
+  const initial = Number(await writing.getAttribute('width'));
+  await expect.poll(async () => Number(await writing.getAttribute('width'))).toBeGreaterThan(initial);
+  await page.screenshot({ path: `test-results/artist-writing-${width}.png` });
+  await expect.poll(async () => Number(await writing.getAttribute('width')), { timeout: 6000 }).toBe(1416);
+  await page.screenshot({ path: `test-results/artist-complete-${width}.png` });
+  const font = width < 600 ? '13px' : '14px';
+  await expect(page.locator('.profile-about-copy p')).toHaveCSS('font-size', font);
+  await expect(page.locator('.profile-about-copy h3')).toHaveCount(0);
+  await expect(page.locator('.profile-about-copy p')).toHaveText(profileBiography(biography));
+  const artBox = (await artwork.boundingBox())!;
+  const bioBox = (await page.locator('.profile-about-copy').boundingBox())!;
+  expect(bioBox.y).toBeGreaterThanOrEqual(artBox.y + artBox.height);
+  const alpha = await page.evaluate(async () => {
+    const image = new Image(); image.src = '/assets/artist-portrait.png'; await image.decode();
+    const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height;
+    const ctx = canvas.getContext('2d')!; ctx.drawImage(image, 0, 0);
+    return ctx.getImageData(0, 0, 1, 1).data[3];
+  });
+  expect(alpha).toBe(0);
+});

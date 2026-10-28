@@ -1,5 +1,6 @@
 import { contactEmail, contactPhone, otherPortfolioUrl, templateProfile } from './content';
 import { profileBiography } from './profile-copy';
+import ArtistPortrait from './ArtistPortrait';
 
 export default function ResumeDetails() {
   return <article className="archive-resume-details" aria-label="个人介绍">
@@ -14,10 +15,9 @@ export default function ResumeDetails() {
     </header>
     <div className="archive-resume-details-body profile-about-layout">
       <div className="profile-about-image" data-edit-path="templateProfile.image">
-        {templateProfile.image ? <img src={templateProfile.image} alt={templateProfile.name} /> : <span role="img" aria-label="个人图片位" />}
+        {templateProfile.image ? templateProfile.image.endsWith('/artist-portrait.png') ? <ArtistPortrait src={templateProfile.image} name={templateProfile.name} /> : <img src={templateProfile.image} alt={templateProfile.name} /> : <span role="img" aria-label="个人图片位" />}
       </div>
       <section className="profile-about-copy">
-        <h3><span>About</span><span data-edit-path="templateProfile.name">{templateProfile.name}</span></h3>
         <p data-edit-path="templateProfile.biography">{profileBiography(templateProfile.biography)}</p>
       </section>
     </div>

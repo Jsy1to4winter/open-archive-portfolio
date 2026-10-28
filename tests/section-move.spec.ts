@@ -17,10 +17,14 @@ for (const width of [1440, 390]) test(`personal intro and operated accounts have
   });
   await expect(page.locator('.archive-name-slip')).toHaveCount(0);
   await page.locator('.archive-desk-about-main').click();
-  await expect(page.locator('.archive-about-dialog[open] .profile-about-image img')).toBeVisible();
+  await expect(page.locator('.archive-about-dialog[open] .artist-portrait')).toBeVisible();
   await expect(page.locator('.archive-about-dialog .about-photo-gallery')).toHaveCount(0);
-  await expect(page.locator('.profile-about-copy h3')).toContainText(data.templateProfile.name);
-  await expect(page.locator('.profile-about-image')).toHaveCSS('padding', '2px');
+  await expect(page.locator('.profile-about-copy h3')).toHaveCount(0);
+  await expect(page.locator('.profile-about-copy p')).toHaveCSS('font-size', width < 600 ? '13px' : '14px');
+  const art = (await page.locator('.profile-about-image').boundingBox())!;
+  const bio = (await page.locator('.profile-about-copy').boundingBox())!;
+  expect(bio.y).toBeGreaterThanOrEqual(art.y + art.height);
+  await expect(page.locator('.artist-portrait')).toHaveAttribute('viewBox', '0 0 1416 1111');
   const space = await page.locator('.profile-about-layout').evaluate(el => {
     const children = [...el.children].map(child => child.getBoundingClientRect().bottom);
     return el.getBoundingClientRect().bottom - Math.max(...children);

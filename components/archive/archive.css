@@ -256,22 +256,20 @@ body.archive-page-open { background: #f3f3f3; color: #171717; overflow: hidden; 
 .archive-name-slip { height: 192px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; gap: 14px; }
 .archive-name-slip-name { display: block; width: 100%; text-align: center; font: 700 28px/1.4 'Archive Space', sans-serif; overflow-wrap: anywhere; }
 .archive-name-slip-introduction { display: block; min-height: 32px; text-align: center; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
-.profile-about-layout { display: grid; grid-template-columns: minmax(140px, 230px) minmax(0, 1fr); align-items: start; gap: 34px; padding-top: 32px; }
-.profile-about-image { width: 100%; aspect-ratio: 3 / 4; background: #ededed; border-radius: 8px; overflow: hidden; }
-.profile-about-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.profile-about-image { position: relative; padding: 2px; background: linear-gradient(135deg, #f8f8f8 15%, #d93648 35%, #fff 55%, #9b1329 75%, #f8f8f8 95%); background-size: 300% 300%; animation: portrait-frame-flow 6s ease-in-out infinite; box-shadow: 12px 12px 30px #17171718, -8px -8px 24px #fff; }
-.profile-about-image img, .profile-about-image > span { position: relative; display: block; width: 100%; height: 100%; border-radius: 6px; overflow: hidden; }
+.profile-about-layout { padding-top: 32px; }
+.profile-about-image { width: min(100%, 640px); margin: 0 auto; background: transparent; }
+.profile-about-image img { display: block; width: 100%; height: auto; object-fit: contain; }
+.artist-portrait { display: block; width: 100%; height: auto; overflow: visible; }
+.profile-about-image > span { display: block; aspect-ratio: 4 / 3; background: #ededed; border-radius: 8px; }
 .account-homepages-title { margin: 24px 0; font-size: 18px; line-height: 1.5; }
 .archive-about-dialog .archive-resume-details { width: min(860px, calc(100% - 64px)); margin: 0 auto; }
 @media (max-width: 600px) { .archive-about-dialog .archive-resume-details { width: calc(100% - 48px); } }
-@keyframes portrait-frame-flow { 0%, 100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
-@media (prefers-reduced-motion: reduce) { .profile-about-image { animation: none; } }
-.profile-about-copy { min-width: 0; }
+.profile-about-copy { min-width: 0; width: min(100%, 640px); margin: 20px auto 0; }
 .profile-about-copy h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; line-height: 1.5; margin-bottom: 18px; }
 .profile-about-copy h3 > span { font-size: inherit; font-weight: inherit; }
 .profile-about-copy h3::before { content: ''; width: 22px; height: 2px; background: #171717; flex-shrink: 0; }
 .profile-about-copy p { font-size: 14px; line-height: 1.9; color: #444; white-space: pre-line; overflow-wrap: anywhere; }
-@media (max-width: 600px) { .profile-about-layout { grid-template-columns: minmax(92px, .8fr) minmax(0, 1.2fr); gap: 18px; } .profile-about-copy h3 { font-size: 17px; } .profile-about-copy p { font-size: 13px; } .archive-name-slip-name { font-size: 24px; } }
+@media (max-width: 600px) { .profile-about-copy h3 { font-size: 17px; } .profile-about-copy p { font-size: 13px; } .archive-name-slip-name { font-size: 24px; } }
 @container archive-viewport (width < 700px) {
   .archive-intro-header { font-size: 8px; letter-spacing: .2px; }
   .archive-intro-brand { gap: 7px; }
