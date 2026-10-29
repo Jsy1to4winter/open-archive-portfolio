@@ -15,7 +15,7 @@ async function desk(page: Page) {
   });
   await page.goto('/');
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  await page.locator('.archive-scroll-track').evaluate(async el => {
+  if (page.viewportSize()!.width >= 768) await page.locator('.archive-scroll-track').evaluate(async el => {
     const { progressForModule } = await import('/components/archive/timeline.ts');
     const { portfolioWorks } = await import('/components/archive/content.ts');
     el.scrollTop = progressForModule('about', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
@@ -24,7 +24,7 @@ async function desk(page: Page) {
   await page.waitForTimeout(650);
 }
 
-for (const width of [1440, 390]) {
+for (const width of [1440]) {
   test(`visitors can drag the homepage sticker at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await desk(page);
@@ -54,8 +54,8 @@ for (const width of [1440, 390]) {
     expect(edge.x + edge.width).toBeLessThanOrEqual(bounds.x + bounds.width + 1);
     await page.setViewportSize({ width: 360, height: 720 });
     await expect.poll(async () => {
-      const rect = (await sticker.boundingBox())!;
-      return rect.x + rect.width;
+      const rect = await sticker.boundingBox();
+      return rect ? rect.x + rect.width : Infinity;
     }).toBeLessThanOrEqual(351);
     await page.screenshot({ path: `test-results/sticker-${width}.png` });
     await expect(page.locator('.portfolio-editor[open]')).toHaveCount(0);
@@ -68,7 +68,7 @@ test('touch dragging moves the sticker without scrolling the page', async ({ bro
   await desk(page);
   const sticker = page.locator('.homepage-sticker');
   const rect = (await sticker.boundingBox())!;
-  const scroll = await page.locator('.archive-scroll-track').evaluate(el => el.scrollTop);
+  const scroll = await page.locator('.mobile-scroll').evaluate(el => el.scrollTop);
   const cdp = await context.newCDPSession(page);
   const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
@@ -76,7 +76,7 @@ test('touch dragging moves the sticker without scrolling the page', async ({ bro
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await expect.poll(() => page.evaluate(() => (window as any).stickerSounds.length)).toBe(1);
   expect((await sticker.boundingBox())!.y - rect.y).toBeGreaterThan(80);
-  expect(await page.locator('.archive-scroll-track').evaluate(el => el.scrollTop)).toBe(scroll);
+  expect(await page.locator('.mobile-scroll').evaluate(el => el.scrollTop)).toBe(scroll);
   await page.screenshot({ path: 'test-results/sticker-touch.png' });
   await context.close();
 });

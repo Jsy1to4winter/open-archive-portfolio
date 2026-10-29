@@ -1,0 +1,82 @@
+.mobile-portfolio { --mobile-gutter: 56px; --header-height: 68px; --paper: #fff; --ink: #171717; background-color: #f3f3f3; background-image: radial-gradient(#17171724 .8px, transparent .8px); background-size: 22px 22px; }
+.mobile-header { position: absolute; inset: 0 0 auto; height: calc(68px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 116px 0 18px; display: flex; align-items: center; gap: 8px; background: #f3f3f3; z-index: 20; border-bottom: 1px solid #17171710; }
+.mobile-header .mobile-brand { font-size: 22px; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.mobile-header > button:not(.mobile-brand) { width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center; margin-left: auto; }
+.mobile-header > .mobile-brand { text-align: left; min-height: 44px; }
+.mobile-scroll { height: 100%; overflow-y: auto; overflow-x: hidden; padding: calc(86px + env(safe-area-inset-top)) var(--mobile-gutter) calc(24px + env(safe-area-inset-bottom)); overscroll-behavior-y: contain; scroll-padding-top: 86px; }
+.mobile-intro { position: relative; width: 100%; aspect-ratio: 8 / 5; background: #171717; color: white; overflow: hidden; margin-bottom: 30px; border-radius: 6px; }
+.mobile-intro > img, .mobile-intro > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.mobile-intro > img { filter: brightness(.65); }
+.mobile-intro-copy { position: absolute; inset: 18px 16px; pointer-events: none; }
+.mobile-intro-copy > span { font-size: 9px; line-height: 1.4; text-transform: uppercase; }
+.mobile-intro h1 { font-size: 28px; font-weight: 700; line-height: 1.15; margin-top: 12px; overflow-wrap: anywhere; }
+.mobile-intro > button { position: absolute; bottom: 10px; right: 10px; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid #ffffff80; border-radius: 50%; background: #17171799; }
+.mobile-modules { display: grid; gap: 28px; }
+.mobile-module { position: relative; width: 100%; min-width: 0; display: flex; flex-direction: column; min-height: 180px; padding: 22px 18px; background: #fff; color: #171717; text-align: left; border: 0; border-radius: 2px; box-shadow: 4px 5px 0 #17171714; }
+.mobile-module::before { content: ''; position: absolute; top: -6px; left: calc(50% - 25px); width: 50px; height: 12px; background: #171717; transform: rotate(-4deg); pointer-events: none; }
+.mobile-module-number { font-size: 10px; line-height: 1.3; }
+.mobile-module-arrow { position: absolute; right: 16px; top: 18px; }
+.mobile-module h2 { font-size: var(--mobile-title-size, 28px); font-weight: 700; line-height: 1.25; margin-top: 24px; overflow-wrap: anywhere; }
+.mobile-module h2 > span { display: block; }
+.mobile-module p { font-size: 12px; line-height: 1.7; margin-top: 16px; overflow-wrap: anywhere; }
+.mobile-module-fragments { background: #171717; color: #fff; }
+.mobile-module-fragments::before { background: #ccc; }
+.mobile-module-craft { background: #dedede; }
+.mobile-module-perspective, .mobile-module-collaboration { background: #eaeaea; }
+.mobile-module-works > img { width: 100%; height: 180px; object-fit: contain; margin-top: 18px; }
+.mobile-contact-copy { font-size: 11px; line-height: 1.8; margin-top: 18px; overflow-wrap: anywhere; }
+.mobile-contact-copy span { display: block; }
+.mobile-sticker-rail { position: absolute; top: calc(86px + env(safe-area-inset-top)); bottom: calc(24px + env(safe-area-inset-bottom)); width: 48px; pointer-events: none; z-index: 15; }
+.mobile-sticker-left { left: 2px; }
+.mobile-sticker-right { right: 2px; }
+.mobile-sticker-rail .homepage-sticker-bounds { inset: 0; }
+.mobile-sticker-rail .homepage-sticker { width: 48px !important; max-width: 100%; padding: 3px; left: 0; top: 0; }
+.mobile-sticker-rail .homepage-sticker .homepage-sticker-name { font-size: 7px; line-height: 1.1; -webkit-text-stroke-width: 2px; }
+.mobile-sticker-rail .homepage-sticker .homepage-sticker-handle { font-size: 4px; line-height: 1.3; -webkit-text-stroke-width: 1.5px; }
+.mobile-detail-loading { position: absolute; inset: 68px 0 0; z-index: 30; background: #f3f3f3; display: grid; place-items: center; font-size: 14px; }
+.mobile-portfolio .archive-mobile-dialog { inset: 0; transform: none; width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; overflow-x: hidden; overscroll-behavior: contain; box-shadow: none; background: #fff; }
+.mobile-portfolio .archive-mobile-dialog .archive-detail-paper { padding: 0 20px calc(28px + env(safe-area-inset-bottom)); min-height: 100%; overflow: visible; background: #fff; }
+.mobile-portfolio .archive-mobile-dialog .archive-detail-paper::before { display: none; }
+.mobile-detail-actions { position: sticky; top: 0; z-index: 60; display: flex; justify-content: flex-end; gap: 8px; background: #fff; padding: calc(8px + env(safe-area-inset-top)) 0 8px; margin: 0 -4px 16px; }
+.mobile-portfolio .mobile-detail-actions > button { position: static; margin: 0; width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center; }
+.mobile-portfolio .archive-mobile-dialog .archive-detail-paper > h2 { margin: 0 0 24px; padding: 0; font-size: 26px; line-height: 1.35; overflow-wrap: anywhere; }
+.mobile-portfolio .archive-resume-details { width: 100%; }
+.mobile-portfolio .profile-about-layout { padding-top: 24px; }
+.mobile-portfolio .about-photo-introduction { padding: 0; }
+.mobile-portfolio .archive-detail-reason { gap: 12px; padding: 22px 0; }
+.mobile-portfolio .archive-detail-reason > div { min-width: 0; }
+.mobile-portfolio .archive-detail-reason .archive-about-copy { font: 15px/1.9 'Inter', 'PingFang SC', sans-serif; overflow-wrap: anywhere; }
+.mobile-portfolio .archive-reason-interactive > div { opacity: 1 !important; transform: none !important; }
+.mobile-portfolio .archive-detail-contact { font-size: 15px; min-height: 56px; }
+.mobile-portfolio .about-photo-controls button, .mobile-portfolio .account-video-controls button, .mobile-portfolio .archive-lightbox-actions button { min-width: 44px; min-height: 44px; }
+.mobile-portfolio .account-video-runway { height: auto !important; }
+.mobile-portfolio .account-videos { position: relative; top: 0; }
+.mobile-portfolio .account-video-header { padding-right: 0; }
+.mobile-portfolio .account-player-close { width: 44px; height: 44px; }
+.mobile-portfolio .account-video-player { padding-top: 58px; }
+.mobile-portfolio .archive-image-dialog .archive-detail-paper { display: flex; }
+.mobile-portfolio .archive-image-dialog .mobile-detail-actions { flex-shrink: 0; }
+.mobile-data-gallery .swiper { height: min(55dvh, 480px); }
+.mobile-data-gallery .swiper-slide { display: flex; align-items: center; justify-content: center; }
+.mobile-data-gallery img { width: 100%; height: 100%; object-fit: contain; }
+.mobile-data-caption { margin-top: 20px; min-height: 70px; text-align: center; }
+.mobile-data-caption h3 { font-size: 15px; font-weight: 600; line-height: 1.5; }
+.mobile-data-caption p { margin-top: 8px; font-size: 12px; line-height: 1.7; }
+.mobile-data-controls { display: flex; justify-content: center; align-items: center; gap: 18px; padding: 16px 0; }
+.mobile-data-controls button { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid #ddd; border-radius: 4px; }
+.mobile-data-controls button:disabled { opacity: .3; }
+.mobile-data-controls span { font-size: 12px; min-width: 48px; text-align: center; }
+.mobile-portfolio-open .portfolio-music-toggle { top: calc(12px + env(safe-area-inset-top)); right: 60px; width: 44px; height: 44px; }
+.mobile-portfolio-open > #root > .portfolio-edit-trigger { top: calc(12px + env(safe-area-inset-top)); right: 10px; width: 44px; height: 44px; }
+.mobile-portfolio-open .portfolio-editor input, .mobile-portfolio-open .portfolio-editor textarea { font-size: 16px; }
+@media (max-width: 360px) {
+  .mobile-portfolio { --mobile-gutter: 48px; }
+  .mobile-sticker-rail { width: 40px; }
+  .mobile-module { padding: 22px 14px; }
+  .mobile-intro h1 { font-size: 24px; }
+  .mobile-module h2 { font-size: min(var(--mobile-title-size), 28px); }
+}
+@media (orientation: landscape) {
+  .mobile-portfolio { --mobile-gutter: max(64px, calc((100vw - 560px) / 2)); }
+  .mobile-intro { aspect-ratio: 2.5; }
+}

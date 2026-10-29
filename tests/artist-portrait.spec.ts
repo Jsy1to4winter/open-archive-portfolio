@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 import { profileBiography } from '../components/archive/profile-copy';
-for (const width of [1440, 390]) test(`Artist particles react and return without moving the photo at ${width}`, async ({ page }) => {
+for (const width of [1440]) test(`Artist particles react and return without moving the photo at ${width}`, async ({ page }) => {
   await page.setViewportSize({ width, height: 1000 });
   const data = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
   const biography = data.templateProfile.biography;

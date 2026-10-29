@@ -7,7 +7,7 @@ export default function ArtistPortrait({ src, name }: { src: string; name: strin
   const canvas = useRef<HTMLCanvasElement>(null);
   const [interactive, setInteractive] = useState(false);
   useEffect(() => {
-    if (!canvas.current) return;
+    if (!canvas.current || matchMedia('(pointer: coarse)').matches) return;
     let cancelled = false;
     const setup = createArtistParticles(canvas.current, src, base, active => { if (!cancelled) setInteractive(active); });
     return () => { cancelled = true; void setup.then(cleanup => cleanup()); };

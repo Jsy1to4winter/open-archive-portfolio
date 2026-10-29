@@ -55,7 +55,7 @@ export default function BackgroundMusic() {
   }, []);
   const canPause = wanted && (playing || hasAudioFocus());
   return <>
-    <audio ref={media} data-background-music src={`${import.meta.env.BASE_URL}assets/portfolio-background.mp3`} loop preload="auto" onPlaying={() => setPlaying(true)} onPause={() => setPlaying(false)} />
+    <audio ref={media} data-background-music src={`${import.meta.env.BASE_URL}assets/portfolio-background.mp3`} loop preload="metadata" onPlaying={() => setPlaying(true)} onPause={() => setPlaying(false)} />
     <button type="button" className="portfolio-music-toggle" aria-label={canPause ? '暂停背景音乐' : '播放背景音乐'} title={canPause ? (playing ? '暂停背景音乐' : '背景音乐已暂停，作品播放结束后续播') : '播放背景音乐'} aria-pressed={wanted} onClick={() => { enabled.current = !canPause; setWanted(enabled.current); sync.current(); }}>
       {playing ? <Volume2 size={16} /> : <VolumeX size={16} />}
     </button>

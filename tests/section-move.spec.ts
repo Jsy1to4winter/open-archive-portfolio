@@ -10,13 +10,13 @@ for (const width of [1440, 390]) test(`personal intro and operated accounts have
   await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(data) }));
   await page.goto('/');
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  await page.locator('.archive-scroll-track').evaluate(async el => {
+  if (width >= 768) await page.locator('.archive-scroll-track').evaluate(async el => {
     const { progressForModule } = await import('/components/archive/timeline.ts');
     const { portfolioWorks } = await import('/components/archive/content.ts');
     el.scrollTop = progressForModule('about', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
   });
   await expect(page.locator('.archive-name-slip')).toHaveCount(0);
-  await page.locator('.archive-desk-about-main').click();
+  await page.locator(width < 768 ? '.mobile-module-about' : '.archive-desk-about-main').click();
   await expect(page.locator('.archive-about-dialog[open] .artist-portrait')).toBeVisible();
   await expect(page.locator('.archive-about-dialog .about-photo-gallery')).toHaveCount(0);
   await expect(page.locator('.profile-about-copy h3')).toHaveCount(0);
@@ -34,7 +34,8 @@ for (const width of [1440, 390]) test(`personal intro and operated accounts have
   expect(introGap).toBeLessThanOrEqual(32);
   await page.screenshot({ path: `test-results/relocated-profile-${width}.png` });
   await page.getByRole('button', { name: 'Close details', exact: true }).click();
-  await page.locator('.archive-desk-craft').evaluate((el: HTMLElement) => el.click());
+  if (width < 768) await page.locator('.mobile-module-craft').click();
+  else await page.locator('.archive-desk-craft').evaluate((el: HTMLElement) => el.click());
   const dialog = page.locator('.archive-archive-dialog[open]');
   await expect(dialog).toContainText('这是我运营过的账号主页');
   await expect(dialog.locator('.swiper-initialized')).toBeVisible();

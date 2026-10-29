@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 
 const content = JSON.parse(fs.readFileSync("public/content.json", "utf8"));
-for (const width of [1440, 390])
+for (const width of [1440])
   test(`operations gallery and highest-view cover at ${width}px`, async ({
     page,
   }) => {

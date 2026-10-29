@@ -9,6 +9,7 @@ import ReasonEntry from './ReasonEntry';
 import SkillApps from './SkillApps';
 import './about-photos.css';
 import AboutPhotos from './AboutPhotos';
+import MobileDataGallery from './MobileDataGallery';
 
 export type ArchiveDetail =
   | { type: 'module'; id: ModuleId }
@@ -19,9 +20,10 @@ type ArchiveDialogProps = {
   detail: ArchiveDetail | null;
   onClose: () => void;
   onView: (id: string) => void;
+  mobile?: boolean;
 };
 
-export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialogProps) {
+export default function ArchiveDialog({ detail, onClose, onView, mobile = false }: ArchiveDialogProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const module = detail?.type === 'module' ? portfolioModules.find(item => item.id === detail.id) : undefined;
@@ -54,7 +56,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
     <dialog
       ref={dialog}
       data-editor-section={isResume ? 'profile' : work ? 'works' : module?.id}
-      className={`archive-archive-dialog${module?.id === 'about' ? ' archive-about-dialog' : ''}${isResume ? ' archive-resume-dialog' : ''}${work ? ' archive-image-dialog' : ''}${module?.id === 'fragments' ? ' archive-account-dialog' : ''}`}
+      className={`archive-archive-dialog${mobile ? ' archive-mobile-dialog' : ''}${module?.id === 'about' ? ' archive-about-dialog' : ''}${isResume ? ' archive-resume-dialog' : ''}${work ? ' archive-image-dialog' : ''}${module?.id === 'fragments' ? ' archive-account-dialog' : ''}`}
       onClose={event => { if (!event.currentTarget.open) onClose(); }}
       onCancel={event => { event.preventDefault(); requestClose(); }}
       onClick={event => { if (event.target === event.currentTarget) requestClose(); }}
@@ -62,14 +64,17 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
       aria-label={isResume ? 'Profile' : undefined}
     >
       {detail && <div className="archive-detail-paper">
+        <div className={mobile ? 'mobile-detail-actions' : 'archive-detail-actions'}>
         <button className="portfolio-edit-trigger" type="button" aria-label="编辑作品集" title="编辑作品集" onClick={() => window.dispatchEvent(new CustomEvent('portfolio-open-editor', { detail: { section: isResume ? 'profile' : work ? 'works' : module?.id } }))}><Pencil size={14}/></button>
         <button ref={closeButton} type="button" className="archive-detail-close" onClick={requestClose} aria-label="Close details"><X size={20} /></button>
-        {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || (module?.id === 'about' ? '关于我' : module?.id === 'fragments' ? screenText.fragments.title : module?.id === 'perspective' ? screenText.perspective.titleLine1 : module?.label)}</h2>}
+        </div>
+        {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || (module?.id === 'about' ? '关于我' : module?.id === 'fragments' ? screenText.fragments.title : module?.id === 'perspective' ? screenText.perspective.titleLine1 : module?.id === 'works' ? `${screenText.gallery.titleLine1} ${screenText.gallery.titleLine2}` : module?.id === 'craft' ? screenText.craft.titleLine1 : module?.label)}</h2>}
         {module?.id === 'fragments' && <AccountShowcase/>}
         {module?.id === 'about' && <><ResumeDetails /><section className="about-photo-introduction" aria-label="关于我介绍">{moduleCopy.about.slice(0, 2).map((reason, index) => <ReasonEntry key={reason.id} reason={reason} animated={false} large editPath={`moduleCopy.about.${index}`}>{index === 1 && <SkillApps />}</ReasonEntry>)}</section></>}
         {module?.id === 'craft' && <><h3 className="account-homepages-title">这是我运营过的账号主页</h3>{aboutReady && <AboutPhotos />}</>}
-        {module && module.id !== 'fragments' && module.id !== 'about' && module.id !== 'craft' && module.id !== 'collaboration' && selectedReasons.map((reason, index) => <ReasonEntry key={`${module.id}-${reason.id}`} reason={reason} animated={module.id === 'perspective'} large={module.id === 'perspective'} editPath={module.id in moduleCopy ? `moduleCopy.${module.id}.${index}` : undefined} />)}
-        {module?.id === 'works' && <div className="archive-detail-works">
+        {module && module.id !== 'fragments' && module.id !== 'about' && module.id !== 'craft' && module.id !== 'collaboration' && !(mobile && module.id === 'works') && selectedReasons.map((reason, index) => <ReasonEntry key={`${module.id}-${reason.id}`} reason={reason} animated={!mobile && module.id === 'perspective'} large={module.id === 'perspective'} editPath={module.id in moduleCopy ? `moduleCopy.${module.id}.${index}` : undefined} />)}
+        {mobile && module?.id === 'works' && <MobileDataGallery />}
+        {!mobile && module?.id === 'works' && <div className="archive-detail-works">
           {portfolioWorks.map(item => <article key={item.id}>
             <button className="archive-detail-work-button" type="button" onClick={() => onView(item.id)} aria-label={`View ${item.title}`}>
               <img src={item.thumbnail} alt={item.alt} loading="lazy" decoding="async" />
@@ -94,7 +99,7 @@ export default function ArchiveDialog({ detail, onClose, onView }: ArchiveDialog
           <a className="archive-detail-contact" href={`mailto:${contactEmail}`}>{contactEmail}<ArrowUpRight size={18} /></a>
           <a className="archive-detail-contact" href={`tel:${contactPhone}`}>{contactPhone}<ArrowUpRight size={18} /></a>
         </div>}
-        {module?.id === 'works' && <a className="archive-detail-other-works" href={otherPortfolioUrl} target="_blank" rel="noopener noreferrer">Elsewhere<ArrowUpRight size={15} /></a>}
+        {!mobile && module?.id === 'works' && <a className="archive-detail-other-works" href={otherPortfolioUrl} target="_blank" rel="noopener noreferrer">Elsewhere<ArrowUpRight size={15} /></a>}
       </div>}
     </dialog>
   );

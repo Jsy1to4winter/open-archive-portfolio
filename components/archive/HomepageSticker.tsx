@@ -9,11 +9,14 @@ import { createStickerPeel, prepareStickerPeel } from './sticker-peel';
 
 gsap.registerPlugin(Draggable);
 
-export default function HomepageSticker({ visible }: { visible: boolean }) {
+export default function HomepageSticker({ visible, rails = false }: { visible: boolean; rails?: boolean }) {
+  if (rails) return <>{stickers.map((item, index) => <div className={`mobile-sticker-rail mobile-sticker-${index % 2 ? 'right' : 'left'}`} key={item.id} hidden={!visible}>
+    <Sticker visible={visible} item={{ ...item, width: 48, x: 0, y: Math.min(.85, .14 + Math.floor(index / 2) * .28) }} persist={false} index={index} />
+  </div>)}</>;
   return <>{stickers.map((item, index) => <Sticker key={item.id} visible={visible} item={item} index={index} />)}</>;
 }
 
-function Sticker({ visible, item, index }: { visible: boolean; item: HomepageStickerData; index: number }) {
+function Sticker({ visible, item, index, persist = true }: { visible: boolean; item: HomepageStickerData; index: number; persist?: boolean }) {
   const bounds = useRef<HTMLDivElement>(null);
   const sticker = useRef<HTMLButtonElement>(null);
   const drag = useRef<Draggable | null>(null);
@@ -45,12 +48,12 @@ function Sticker({ visible, item, index }: { visible: boolean; item: HomepageSti
       x: width ? Math.min(1, Math.max(0, drag.current.x / width)) : 0,
       y: height ? Math.min(1, Math.max(0, drag.current.y / height)) : 0,
     };
-    window.dispatchEvent(new CustomEvent('portfolio-sticker-move', { detail: { id: item.id, ...position.current } }));
+    if (persist) window.dispatchEvent(new CustomEvent('portfolio-sticker-move', { detail: { id: item.id, ...position.current } }));
   }
 
   useLayoutEffect(() => {
     if (!visible || !sticker.current || !bounds.current) { edgePress.current = null; peel.current?.reset(); return; }
-    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) void prepareStickerPeel().catch(() => {});
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hover: hover) and (pointer: fine)').matches) void prepareStickerPeel().catch(() => {});
     void prepareStickerSound();
     const [instance] = Draggable.create(sticker.current, {
       type: 'x,y',

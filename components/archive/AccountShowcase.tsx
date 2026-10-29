@@ -34,6 +34,7 @@ export default function AccountShowcase() {
       )
     : "视频播放";
   const reduced = useReducedMotion();
+  const touch = matchMedia('(pointer: coarse)').matches;
   const runway = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const posters = useRef<Array<HTMLButtonElement | null>>([]);
@@ -95,7 +96,7 @@ export default function AccountShowcase() {
         };
         draw.current = render;
         render();
-        if (!reduced && videos.length > 1) {
+        if (!reduced && !touch && videos.length > 1) {
           // Scroll only inside this account dialog; animate children of the sticky section.
           const tween = gsap.to(model.current, {
             position: videos.length - 1,
@@ -127,7 +128,7 @@ export default function AccountShowcase() {
       trigger.current = null;
       draw.current = () => {};
     };
-  }, [videos, reduced]);
+  }, [videos, reduced, touch]);
 
   function moveTo(position: number) {
     const count = videos.length;
@@ -146,7 +147,7 @@ export default function AccountShowcase() {
       manualTween.current?.kill();
       manualTween.current = gsap.to(model.current, {
         position,
-        duration: reduced ? 0 : 0.7,
+        duration: reduced ? 0 : touch ? 0.25 : 0.7,
         ease: "power2.inOut",
         onUpdate: () => draw.current(),
         overwrite: false,
@@ -157,7 +158,7 @@ export default function AccountShowcase() {
     moveTo(Math.round(model.current.position) + direction);
 
   useEffect(() => {
-    if (videos.length < 2 || paused || hovered || selected || reduced) return;
+    if (videos.length < 2 || paused || hovered || selected || reduced || touch) return;
     const interval = window.setInterval(() => {
       const bounds = stage.current?.getBoundingClientRect();
       const container = stage.current
@@ -175,7 +176,7 @@ export default function AccountShowcase() {
         stepRef.current(1);
     }, 3000);
     return () => clearInterval(interval);
-  }, [videos.length, paused, hovered, selected, reduced]);
+  }, [videos.length, paused, hovered, selected, reduced, touch]);
 
   useEffect(() => {
     if (selected) {
@@ -336,7 +337,7 @@ export default function AccountShowcase() {
               >
                 <ChevronLeft size={18} />
               </button>
-              <button
+              {!touch && <button
                 type="button"
                 aria-label={paused ? "开始自动滑动" : "暂停自动滑动"}
                 title={paused ? "开始自动滑动" : "暂停自动滑动"}
@@ -344,7 +345,7 @@ export default function AccountShowcase() {
                 onClick={() => setPaused((value) => !value)}
               >
                 {paused || reduced ? <Play size={15} /> : <Pause size={15} />}
-              </button>
+              </button>}
               <button
                 type="button"
                 aria-label="下一个视频"

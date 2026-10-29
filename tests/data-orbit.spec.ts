@@ -21,7 +21,7 @@ test('orbit is initialized before the paper finishes expanding', async ({ page }
   await expect(page.locator('.data-orbit')).toHaveAttribute('data-prepared', 'yes');
 });
 
-for (const viewport of [{ width: 1440, height: 857 }, { width: 390, height: 769 }]) {
+for (const viewport of [{ width: 1440, height: 857 }]) {
   test(`homepage data card opens rotating gallery at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport);
     const content = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
@@ -53,7 +53,7 @@ for (const viewport of [{ width: 1440, height: 857 }, { width: 390, height: 769 
   });
 }
 
-for (const width of [1440, 390]) test(`3D data rotation, pause and lightbox at ${width}px`, async ({ page }) => {
+for (const width of [1440]) test(`3D data rotation, pause and lightbox at ${width}px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 900 });
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));

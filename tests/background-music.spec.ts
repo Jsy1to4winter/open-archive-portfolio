@@ -44,6 +44,8 @@ for (const width of [1440, 390]) test(`video dialog suspends music until closed 
   await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(content) }));
   const music = await start(page);
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  if (width < 768) await page.locator('.mobile-module-fragments').click();
+  else {
   await page.locator('.archive-scroll-track').evaluate(async el => {
     const { progressForModule } = await import('/components/archive/timeline.ts');
     const { portfolioWorks } = await import('/components/archive/content.ts');
@@ -51,6 +53,7 @@ for (const width of [1440, 390]) test(`video dialog suspends music until closed 
   });
   await page.waitForTimeout(700);
   await page.locator('.archive-desk-fragments .archive-desk-card-arrow').click();
+  }
   await page.locator('.account-video-poster').click();
   await expect(page.locator('.account-video-player[open]')).toBeVisible();
   await expect(music).toHaveJSProperty('paused', true);

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
-for (const width of [1440, 390]) test(`edge peels stay anchored and center moves without curling at ${width}`, async ({ page }) => {
+for (const width of [1440]) test(`edge peels stay anchored and center moves without curling at ${width}`, async ({ page }) => {
   await page.setViewportSize({ width, height: 900 });
   const data = JSON.parse(fs.readFileSync('public/content.json', 'utf8'));
   data.stickers = [
@@ -91,28 +91,33 @@ test('touch peel returns without scrolling the page', async ({ browser, baseURL 
   await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(data) }));
   await page.goto('/');
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  await page.locator('.archive-scroll-track').evaluate(async el => {
-    const { progressForModule } = await import('/components/archive/timeline.ts');
-    const { portfolioWorks } = await import('/components/archive/content.ts');
-    el.scrollTop = progressForModule('about', portfolioWorks.length) * (el.scrollHeight - el.clientHeight);
-  });
+  await page.locator('.mobile-portfolio').waitFor();
+  const scroller = page.locator('.mobile-scroll');
   await page.waitForTimeout(700);
   const sticker = page.locator('.homepage-sticker');
   await sticker.tap();
   await expect(sticker.locator('.homepage-sticker-peel')).toHaveAttribute('data-ready', 'true', { timeout: 60000 });
   await expect(sticker.locator('.homepage-sticker-peel')).toHaveAttribute('data-progress', '0');
   const rect = (await sticker.boundingBox())!;
-  const x = rect.x + 12, y = rect.y + rect.height / 2;
-  const scroll = await page.locator('.archive-scroll-track').evaluate(el => el.scrollTop);
+  const x = rect.x + 4, y = rect.y + rect.height / 2;
+  const scroll = await scroller.evaluate(el => el.scrollTop);
   const cdp = await context.newCDPSession(page);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
   for (let i = 1; i <= 8; i++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x + i * 2, y: y + i * 8 }] });
   await expect(sticker).toHaveAttribute('data-peel-active', 'true');
+  const ink = await sticker.locator('canvas').evaluate((canvas: HTMLCanvasElement) => {
+    const gl = canvas.getContext('webgl2')!;
+    const pixels = new Uint8Array(canvas.width * canvas.height * 4);
+    gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+    let count = 0; for (let i = 3; i < pixels.length; i += 4) if (pixels[i]) count++;
+    return count;
+  });
+  expect(ink).toBeGreaterThan(10);
   await page.screenshot({ path: 'test-results/peel-touch.png' });
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await expect(sticker.locator('.homepage-sticker-peel')).toHaveAttribute('data-progress', '0');
   expect((await sticker.boundingBox())!.x).toBeCloseTo(rect.x, 1);
   expect((await sticker.boundingBox())!.y).toBeCloseTo(rect.y, 1);
-  expect(await page.locator('.archive-scroll-track').evaluate(el => el.scrollTop)).toBe(scroll);
+  expect(await scroller.evaluate(el => el.scrollTop)).toBe(scroll);
   await context.close();
 });

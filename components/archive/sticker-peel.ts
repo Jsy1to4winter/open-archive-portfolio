@@ -16,6 +16,10 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
   const pose = { value: 0 };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let motion: StickerPlaybackMotion = { origin: { x: 0, y: .5 }, target: { x: 1, y: .5 } };
+  const padding = () => {
+    const style = getComputedStyle(button);
+    return { x: parseFloat(style.paddingLeft) + parseFloat(style.paddingRight), y: parseFloat(style.paddingTop) + parseFloat(style.paddingBottom) };
+  };
   const paint = () => {
     if (!instance || disposed || reduced.matches) return;
     try {
@@ -25,7 +29,8 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
     } catch { reset(); }
   };
   const resize = () => {
-    const width = Math.max(1, button.clientWidth - 20), height = Math.max(1, button.clientHeight - 20);
+    const inset = padding();
+    const width = Math.max(1, button.clientWidth - inset.x), height = Math.max(1, button.clientHeight - inset.y);
     const artWidth = Math.min(width, height * ratio);
     instance?.setOptions({ display: { width: artWidth, height: artWidth / ratio } });
     instance?.resize();
@@ -91,7 +96,8 @@ export function createStickerPeel(button: HTMLButtonElement, host: HTMLDivElemen
   return {
     hit(clientX: number, clientY: number) {
       const rect = button.getBoundingClientRect();
-      const width = Math.min(rect.width - 20, (rect.height - 20) * ratio);
+      const inset = padding();
+      const width = Math.min(rect.width - inset.x, (rect.height - inset.y) * ratio);
       const height = width / ratio;
       const x = (clientX - rect.x - (rect.width - width) / 2) / width;
       const y = (clientY - rect.y - (rect.height - height) / 2) / height;
