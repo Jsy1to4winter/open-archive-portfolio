@@ -9,16 +9,16 @@
       "width": 204
     },
     {
-      "x": 0.5768974338412189,
-      "y": 0.45818141025641024,
+      "x": 0.5749603712671509,
+      "y": 0.41798040201005027,
       "id": "item-5bbecbac",
       "name": "新贴纸",
       "image": "/open-archive-portfolio/assets/uploads/8727471d-148b-4fee-ba2b-5b64420fd461.png",
       "width": 261
     },
     {
-      "x": 0.9291612788632326,
-      "y": 0.9710842105263157,
+      "x": 0.9320032859680284,
+      "y": 0.9364092879256966,
       "id": "item-dfea6be7",
       "name": "新贴纸",
       "image": "/open-archive-portfolio/assets/uploads/3780b134-4cc5-4ea7-b228-9cae3e12f25f.png",
@@ -219,13 +219,13 @@
       "bodyLine2": "A place to begin again."
     },
     "fragments": {
-      "title": "AI短视频",
-      "subtitle": "多赛道视频聚合",
+      "title": "萌宠AI短视频",
+      "subtitle": "萌宠赛道",
       "description": "The daily life of cats"
     },
     "craft": {
-      "titleLine1": "个人运营账号合集",
-      "titleLine2": "Collection",
+      "titleLine1": "多赛道AI视频",
+      "titleLine2": "个人运营账号合集",
       "description": "Like/Fans/Ideas",
       "note": "A practice in progress."
     },
@@ -240,7 +240,7 @@
       "titleLine2": "hello"
     },
     "gallery": {
-      "titleLine1": "运营数据展示",
+      "titleLine1": "视频数据展示",
       "titleLine2": "（仅部分）",
       "minimalTitle": "Work.",
       "bodyLine1": "",
@@ -443,5 +443,60 @@
     "perspective": 39,
     "gallery": 42,
     "collaboration": 26
-  }
+  },
+  "accountVideoGroups": [
+    {
+      "id": "pets",
+      "title": "萌宠赛道视频",
+      "videos": []
+    },
+    {
+      "id": "life",
+      "title": "生活类赛道视频",
+      "videos": [
+        {
+          "id": "item-492796ed",
+          "title": "变装",
+          "src": "/open-archive-portfolio/assets/uploads/5d3e2d26-eac0-45c3-8852-65d5ee742dee.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/2cc2f09f-3489-43bc-9f10-bc0478cec345.jpg"
+        },
+        {
+          "id": "item-9edc64b7",
+          "title": "视频节点 1 - 副本(3)",
+          "src": "/open-archive-portfolio/assets/uploads/7c7ba093-5f55-4273-8bca-02ee4a89cb25.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/33f8a81c-d1f0-43d3-b8e5-4990410355a8.jpg"
+        },
+        {
+          "id": "item-51a424ba",
+          "title": "大幅度俯拍视角",
+          "src": "/open-archive-portfolio/assets/uploads/a40daf8b-0043-49db-9dfa-33263fa4fcce.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/be1c7bdc-b690-44d7-b43e-1fd528f119b5.jpg"
+        },
+        {
+          "id": "item-e37f738d",
+          "title": "普通人",
+          "src": "/open-archive-portfolio/assets/uploads/880decf6-67a7-483c-a273-cb9d296bc580.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/5cf2f20c-7666-4176-b226-55615c7c3628.jpg"
+        }
+      ]
+    },
+    {
+      "id": "ai-drama",
+      "title": "AI漫剧类赛道视频",
+      "videos": [
+        {
+          "id": "item-c245a306",
+          "title": "AI漫剧第五集 丹体",
+          "src": "/open-archive-portfolio/assets/uploads/4997f89d-ec11-4b69-9ea4-bdc74360785d.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/e68edb92-3d81-4375-8884-0c5265e10036.jpg"
+        },
+        {
+          "id": "item-91462920",
+          "title": "第3集_第三集 新来的伙计",
+          "src": "/open-archive-portfolio/assets/uploads/d8e9bc5d-028e-473f-9c16-6895cd8f6e37.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/2a0153aa-fefa-4a7b-9c2d-4c4e410edf07.jpg"
+        }
+      ]
+    }
+  ]
 }
