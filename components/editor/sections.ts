@@ -12,5 +12,5 @@ export function sectionForPath(path: Array<string | number>): EditorSection | nu
   if (root === 'introMedia' || (root === 'templateProfile' && ['brand', 'discipline'].includes(String(path[1])))) return 'intro';
   if (root === 'screenText') return ({ intro: 'intro', about: 'about', fragments: 'fragments', craft: 'craft', perspective: 'perspective', gallery: 'works', collaboration: 'collaboration', profile: 'about' } as Record<string, EditorSection>)[String(path[1])] ?? null;
   if (root === 'moduleCopy') return String(path[1]) as EditorSection;
-  return ({ aboutPhotos: 'craft', accountMedia: 'fragments', portfolioWorks: 'works', templateProfile: 'about', contactEmail: 'collaboration', contactPhone: 'collaboration', stickers: 'stickers' } as Record<string, EditorSection>)[root] ?? null;
+  return ({ aboutPhotos: 'craft', accountVideoGroups: 'craft', accountMedia: 'fragments', portfolioWorks: 'works', templateProfile: 'about', contactEmail: 'collaboration', contactPhone: 'collaboration', stickers: 'stickers' } as Record<string, EditorSection>)[root] ?? null;
 }

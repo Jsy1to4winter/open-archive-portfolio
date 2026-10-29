@@ -33,6 +33,7 @@ import { MAX_ACCOUNT_VIDEOS } from "../archive/account-media";
 import { sections, sectionTitle, sectionForPath, type EditorSection } from './sections';
 import { profileBiography } from '../archive/profile-copy';
 import { contentDigest, isDeployed, type DeploymentStatus } from './deployment';
+import { VIDEOS_PER_GROUP, MAX_GROUPED_VIDEOS } from '../archive/account-video-groups';
 
 const labels: Record<string, string> = {
   aboutPhotos: '运营过的账号主页',
@@ -225,7 +226,7 @@ export default function PortfolioEditor() {
       if (
         !(target instanceof Element) ||
         target.closest(
-          ".portfolio-editor,.portfolio-edit-trigger,.account-video-poster,.account-video-controls,.account-video-player,.homepage-sticker,.archive-reason-interactive,.about-photo-gallery,.archive-name-slip,.artist-particles",
+          ".portfolio-editor,.portfolio-edit-trigger,.account-video-poster,.account-video-controls,.account-video-player,.account-group-video,.account-group-arrows,.group-video-player,.homepage-sticker,.archive-reason-interactive,.about-photo-gallery,.archive-name-slip,.artist-particles",
         )
       )
         return null;
@@ -330,7 +331,7 @@ export default function PortfolioEditor() {
     data.stickers.forEach(item => { item.image = urls.current.get(item.image) ?? item.image; });
     data.accountMedia.image =
       urls.current.get(data.accountMedia.image) ?? data.accountMedia.image;
-    for (const item of data.accountMedia.videos) {
+    for (const item of [...data.accountMedia.videos, ...data.accountVideoGroups.flatMap(group => group.videos)]) {
       item.src = urls.current.get(item.src) ?? item.src;
       item.poster = urls.current.get(item.poster) ?? item.poster;
     }
@@ -498,7 +499,7 @@ export default function PortfolioEditor() {
       }
       let bytes = new Uint8Array(await file.arrayBuffer());
       let generatedPoster: { address: string; upload: Upload } | null = null;
-      if (video && ['accountMedia', 'introMedia'].includes(String(path[0]))) {
+      if (video && ['accountMedia', 'accountVideoGroups', 'introMedia'].includes(String(path[0]))) {
         let poster: Blob | null;
         try {
           poster = await videoPoster(
@@ -545,7 +546,7 @@ export default function PortfolioEditor() {
       setDraft((previous) => {
         let next = replace(previous, path, address);
         if (video && path[0] === 'introMedia' && generatedPoster) next = replace(next, ['introMedia', 'poster'], generatedPoster.address);
-        if (video && path[0] === "accountMedia") {
+        if (video && ['accountMedia', 'accountVideoGroups'].includes(String(path[0]))) {
           const titlePath = [...path.slice(0, -1), "title"];
           if (!get(next, titlePath))
             next = replace(next, titlePath, file.name.replace(/\.[^.]+$/, ""));
@@ -587,7 +588,10 @@ export default function PortfolioEditor() {
 
   function field(value: unknown, path: Path): React.ReactNode {
     const key = String(path[path.length - 1]);
+    const videoList = ['accountMedia', 'accountVideoGroups'].includes(String(path[0])) && key === 'videos';
+    const videoLimit = path[0] === 'accountVideoGroups' ? VIDEOS_PER_GROUP : MAX_ACCOUNT_VIDEOS;
     const name =
+      path[0] === 'accountVideoGroups' && key === 'title' ? '赛道名称' :
       path[0] === 'templateProfile' && key === 'image' ? '个人图片' :
       path[0] === "accountMedia" && key === "image"
         ? "账号截图"
@@ -608,11 +612,11 @@ export default function PortfolioEditor() {
       <input id={`field-${path.join('-')}`} type="range" min="12" max="120" step="1" value={Number(value)} onChange={event => update(path, Number(event.target.value))} />
     </div>;
     if (path[0] === 'portfolioWorks' && ['width', 'height', 'thumbnail', 'category', 'alt'].includes(key)) return null;
-    if (path[0] === 'accountMedia' && path[1] === 'videos' && path.length === 3 && value && typeof value === 'object') {
+    if (((path[0] === 'accountMedia' && path[1] === 'videos' && path.length === 3) || (path[0] === 'accountVideoGroups' && path[2] === 'videos' && path.length === 4)) && value && typeof value === 'object') {
       const item = value as { src: string; poster: string };
       const source = urls.current.get(item.src) ?? item.src;
       return <div className="editor-video-upload" key={path.join('.')}>
-        {source && <video controls playsInline preload="metadata" src={source} poster={urls.current.get(item.poster) ?? (item.poster || undefined)} />}
+        {source && <video controls playsInline preload={path[0] === 'accountVideoGroups' ? 'none' : 'metadata'} src={source} poster={urls.current.get(item.poster) ?? (item.poster || undefined)} />}
         <label className="editor-upload"><UploadIcon size={15} />{source ? '替换视频' : '上传视频'}
           <input type="file" accept="video/mp4,video/webm" onChange={event => { const file = event.target.files?.[0]; if (file) void upload(file, [...path, 'src']); event.target.value = ''; }} />
         </label>
@@ -631,9 +635,9 @@ export default function PortfolioEditor() {
           <div className="editor-list-heading">
             <h3>
               {name}
-              {path[0] === "accountMedia" && key === "videos" && (
+              {videoList && (
                 <small className="editor-video-count">
-                  {value.length} / {MAX_ACCOUNT_VIDEOS}
+                  {value.length} / {videoLimit}
                 </small>
               )}
             </h3>
@@ -642,15 +646,11 @@ export default function PortfolioEditor() {
               title={`添加${name}`}
               aria-label={`添加${name}`}
               disabled={
-                path[0] === "accountMedia" &&
-                key === "videos" &&
-                value.length >= MAX_ACCOUNT_VIDEOS
+                videoList && value.length >= videoLimit
               }
               onClick={() => {
                 if (
-                  path[0] === "accountMedia" &&
-                  key === "videos" &&
-                  value.length >= MAX_ACCOUNT_VIDEOS
+                  videoList && value.length >= videoLimit
                 )
                   return;
                 const sample =
@@ -658,7 +658,7 @@ export default function PortfolioEditor() {
                   path[0] === 'stickers'
                     ? { id: '', name: '新贴纸', image: '', width: 220, x: 0.5, y: 0.05 }
                     :
-                  path[0] === "accountMedia" && key === "videos"
+                  videoList
                     ? { id: "", title: "", src: "", poster: "" }
                     : (value[0] ?? "");
                 const item =
@@ -723,7 +723,7 @@ export default function PortfolioEditor() {
                       value.length <= 1 &&
                       path[0] !== 'aboutPhotos' &&
                       path[0] !== 'stickers' &&
-                      !(path[0] === "accountMedia" && key === "videos")
+                      !videoList
                     }
                     onClick={() =>
                       update(
@@ -841,7 +841,13 @@ export default function PortfolioEditor() {
       {Object.entries(text).filter(([key]) => tab !== 'works' || ['titleLine1', 'titleLine2', 'bodyLine1', 'bodyLine2'].includes(key)).map(([key, value]) => field(value, ['screenText', group, key]))}
       {tab === 'about' && <>{(['name', 'image', 'biography', 'disciplines', 'location'] as const).map(key => field(key === 'biography' ? profileBiography(draft.templateProfile[key]) : draft.templateProfile[key], ['templateProfile', key]))}{renderCopy('about')}</>}
       {tab === 'fragments' && <>{field(draft.accountMedia.image, ['accountMedia', 'image'])}{field(draft.accountMedia.caption, ['accountMedia', 'caption'])}{field(draft.accountMedia.videos, ['accountMedia', 'videos'])}</>}
-      {tab === 'craft' && field(draft.aboutPhotos, ['aboutPhotos'])}
+      {tab === 'craft' && <>{field(draft.aboutPhotos, ['aboutPhotos'])}
+        <h3 className="editor-screen-group-title">赛道视频 <small>{draft.accountVideoGroups.reduce((sum, group) => sum + group.videos.length, 0)} / {MAX_GROUPED_VIDEOS}</small></h3>
+        {draft.accountVideoGroups.map((group, index) => <section className="editor-track-group" key={group.id} aria-label={`赛道 ${index + 1}`}>
+          {field(group.title, ['accountVideoGroups', index, 'title'])}
+          {field(group.videos, ['accountVideoGroups', index, 'videos'])}
+        </section>)}
+      </>}
       {tab === 'perspective' && renderCopy('perspective')}
       {tab === 'works' && field(draft.portfolioWorks, ['portfolioWorks'])}
       {tab === 'collaboration' && <>{field(draft.contactEmail, ['contactEmail'])}{field(draft.contactPhone, ['contactPhone'])}</>}

@@ -10,6 +10,7 @@ import SkillApps from './SkillApps';
 import './about-photos.css';
 import AboutPhotos from './AboutPhotos';
 import MobileDataGallery from './MobileDataGallery';
+import AccountVideoGroups from './AccountVideoGroups';
 
 export type ArchiveDetail =
   | { type: 'module'; id: ModuleId }
@@ -56,7 +57,7 @@ export default function ArchiveDialog({ detail, onClose, onView, mobile = false 
     <dialog
       ref={dialog}
       data-editor-section={isResume ? 'profile' : work ? 'works' : module?.id}
-      className={`archive-archive-dialog${mobile ? ' archive-mobile-dialog' : ''}${module?.id === 'about' ? ' archive-about-dialog' : ''}${isResume ? ' archive-resume-dialog' : ''}${work ? ' archive-image-dialog' : ''}${module?.id === 'fragments' ? ' archive-account-dialog' : ''}`}
+      className={`archive-archive-dialog${module?.id === 'craft' ? ' archive-craft-dialog' : ''}${mobile ? ' archive-mobile-dialog' : ''}${module?.id === 'about' ? ' archive-about-dialog' : ''}${isResume ? ' archive-resume-dialog' : ''}${work ? ' archive-image-dialog' : ''}${module?.id === 'fragments' ? ' archive-account-dialog' : ''}`}
       onClose={event => { if (!event.currentTarget.open) onClose(); }}
       onCancel={event => { event.preventDefault(); requestClose(); }}
       onClick={event => { if (event.target === event.currentTarget) requestClose(); }}
@@ -71,7 +72,7 @@ export default function ArchiveDialog({ detail, onClose, onView, mobile = false 
         {isResume ? <ResumeDetails /> : <h2 id="archive-detail-title">{work?.title || (module?.id === 'about' ? '关于我' : module?.id === 'fragments' ? screenText.fragments.title : module?.id === 'perspective' ? screenText.perspective.titleLine1 : module?.id === 'works' ? `${screenText.gallery.titleLine1} ${screenText.gallery.titleLine2}` : module?.id === 'craft' ? screenText.craft.titleLine1 : module?.label)}</h2>}
         {module?.id === 'fragments' && <AccountShowcase/>}
         {module?.id === 'about' && <><ResumeDetails /><section className="about-photo-introduction" aria-label="关于我介绍">{moduleCopy.about.slice(0, 2).map((reason, index) => <ReasonEntry key={reason.id} reason={reason} animated={false} large editPath={`moduleCopy.about.${index}`}>{index === 1 && <SkillApps />}</ReasonEntry>)}</section></>}
-        {module?.id === 'craft' && <><h3 className="account-homepages-title">这是我运营过的账号主页</h3>{aboutReady && <AboutPhotos />}</>}
+        {module?.id === 'craft' && <><h3 className="account-homepages-title">这是我运营过的账号主页</h3>{aboutReady && <AboutPhotos />}<AccountVideoGroups /></>}
         {module && module.id !== 'fragments' && module.id !== 'about' && module.id !== 'craft' && module.id !== 'collaboration' && !(mobile && module.id === 'works') && selectedReasons.map((reason, index) => <ReasonEntry key={`${module.id}-${reason.id}`} reason={reason} animated={!mobile && module.id === 'perspective'} large={module.id === 'perspective'} editPath={module.id in moduleCopy ? `moduleCopy.${module.id}.${index}` : undefined} />)}
         {mobile && module?.id === 'works' && <MobileDataGallery />}
         {!mobile && module?.id === 'works' && <div className="archive-detail-works">

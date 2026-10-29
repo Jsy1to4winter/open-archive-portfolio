@@ -3,6 +3,7 @@ import { splitModuleCopy } from './module-copy';
 import { defaultStickers } from './stickers';
 import { defaultScreenText } from "./screen-text";
 import { defaultAccountMedia, MAX_ACCOUNT_VIDEOS } from "./account-media";
+import { defaultAccountVideoGroups, MAX_VIDEO_GROUPS, VIDEOS_PER_GROUP, MAX_GROUPED_VIDEOS } from './account-video-groups';
 export type { Reason, PortfolioWork } from "./default-content";
 
 export const defaultContent = {
@@ -11,6 +12,7 @@ export const defaultContent = {
   aboutPhotos: [] as Array<{ id: string; title: string; image: string; caption: string }>,
   stickers: defaultStickers,
   accountMedia: defaultAccountMedia,
+  accountVideoGroups: defaultAccountVideoGroups,
   screenText: defaultScreenText,
   templateProfile: defaults.templateProfile,
   contactEmail: defaults.contactEmail,
@@ -38,6 +40,7 @@ export function normalizeContent(value: unknown): SiteContent {
       source.accountMedia === undefined
         ? structuredClone(defaultAccountMedia)
         : source.accountMedia,
+    accountVideoGroups: source.accountVideoGroups === undefined ? structuredClone(defaultAccountVideoGroups) : source.accountVideoGroups,
     screenText:
       source.screenText === undefined
         ? structuredClone(defaultScreenText)
@@ -83,6 +86,12 @@ export function validateContent(value: unknown): asserts value is SiteContent {
     throw new Error('贴纸名称、图片或尺寸无效，宽度须在 64 至 600 像素之间。');
   if (data.accountMedia.videos.length > MAX_ACCOUNT_VIDEOS)
     throw new Error(`视频作品最多可以放 ${MAX_ACCOUNT_VIDEOS} 个。`);
+  const groups = data.accountVideoGroups;
+  if (groups.length !== MAX_VIDEO_GROUPS || new Set(groups.map(group => group.id)).size !== groups.length || groups.some(group => !group.id || !group.title.trim() || group.videos.length > VIDEOS_PER_GROUP))
+    throw new Error(`账号展示须保留 ${MAX_VIDEO_GROUPS} 个赛道并填写名称，每个赛道最多 ${VIDEOS_PER_GROUP} 个视频。`);
+  const groupedVideos = groups.flatMap(group => group.videos);
+  if (groupedVideos.length > MAX_GROUPED_VIDEOS || !groupedVideos.every(video => video && ['id', 'title', 'src', 'poster'].every(key => typeof (video as Record<string, unknown>)[key] === 'string') && video.id && video.src.trim()) || new Set(groupedVideos.map(video => video.id)).size !== groupedVideos.length)
+    throw new Error(`请为每个赛道视频上传文件，并保留唯一编号，总计最多 ${MAX_GROUPED_VIDEOS} 个。`);
   if (
     !data.accountMedia.videos.every(
       (video) =>
@@ -129,6 +138,7 @@ export function validateContent(value: unknown): asserts value is SiteContent {
     ...data.stickers.map(item => item.image),
     data.accountMedia.image,
     ...data.accountMedia.videos.flatMap((video) => [video.src, video.poster]),
+    ...groupedVideos.flatMap(video => [video.src, video.poster]),
     data.templateProfile.website,
     ...data.reasons.map((item) => item.source),
     ...data.portfolioWorks.flatMap((item) => [item.image, item.thumbnail]),
@@ -165,6 +175,7 @@ export let moduleCopy = loaded.moduleCopy;
 export let aboutPhotos = loaded.aboutPhotos;
 export let stickers = loaded.stickers;
 export let accountMedia = loaded.accountMedia;
+export let accountVideoGroups = loaded.accountVideoGroups;
 export let screenText = loaded.screenText;
 export let contactEmail = loaded.contactEmail;
 export let contactPhone = loaded.contactPhone;
@@ -181,6 +192,7 @@ export function currentContent(): SiteContent {
     aboutPhotos,
     stickers,
     accountMedia,
+    accountVideoGroups,
     screenText,
     templateProfile,
     contactEmail,
@@ -200,6 +212,7 @@ export function applyContent(data: SiteContent) {
     aboutPhotos,
     stickers,
     accountMedia,
+    accountVideoGroups,
     screenText,
     templateProfile,
     contactEmail,
