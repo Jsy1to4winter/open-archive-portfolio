@@ -519,7 +519,38 @@
     {
       "id": "pets",
       "title": "萌宠赛道视频",
-      "videos": []
+      "videos": [
+        {
+          "id": "pets-copy-20261030-1",
+          "title": "视频 01",
+          "src": "/open-archive-portfolio/assets/uploads/bf996714-b576-41d0-b150-6092a6939ba0.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/6fce7a6d-33b5-4a25-9d99-121aed0d430f.jpg"
+        },
+        {
+          "id": "pets-copy-20261030-2",
+          "title": "视频 02",
+          "src": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-2.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-2.jpg"
+        },
+        {
+          "id": "pets-copy-20261030-3",
+          "title": "视频 03",
+          "src": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-3.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-3.jpg"
+        },
+        {
+          "id": "pets-copy-20261030-4",
+          "title": "视频 04",
+          "src": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-4.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-4.jpg"
+        },
+        {
+          "id": "pets-copy-20261030-5",
+          "title": "视频 05",
+          "src": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-1.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-1.jpg"
+        }
+      ]
     }
   ]
 }
