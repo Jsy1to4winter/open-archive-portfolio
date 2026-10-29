@@ -5,7 +5,7 @@ const original = JSON.parse(fs.readFileSync('public/content.json', 'utf8').repla
 const clip = '/assets/uploads/0c55efa3-231c-45b7-9820-f2c7266a3ea9-h264.mp4';
 const poster = '/assets/uploads/0c55efa3-231c-45b7-9820-f2c7266a3ea9-poster.jpg';
 function fixture() {
-  return { ...structuredClone(original), stickers: [], accountVideoGroups: ['萌宠赛道视频', '生活类赛道视频', 'AI漫剧类赛道视频'].map((title, group) => ({ id: `group-${group}`, title, videos: Array.from({ length: 10 }, (_, i) => ({ id: `video-${group}-${i}`, title: '', src: clip, poster })) })) };
+  return { ...structuredClone(original), stickers: [], accountVideoGroups: ['剧情类赛道视频', 'AI漫剧类赛道视频', '生活类赛道视频', '萌宠赛道视频'].map((title, group) => ({ id: ['story', 'ai-drama', 'life', 'pets'][group], title, videos: Array.from({ length: 10 }, (_, i) => ({ id: `video-${group}-${i}`, title: '', src: clip, poster })) })) };
 }
 async function openCraft(page: Page, mobile: boolean) {
   if (mobile) await page.locator('.mobile-module-craft').click();
@@ -20,7 +20,7 @@ async function openCraft(page: Page, mobile: boolean) {
   await expect(page.locator('.archive-craft-dialog[open]')).toBeVisible();
 }
 
-for (const width of [1440, 390]) test(`30 grouped videos follow the accounts and browse independently at ${width}`, async ({ browser, baseURL }) => {
+for (const width of [1440, 390]) test(`40 grouped videos follow the accounts and browse independently at ${width}`, async ({ browser, baseURL }) => {
   const mobile = width < 768;
   const context = await browser.newContext({ baseURL, viewport: { width, height: 900 }, isMobile: mobile, hasTouch: mobile });
   const page = await context.newPage();
@@ -33,8 +33,8 @@ for (const width of [1440, 390]) test(`30 grouped videos follow the accounts and
   const dialog = page.locator('.archive-craft-dialog[open]');
   await expect(dialog.locator('.about-photo-gallery .swiper-initialized')).toBeVisible();
   const rows = dialog.locator('.account-video-group');
-  await expect(rows).toHaveCount(3);
-  await expect(dialog.locator('.account-group-video')).toHaveCount(30);
+  await expect(rows).toHaveCount(4);
+  await expect(dialog.locator('.account-group-video')).toHaveCount(40);
   const accounts = (await dialog.locator('.about-photo-gallery').boundingBox())!;
   const accountImage = dialog.locator('.about-photo-gallery .swiper-slide-active img');
   await expect.poll(() => accountImage.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
@@ -62,7 +62,7 @@ for (const width of [1440, 390]) test(`30 grouped videos follow the accounts and
     await expect(page.locator('.group-video-player[open]')).toHaveCount(0);
     expect(await rows.nth(1).locator('.swiper').evaluate(el => (el as HTMLElement & { swiper: { activeIndex: number } }).swiper.activeIndex)).toBe(0);
   }
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
     const row = rows.nth(i);
     await expect(row.getByRole('heading')).toHaveText(data.accountVideoGroups[i].title);
     await expect(row.locator('.swiper-slide')).toHaveCount(10);
@@ -101,28 +101,33 @@ test('legacy content migrates without moving existing videos; invalid group size
   await page.goto('/');
   const legacy = structuredClone(original);
   delete legacy.accountVideoGroups;
-  const result = await page.evaluate(async old => {
+  const previousGroups = ['pets', 'life', 'ai-drama'].map((id, i) => ({ id, title: `自定义赛道 ${i}`, videos: [{ id: `retained-${i}`, title: '原视频', src: clip, poster }] }));
+  const result = await page.evaluate(async ({ old, previousGroups }) => {
     const { normalizeContent, validateContent } = await import('/components/archive/content.ts');
     const migrated = normalizeContent(old);
     const errors: string[] = [];
     const video = { id: 'sample', title: '', src: '/valid.mp4', poster: '' };
-    for (const variant of ['eleven', 'four', 'unsafe']) {
+    for (const variant of ['eleven', 'five', 'unsafe']) {
       const changed = structuredClone(migrated);
       if (variant === 'eleven') changed.accountVideoGroups[0].videos = Array.from({ length: 11 }, (_, i) => ({ ...video, id: String(i) }));
-      if (variant === 'four') changed.accountVideoGroups.push({ id: 'four', title: 'four', videos: [] });
+      if (variant === 'five') changed.accountVideoGroups.push({ id: 'five', title: 'five', videos: [] });
       if (variant === 'unsafe') changed.accountVideoGroups[0].videos = [{ ...video, src: 'javascript:alert(1)' }];
       try { validateContent(changed); } catch { errors.push(variant); }
     }
-    return { groups: migrated.accountVideoGroups, existing: migrated.accountMedia, photos: migrated.aboutPhotos, errors };
-  }, legacy);
-  expect(result.groups).toHaveLength(3);
+    const ordered = normalizeContent({ ...old, accountVideoGroups: previousGroups }).accountVideoGroups;
+    return { groups: migrated.accountVideoGroups, ordered, existing: migrated.accountMedia, photos: migrated.aboutPhotos, errors };
+  }, { old: legacy, previousGroups });
+  expect(result.groups).toHaveLength(4);
   expect(result.groups.every(group => !group.videos.length)).toBe(true);
   expect(result.existing).toEqual(original.accountMedia);
   expect(result.photos).toEqual(original.aboutPhotos);
-  expect(result.errors).toEqual(['eleven', 'four', 'unsafe']);
+  expect(result.errors).toEqual(['eleven', 'five', 'unsafe']);
+  expect(result.ordered.map(group => group.id)).toEqual(['story', 'ai-drama', 'life', 'pets']);
+  expect(result.ordered[0].videos).toEqual([]);
+  for (const previous of previousGroups) expect(result.ordered.find(group => group.id === previous.id)).toEqual(previous);
 });
 
-test('owner uploads the thirtieth video, renames a track and publishes only its own content', async ({ page }) => {
+test('owner uploads the fortieth video, renames a track and publishes only its own content', async ({ page }) => {
   const data = fixture(); data.accountVideoGroups[0].videos.pop();
   const writes: Array<{ url: string; body: Record<string, unknown> }> = [];
   const root = 'https://api.github.com/repos/Jsy1to4winter/open-archive-portfolio';
@@ -143,8 +148,8 @@ test('owner uploads the thirtieth video, renames a track and publishes only its 
   await page.getByRole('button', { name: '登录', exact: true }).click();
   await page.getByRole('tab').nth(2).click();
   const groups = page.locator('.editor-track-group');
-  await expect(groups).toHaveCount(3);
-  await page.locator('#field-accountVideoGroups-0-title').fill('宠物日常视频');
+  await expect(groups).toHaveCount(4);
+  await page.locator('#field-accountVideoGroups-0-title').fill('剧情短片');
   await groups.first().getByRole('button', { name: '添加视频作品' }).click();
   await expect(groups.first().getByRole('button', { name: '添加视频作品' })).toBeDisabled();
   await groups.first().locator('input[type=file]').last().setInputFiles(`public${clip}`);
@@ -155,8 +160,8 @@ test('owner uploads the thirtieth video, renames a track and publishes only its 
   await page.getByRole('button', { name: '保存发布', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('已保存到 GitHub', { timeout: 20000 });
   const saved = JSON.parse(Buffer.from(writes.filter(write => write.url.endsWith('/git/blobs')).at(-1)!.body.content as string, 'base64').toString());
-  expect(saved.accountVideoGroups.map((group: { videos: unknown[] }) => group.videos.length)).toEqual([10, 10, 10]);
-  expect(saved.accountVideoGroups[0].title).toBe('宠物日常视频');
+  expect(saved.accountVideoGroups.map((group: { videos: unknown[] }) => group.videos.length)).toEqual([10, 10, 10, 10]);
+  expect(saved.accountVideoGroups[0].title).toBe('剧情短片');
   expect(saved.accountVideoGroups[0].videos[9].poster).toMatch(/assets\/uploads\/.*\.jpg$/);
   expect(saved.accountVideoGroups[0].videos[9].src).toMatch(/assets\/uploads\/.*\.mp4$/);
   expect(JSON.stringify(saved)).not.toContain('blob:');

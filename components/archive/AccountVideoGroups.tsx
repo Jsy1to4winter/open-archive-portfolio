@@ -26,7 +26,7 @@ function VideoRow({ group, onOpen }: { group: AccountVideoGroup; onOpen: (select
         <button type="button" aria-label={`${group.title} 下一页`} title="向右翻看" disabled={edges.end} onClick={() => slider.current?.slideNext()}><ChevronRight size={20} /></button>
       </div>
     </header>
-    <Swiper modules={[A11y, FreeMode, Mousewheel]} slidesPerView="auto" spaceBetween={16} freeMode={{ enabled: true, sticky: true }} mousewheel={{ forceToAxis: true, releaseOnEdges: true }} grabCursor
+    {group.videos.length ? <Swiper modules={[A11y, FreeMode, Mousewheel]} slidesPerView="auto" spaceBetween={16} freeMode={{ enabled: true, sticky: true }} mousewheel={{ forceToAxis: true, releaseOnEdges: true }} grabCursor
       onSwiper={swiper => { slider.current = swiper; sync(swiper); }} onProgress={sync} onResize={sync} onSlideChange={sync}
       onKeyDown={event => {
         if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
@@ -44,7 +44,7 @@ function VideoRow({ group, onOpen }: { group: AccountVideoGroup; onOpen: (select
           </button>
         </SwiperSlide>;
       })}
-    </Swiper>
+    </Swiper> : <p className="account-group-empty">暂无视频</p>}
   </section>;
 }
 
@@ -68,8 +68,7 @@ export default function AccountVideoGroups() {
     setSelected(null);
     opener.current?.focus({ preventScroll: true });
   };
-  const groups = accountVideoGroups.filter(group => group.videos.length);
-  if (!groups.length) return null;
+  const groups = accountVideoGroups;
   return <div className="account-video-groups">
     {groups.map(group => <VideoRow group={group} key={group.id} onOpen={(selection, element) => { opener.current = element; setError(''); setSelected(selection); }} />)}
     <dialog ref={player} className="group-video-player" aria-label={selected?.label || '赛道视频播放'}

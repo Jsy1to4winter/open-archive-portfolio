@@ -3,7 +3,7 @@ import { splitModuleCopy } from './module-copy';
 import { defaultStickers } from './stickers';
 import { defaultScreenText } from "./screen-text";
 import { defaultAccountMedia, MAX_ACCOUNT_VIDEOS } from "./account-media";
-import { defaultAccountVideoGroups, MAX_VIDEO_GROUPS, VIDEOS_PER_GROUP, MAX_GROUPED_VIDEOS } from './account-video-groups';
+import { defaultAccountVideoGroups, normalizeAccountVideoGroups, MAX_VIDEO_GROUPS, VIDEOS_PER_GROUP, MAX_GROUPED_VIDEOS } from './account-video-groups';
 export type { Reason, PortfolioWork } from "./default-content";
 
 export const defaultContent = {
@@ -40,7 +40,7 @@ export function normalizeContent(value: unknown): SiteContent {
       source.accountMedia === undefined
         ? structuredClone(defaultAccountMedia)
         : source.accountMedia,
-    accountVideoGroups: source.accountVideoGroups === undefined ? structuredClone(defaultAccountVideoGroups) : source.accountVideoGroups,
+    accountVideoGroups: normalizeAccountVideoGroups(source.accountVideoGroups),
     screenText:
       source.screenText === undefined
         ? structuredClone(defaultScreenText)
