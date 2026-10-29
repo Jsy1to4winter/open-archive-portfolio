@@ -268,39 +268,33 @@
     "videos": [
       {
         "id": "item-6ecf7606",
-        "title": "变装",
-        "src": "/open-archive-portfolio/assets/uploads/61d87c66-faf4-4590-8180-b20b2119924b.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/8148026e-dc9d-4bee-a40d-be7de3e8f8e4.jpg"
+        "title": "视频 01",
+        "src": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-1.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-1.jpg"
       },
       {
         "id": "item-a0ffdfec",
-        "title": "AI漫剧《一纸婚书》",
-        "src": "/open-archive-portfolio/assets/uploads/d45567b0-8e1a-44dd-a70f-13ff94a36965.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/f3ac1daf-9c0e-4b83-9c28-275ae023e85d.jpg"
+        "title": "视频 02",
+        "src": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-2.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-2.jpg"
       },
       {
         "id": "item-520b7ef4",
-        "title": "32725aa1c9a3a5e2034144d06826f3fb",
-        "src": "/open-archive-portfolio/assets/uploads/8b5bdf20-1168-4e8e-bc84-9d401d923b05.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/107c6a22-8a23-4861-a94b-5a959ddbb835.jpg"
+        "title": "视频 03",
+        "src": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-3.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-3.jpg"
       },
       {
         "id": "item-a2bc2e59",
-        "title": "生活化场景",
-        "src": "/open-archive-portfolio/assets/uploads/05d4f293-2f37-4969-8774-652d507b8701.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/933e3591-9c5b-425b-a0e5-9505d98867c5.jpg"
+        "title": "视频 04",
+        "src": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-4.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-4.jpg"
       },
       {
         "id": "item-c48fe813",
-        "title": "AI漫剧第五集 丹体",
-        "src": "/open-archive-portfolio/assets/uploads/3679f45a-2863-4bee-8810-547b6605221d.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/b83d8f56-e002-4e98-abc2-ae897e286da8.jpg"
-      },
-      {
-        "id": "item-007f55e8",
-        "title": "水龙头变装",
-        "src": "/open-archive-portfolio/assets/uploads/4037035b-f371-470e-bb04-4e06dd12efd3.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/7ff331cd-a97c-4733-856e-3d8d668894aa.jpg"
+        "title": "视频 05",
+        "src": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-1.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-1.jpg"
       }
     ]
   },
