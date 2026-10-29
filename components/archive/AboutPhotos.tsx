@@ -27,7 +27,7 @@ export default function AboutPhotos() {
         </button>
       </SwiperSlide>)}
     </Swiper>
-    <div className="about-photo-caption" aria-live="polite"><h3>{aboutPhotos[index]?.title}</h3><p>{aboutPhotos[index]?.caption}</p></div>
+    {(aboutPhotos[index]?.title || aboutPhotos[index]?.caption) && <div className="about-photo-caption" aria-live="polite"><h3>{aboutPhotos[index]?.title}</h3><p>{aboutPhotos[index]?.caption}</p></div>}
     <nav className="about-photo-controls" aria-label="切换运营账号主页">
       <button type="button" aria-label="上一个账号主页" title="上一张" disabled={index === 0} onClick={() => swiper.current?.slidePrev()}><ChevronLeft size={20} /></button>
       <span aria-live="polite">{String(index + 1).padStart(2, '0')} / {String(aboutPhotos.length).padStart(2, '0')}</span>

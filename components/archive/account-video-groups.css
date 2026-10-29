@@ -1,4 +1,4 @@
-.account-video-groups { margin-top: 36px; min-width: 0; }
+.account-video-groups { margin-top: 24px; min-width: 0; }
 .account-video-group { padding: 28px 0; border-top: 1px solid #ddd; min-width: 0; }
 .account-video-group > header { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 18px; }
 .account-video-group h3 { flex: 1 1 200px; min-width: 0; font-size: 19px; font-weight: 650; line-height: 1.5; overflow-wrap: anywhere; }

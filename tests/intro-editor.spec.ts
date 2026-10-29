@@ -17,7 +17,7 @@ for (const width of [1440, 390]) test(`intro texts and video can be replaced at 
   });
   await page.goto('/');
   await expect(page.locator('.archive-intro-credit')).toHaveCount(0);
-  await expect(page.locator('.archive-intro-footer')).not.toContainText('BY KAKI');
+  if (width >= 768) await expect(page.locator('.archive-intro-footer')).not.toContainText('BY KAKI');
   await page.getByRole('button', { name: '编辑作品集', exact: true }).click();
   await page.getByLabel('编辑凭证', { exact: true }).fill('test-only-not-a-token');
   await page.getByRole('button', { name: '登录', exact: true }).click();
@@ -30,9 +30,14 @@ for (const width of [1440, 390]) test(`intro texts and video can be replaced at 
   await expect(page.getByRole('status')).toContainText('文件已加入草稿');
   await expect(page.locator('.editor-video-upload video')).toHaveJSProperty('videoWidth', 1056);
   await page.getByRole('button', { name: '预览', exact: true }).click();
-  await expect(page.locator('.archive-screen-eyebrow')).toHaveText('MY STUDIO / MY WORK');
-  await expect(page.locator('.archive-screen-title')).toContainText('My creative');
-  await expect(page.locator('.archive-computer-screen video')).toHaveJSProperty('videoWidth', 1056);
+  if (width >= 768) {
+    await expect(page.locator('.archive-screen-eyebrow')).toHaveText('MY STUDIO / MY WORK');
+    await expect(page.locator('.archive-screen-title')).toContainText('My creative');
+    await expect(page.locator('.archive-computer-screen video')).toHaveJSProperty('videoWidth', 1056);
+  } else {
+    await expect(page.locator('.mobile-brand')).toHaveText('MY STUDIO');
+    await expect(page.locator('.mobile-intro')).toHaveCount(0);
+  }
   await page.screenshot({ path: `test-results/intro-edited-${width}.png` });
   await page.getByRole('button', { name: '编辑作品集', exact: true }).click();
   await page.getByRole('button', { name: '保存发布', exact: true }).click();

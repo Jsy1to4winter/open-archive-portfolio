@@ -4,13 +4,6 @@
 .mobile-header > button:not(.mobile-brand) { width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center; margin-left: auto; }
 .mobile-header > .mobile-brand { text-align: left; min-height: 44px; }
 .mobile-scroll { height: 100%; overflow-y: auto; overflow-x: hidden; padding: calc(86px + env(safe-area-inset-top)) var(--mobile-gutter) calc(24px + env(safe-area-inset-bottom)); overscroll-behavior-y: contain; scroll-padding-top: 86px; }
-.mobile-intro { position: relative; width: 100%; aspect-ratio: 8 / 5; background: #171717; color: white; overflow: hidden; margin-bottom: 30px; border-radius: 6px; }
-.mobile-intro > img, .mobile-intro > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.mobile-intro > img { filter: brightness(.65); }
-.mobile-intro-copy { position: absolute; inset: 18px 16px; pointer-events: none; }
-.mobile-intro-copy > span { font-size: 9px; line-height: 1.4; text-transform: uppercase; }
-.mobile-intro h1 { font-size: 28px; font-weight: 700; line-height: 1.15; margin-top: 12px; overflow-wrap: anywhere; }
-.mobile-intro > button { position: absolute; bottom: 10px; right: 10px; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid #ffffff80; border-radius: 50%; background: #17171799; }
 .mobile-modules { display: grid; gap: 28px; }
 .mobile-module { position: relative; width: 100%; min-width: 0; display: flex; flex-direction: column; min-height: 180px; padding: 22px 18px; background: #fff; color: #171717; text-align: left; border: 0; border-radius: 2px; box-shadow: 4px 5px 0 #17171714; }
 .mobile-module::before { content: ''; position: absolute; top: -6px; left: calc(50% - 25px); width: 50px; height: 12px; background: #171717; transform: rotate(-4deg); pointer-events: none; }
@@ -73,10 +66,8 @@
   .mobile-portfolio { --mobile-gutter: 48px; }
   .mobile-sticker-rail { width: 40px; }
   .mobile-module { padding: 22px 14px; }
-  .mobile-intro h1 { font-size: 24px; }
   .mobile-module h2 { font-size: min(var(--mobile-title-size), 28px); }
 }
 @media (orientation: landscape) {
   .mobile-portfolio { --mobile-gutter: max(64px, calc((100vw - 560px) / 2)); }
-  .mobile-intro { aspect-ratio: 2.5; }
 }

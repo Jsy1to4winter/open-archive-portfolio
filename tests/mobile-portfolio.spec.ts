@@ -12,6 +12,9 @@ for (const width of [320, 390, 430]) test(`touch portfolio has reachable modules
   await page.route('**/content.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(data) }));
   await page.goto('/');
   await expect(page.locator('.mobile-module')).toHaveCount(6);
+  await expect(page.locator('.mobile-intro')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '播放展示视频' })).toHaveCount(0);
+  expect((await page.locator('.mobile-module-about').boundingBox())!.y).toBeLessThan(110);
   await page.waitForTimeout(500);
   expect(requests.filter(url => /\.mp4(?:\?|$)|sticker-forge|\/three|artist-portrait|artist-particles|ffmpeg-core/.test(url))).toEqual([]);
   await expect(page.locator('.archive-desk-camera')).toHaveCount(0);

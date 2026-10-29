@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties } from 'react';
-import { ArrowUpRight, Mail, Play } from 'lucide-react';
-import { contactEmail, contactPhone, introMedia, portfolioWorks, screenText, templateProfile, titleSizes } from './content';
+import { ArrowUpRight, Mail } from 'lucide-react';
+import { contactEmail, contactPhone, portfolioWorks, screenText, templateProfile, titleSizes } from './content';
 import type { ArchiveDetail } from './ArchiveDialog';
 import type { ModuleId } from './timeline';
 import HomepageSticker from './HomepageSticker';
@@ -11,7 +11,6 @@ const ArchiveDialog = lazy(() => import('./ArchiveDialog'));
 export default function MobilePortfolio() {
   const [detail, setDetail] = useState<ArchiveDetail | null>(null);
   const [dialogLoaded, setDialogLoaded] = useState(false);
-  const [playIntro, setPlayIntro] = useState(false);
   const scroller = useRef<HTMLElement>(null);
   const opener = useRef<HTMLElement | null>(null);
   const scrollTop = useRef(0);
@@ -24,7 +23,6 @@ export default function MobilePortfolio() {
   function open(id: ModuleId) {
     opener.current = document.activeElement as HTMLElement | null;
     scrollTop.current = scroller.current?.scrollTop ?? 0;
-    setPlayIntro(false);
     setDialogLoaded(true);
     setDetail({ type: 'module', id });
   }
@@ -49,13 +47,6 @@ export default function MobilePortfolio() {
       <button type="button" aria-label="Say hello" title="Say hello" onClick={() => open('collaboration')}><Mail size={19} /></button>
     </header>
     <main ref={scroller} className="mobile-scroll" id="mobile-top" aria-label="个人作品集" inert={detail !== null}>
-      <section className="mobile-intro" aria-label="展示页">
-        {playIntro ? <video src={introMedia.src ?? undefined} poster={introMedia.poster ?? undefined} muted autoPlay controls playsInline preload="metadata" /> : <>
-          {introMedia.poster && <img src={introMedia.poster} alt="" width="640" height="400" decoding="async" fetchPriority="high" />}
-          <div className="mobile-intro-copy"><span data-edit-path="screenText.intro.selectedWork">{screenText.intro.selectedWork}</span><h1><span data-edit-path="screenText.intro.titleLine1">{screenText.intro.titleLine1}</span><br /><span data-edit-path="screenText.intro.titleLine2">{screenText.intro.titleLine2}</span></h1></div>
-          {introMedia.src && <button type="button" title="播放展示视频" aria-label="播放展示视频" onClick={() => setPlayIntro(true)}><Play size={20} fill="currentColor" /></button>}
-        </>}
-      </section>
       <div className="mobile-modules">
         {cards.map((card, index) => <button key={card.id} type="button" className={`mobile-module mobile-module-${card.id}`} data-module={card.id} onClick={() => open(card.id)} aria-label={card.title.filter(Boolean).join(' ')}>
           <span className="mobile-module-number">{String(index + 1).padStart(2, '0')}</span><ArrowUpRight size={20} className="mobile-module-arrow" aria-hidden="true" />

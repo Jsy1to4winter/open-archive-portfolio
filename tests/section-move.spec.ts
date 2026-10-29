@@ -38,8 +38,8 @@ for (const width of [1440, 390]) test(`personal intro and operated accounts have
   else await page.locator('.archive-desk-craft').evaluate((el: HTMLElement) => el.click());
   const dialog = page.locator('.archive-archive-dialog[open]');
   await expect(dialog).toContainText('这是我运营过的账号主页');
-  await expect(dialog.locator('.swiper-initialized')).toBeVisible();
-  await expect(dialog.locator('.swiper-slide')).toHaveCount(data.aboutPhotos.length);
+  await expect(dialog.locator('.about-photo-gallery .swiper-initialized')).toBeVisible();
+  await expect(dialog.locator('.about-photo-gallery .swiper-slide')).toHaveCount(data.aboutPhotos.length);
   await expect(dialog.locator('.archive-detail-reason')).toHaveCount(0);
   const index = await dialog.locator('.about-photo-controls span').textContent();
   await dialog.getByRole('button', { name: '下一个账号主页', exact: true }).click();

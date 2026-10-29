@@ -268,7 +268,7 @@ body.archive-page-open { background: #f3f3f3; color: #171717; overflow: hidden; 
 @media (prefers-reduced-motion: reduce) { .artist-particles, .artist-static-layer { display: none; } .artist-motion-fallback { display: inline; } }
 @media (max-width: 600px) { .profile-about-image { width: min(100%, 300px); } }
 .profile-about-image > span { display: block; aspect-ratio: 4 / 3; background: #ededed; border-radius: 8px; }
-.account-homepages-title { margin: 24px 0; font-size: 18px; line-height: 1.5; }
+.account-homepages-title { margin: 14px 0; font-size: 16px; line-height: 1.5; }
 .archive-about-dialog .archive-resume-details { width: min(860px, calc(100% - 64px)); margin: 0 auto; }
 @media (max-width: 600px) { .archive-about-dialog .archive-resume-details { width: calc(100% - 48px); } }
 .profile-about-copy { min-width: 0; width: min(100%, 640px); margin: 20px auto 0; }

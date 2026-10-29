@@ -35,6 +35,9 @@ import { profileBiography } from '../archive/profile-copy';
 import { contentDigest, isDeployed, type DeploymentStatus } from './deployment';
 import { VIDEOS_PER_GROUP, MAX_GROUPED_VIDEOS } from '../archive/account-video-groups';
 
+const MAX_VIDEO_UPLOAD_MB = 35;
+const MAX_VIDEO_UPLOAD_BYTES = MAX_VIDEO_UPLOAD_MB * 1024 * 1024;
+
 const labels: Record<string, string> = {
   aboutPhotos: '运营过的账号主页',
   stickers: "贴纸",
@@ -470,9 +473,9 @@ export default function PortfolioEditor() {
             ? "请选择 MP4 或 WebM 视频。"
             : "请选择 JPG、PNG、WebP、GIF 或 AVIF 图片。",
         );
-      if (file.size > (video ? 20 : 8) * 1024 * 1024)
+      if (file.size > (video ? MAX_VIDEO_UPLOAD_BYTES : 8 * 1024 * 1024))
         throw new Error(
-          video ? "视频请控制在 20 MB 以内。" : "图片请控制在 8 MB 以内。",
+          video ? `视频请控制在 ${MAX_VIDEO_UPLOAD_MB} MB 以内。` : "图片请控制在 8 MB 以内。",
         );
       const ext = (
         {
@@ -517,8 +520,8 @@ export default function PortfolioEditor() {
             throw error;
           const { convertVideo } = await import("./convert-video");
           file = await convertVideo(file, setMessage);
-          if (file.size > 20 * 1024 * 1024)
-            throw new Error("转换后视频超过 20 MB，请压缩或缩短后重试。");
+          if (file.size > MAX_VIDEO_UPLOAD_BYTES)
+            throw new Error(`转换后视频超过 ${MAX_VIDEO_UPLOAD_MB} MB，请压缩或缩短后重试。`);
           URL.revokeObjectURL(objectUrl);
           objectUrl = URL.createObjectURL(file);
           urls.current.set(address, objectUrl);

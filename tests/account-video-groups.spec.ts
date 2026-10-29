@@ -36,6 +36,16 @@ for (const width of [1440, 390]) test(`30 grouped videos follow the accounts and
   await expect(rows).toHaveCount(3);
   await expect(dialog.locator('.account-group-video')).toHaveCount(30);
   const accounts = (await dialog.locator('.about-photo-gallery').boundingBox())!;
+  const accountImage = dialog.locator('.about-photo-gallery .swiper-slide-active img');
+  await expect.poll(() => accountImage.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+  const imageRect = (await accountImage.boundingBox())!;
+  expect(imageRect.height).toBeLessThanOrEqual(mobile ? 190 : 220);
+  expect(imageRect.width).toBeLessThanOrEqual(mobile ? 160 : 190);
+  expect((await rows.first().boundingBox())!.y).toBeLessThan(650);
+  await expect(dialog.locator('.about-photo-gallery')).toHaveCSS('opacity', '1');
+  await accountImage.evaluate((el: HTMLImageElement) => el.decode());
+  await rows.first().locator('img').first().evaluate((el: HTMLImageElement) => el.decode());
+  await page.screenshot({ path: `test-results/compact-accounts-${width}.png` });
   expect((await rows.first().boundingBox())!.y).toBeGreaterThanOrEqual(accounts.y + accounts.height);
   expect(requests).toEqual([]);
   if (mobile) {
@@ -89,6 +99,8 @@ for (const width of [1440, 390]) test(`30 grouped videos follow the accounts and
 
 test('legacy content migrates without moving existing videos; invalid group sizes are rejected', async ({ page }) => {
   await page.goto('/');
+  const legacy = structuredClone(original);
+  delete legacy.accountVideoGroups;
   const result = await page.evaluate(async old => {
     const { normalizeContent, validateContent } = await import('/components/archive/content.ts');
     const migrated = normalizeContent(old);
@@ -102,7 +114,7 @@ test('legacy content migrates without moving existing videos; invalid group size
       try { validateContent(changed); } catch { errors.push(variant); }
     }
     return { groups: migrated.accountVideoGroups, existing: migrated.accountMedia, photos: migrated.aboutPhotos, errors };
-  }, original);
+  }, legacy);
   expect(result.groups).toHaveLength(3);
   expect(result.groups.every(group => !group.videos.length)).toBe(true);
   expect(result.existing).toEqual(original.accountMedia);
