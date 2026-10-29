@@ -269,8 +269,8 @@
       {
         "id": "item-6ecf7606",
         "title": "视频 01",
-        "src": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-1.mp4",
-        "poster": "/open-archive-portfolio/assets/uploads/portfolio-video-20261030-1.jpg"
+        "src": "/open-archive-portfolio/assets/uploads/bf996714-b576-41d0-b150-6092a6939ba0.mp4",
+        "poster": "/open-archive-portfolio/assets/uploads/6fce7a6d-33b5-4a25-9d99-121aed0d430f.jpg"
       },
       {
         "id": "item-a0ffdfec",
@@ -440,9 +440,27 @@
   },
   "accountVideoGroups": [
     {
-      "id": "pets",
-      "title": "萌宠赛道视频",
+      "id": "story",
+      "title": "剧情类赛道视频",
       "videos": []
+    },
+    {
+      "id": "ai-drama",
+      "title": "AI漫剧类赛道视频",
+      "videos": [
+        {
+          "id": "item-c245a306",
+          "title": "AI漫剧第五集 丹体",
+          "src": "/open-archive-portfolio/assets/uploads/4997f89d-ec11-4b69-9ea4-bdc74360785d.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/e68edb92-3d81-4375-8884-0c5265e10036.jpg"
+        },
+        {
+          "id": "item-91462920",
+          "title": "第3集_第三集 新来的伙计",
+          "src": "/open-archive-portfolio/assets/uploads/d8e9bc5d-028e-473f-9c16-6895cd8f6e37.mp4",
+          "poster": "/open-archive-portfolio/assets/uploads/2a0153aa-fefa-4a7b-9c2d-4c4e410edf07.jpg"
+        }
+      ]
     },
     {
       "id": "life",
@@ -475,22 +493,9 @@
       ]
     },
     {
-      "id": "ai-drama",
-      "title": "AI漫剧类赛道视频",
-      "videos": [
-        {
-          "id": "item-c245a306",
-          "title": "AI漫剧第五集 丹体",
-          "src": "/open-archive-portfolio/assets/uploads/4997f89d-ec11-4b69-9ea4-bdc74360785d.mp4",
-          "poster": "/open-archive-portfolio/assets/uploads/e68edb92-3d81-4375-8884-0c5265e10036.jpg"
-        },
-        {
-          "id": "item-91462920",
-          "title": "第3集_第三集 新来的伙计",
-          "src": "/open-archive-portfolio/assets/uploads/d8e9bc5d-028e-473f-9c16-6895cd8f6e37.mp4",
-          "poster": "/open-archive-portfolio/assets/uploads/2a0153aa-fefa-4a7b-9c2d-4c4e410edf07.jpg"
-        }
-      ]
+      "id": "pets",
+      "title": "萌宠赛道视频",
+      "videos": []
     }
   ]
 }
