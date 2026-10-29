@@ -9,8 +9,8 @@
       "width": 204
     },
     {
-      "x": 0.5615004842615012,
-      "y": 0.4445062814070352,
+      "x": 0.5768974338412189,
+      "y": 0.45818141025641024,
       "id": "item-5bbecbac",
       "name": "新贴纸",
       "image": "/open-archive-portfolio/assets/uploads/8727471d-148b-4fee-ba2b-5b64420fd461.png",
@@ -437,8 +437,8 @@
     ]
   },
   "titleSizes": {
-    "about": 76,
-    "fragments": 72,
+    "about": 52,
+    "fragments": 49,
     "craft": 37,
     "perspective": 39,
     "gallery": 42,
